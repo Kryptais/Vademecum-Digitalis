@@ -36,6 +36,21 @@ public class CharacterSheet
     public int InitiativeBasis { get; set; } = 0;
     public int Geschwindigkeit { get; set; } = 8;
 
+    // Modifikatoren für Basiswert-Kalkulation
+    public int LebensenergieZukauf { get; set; } = 0;
+    public int LebensenergieBoni { get; set; } = 0;
+    public int SeelenkraftZukauf { get; set; } = 0;
+    public int SeelenkraftBoni { get; set; } = 0;
+    public int ZähigkeitZukauf { get; set; } = 0;
+    public int ZähigkeitBoni { get; set; } = 0;
+    public int InitiativeBasisZukauf { get; set; } = 0;
+    public int InitiativeBasisBoni { get; set; } = 0;
+    public int GeschwindigkeitZukauf { get; set; } = 0;
+    public int GeschwindigkeitBoni { get; set; } = 0;
+
+    // Spezieskosten
+    public int SpeziesApKosten { get; set; } = 0;
+
     // V1-Felder laut Anforderungen
     public int AbenteuerpunkteGesamt { get; set; } = 1100;
     public int AbenteuerpunkteVerfuegbar { get; set; } = 0;
