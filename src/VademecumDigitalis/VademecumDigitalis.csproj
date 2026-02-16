@@ -18,7 +18,10 @@
     <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
 
-    <TargetPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</TargetPlatformVersion>
+    <!-- Use a stable Android SDK path so accepted licenses are reused and not asked repeatedly. -->
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_SDK_ROOT)' != ''">$(ANDROID_SDK_ROOT)</AndroidSdkDirectory>
+    <AndroidSdkDirectory Condition="'$(AndroidSdkDirectory)' == '' and '$(ANDROID_HOME)' != ''">$(ANDROID_HOME)</AndroidSdkDirectory>
+
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
     <TargetPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</TargetPlatformVersion>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
@@ -35,10 +38,6 @@
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
     <MauiImage Include="Resources\Images\*" />
     <MauiImage Remove="Resources\Images\.gitkeep" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
   </ItemGroup>
 
   <ItemGroup>
