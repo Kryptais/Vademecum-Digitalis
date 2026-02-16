@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.MainPage"
+             Title="Charakterbogen">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="16">
+            <Label Text="Vademecum Digitalis"
+                   FontSize="28"
+                   FontAttributes="Bold" />
+            <Label Text="Digitaler DSA-5-Charakterbogen (Hauptblatt)"
+                   FontSize="16"
+                   TextColor="#4B5563" />
+
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Hauptattribute (immer im Blick)" FontSize="18" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="2" Text="IN" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="3" Text="CH" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="4" Text="FF" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="5" Text="GE" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold" HorizontalOptions="Center" />
+
+                        <Entry Grid.Row="1" Grid.Column="0" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Mut}" />
+                        <Entry Grid.Row="1" Grid.Column="1" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Klugheit}" />
+                        <Entry Grid.Row="1" Grid.Column="2" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Intuition}" />
+                        <Entry Grid.Row="1" Grid.Column="3" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Charisma}" />
+                        <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Fingerfertigkeit}" />
+                        <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Gewandtheit}" />
+                        <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Konstitution}" />
+                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Körperkraft}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Charakterinfos" FontSize="18" FontAttributes="Bold" />
+
+                    <Label Text="Name" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Name" Text="{Binding Name}" />
+
+                    <Label Text="Spieler" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Spieler" Text="{Binding Spieler}" />
+
+                    <Label Text="Spezies" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Spezies" Text="{Binding Spezies}" />
+
+                    <Label Text="Kultur" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Kultur" Text="{Binding Kultur}" />
+
+                    <Label Text="Profession" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Profession" Text="{Binding Profession}" />
+
+                    <Label Text="Geschlecht" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Geschlecht" Text="{Binding Geschlecht}" />
+
+                    <Label Text="Geburtstag" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="z. B. 12. Rahja 1038 BF" Text="{Binding Geburtstag}" />
+
+                    <Label Text="Alter" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Alter" Text="{Binding Alter}" />
+
+                    <Label Text="Größe" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Größe" Text="{Binding Größe}" />
+
+                    <Label Text="Gewicht" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Gewicht" Text="{Binding Gewicht}" />
+
+                    <Label Text="Haarfarbe" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Haarfarbe" Text="{Binding Haarfarbe}" />
+
+                    <Label Text="Augenfarbe" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Augenfarbe" Text="{Binding Augenfarbe}" />
+
+                    <Label Text="Sozialstatus" FontAttributes="Bold" FontSize="13" />
+                    <Entry Placeholder="Sozialstatus" Text="{Binding Sozialstatus}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Basiswerte" FontSize="18" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Label Grid.Row="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Lebensenergie}" />
+
+                        <Label Grid.Row="1" Text="Astralenergie (AsP)" VerticalOptions="Center" />
+                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Astralenergie}" />
+
+                        <Label Grid.Row="2" Text="Karmaenergie (KaP)" VerticalOptions="Center" />
+                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Karmaenergie}" />
+
+                        <Label Grid.Row="3" Text="Seelenkraft (SK)" VerticalOptions="Center" />
+                        <Entry Grid.Row="3" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Seelenkraft}" />
+
+                        <Label Grid.Row="4" Text="Zähigkeit (ZK)" VerticalOptions="Center" />
+                        <Entry Grid.Row="4" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Zähigkeit}" />
+
+                        <Label Grid.Row="5" Text="Initiative-Basis" VerticalOptions="Center" />
+                        <Entry Grid.Row="5" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding InitiativeBasis}" />
+
+                        <Label Grid.Row="6" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
+                        <Entry Grid.Row="6" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Geschwindigkeit}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Abenteuerpunkte" FontSize="18" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Label Grid.Row="0" Text="AP gesamt" VerticalOptions="Center" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteGesamt}" />
+
+                        <Label Grid.Row="1" Text="AP verfügbar" VerticalOptions="Center" />
+                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteVerfuegbar}" />
+
+                        <Label Grid.Row="2" Text="AP ausgegeben" VerticalOptions="Center" />
+                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteAusgegeben}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Schicksalspunkte" FontSize="18" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Label Grid.Row="0" Text="SchiP gesamt" VerticalOptions="Center" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteGesamt}" />
+
+                        <Label Grid.Row="1" Text="SchiP verfügbar" VerticalOptions="Center" />
+                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteVerfuegbar}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
