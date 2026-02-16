@@ -13,7 +13,7 @@
             Route="MainPage" />
 
         <ShellContent
-            Title="V/N"
+            Title="Vorteile/Nachteile"
             ContentTemplate="{DataTemplate local:AdvantagesPage}"
             Route="AdvantagesPage" />
 

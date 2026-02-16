@@ -8,7 +8,14 @@ public class MainPageViewModel : INotifyPropertyChanged
 {
     private readonly CharacterSheet _sheet = new();
 
+    public MainPageViewModel()
+    {
+        TalentGruppen = BuildTalentGruppen();
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public IReadOnlyList<TalentGroup> TalentGruppen { get; }
 
     public string Name
     {
@@ -230,6 +237,101 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         get => _sheet.Kampftalente;
         set => SetProperty(_sheet.Kampftalente, value, v => _sheet.Kampftalente = v);
+    }
+
+    private static IReadOnlyList<TalentGroup> BuildTalentGruppen()
+    {
+        return
+        [
+            new TalentGroup("Körpertalente", new[]
+            {
+                NewTalent("Fliegen", "B", "MU", "IN", "GE", "JA"),
+                NewTalent("Gaukeleien", "A", "MU", "CH", "FF", "JA"),
+                NewTalent("Klettern", "B", "MU", "GE", "KK", "JA"),
+                NewTalent("Körperbeherrschung", "D", "GE", "GE", "KO", "JA"),
+                NewTalent("Kraftakt", "B", "KO", "KK", "KK", "JA"),
+                NewTalent("Reiten", "B", "CH", "GE", "KK", "JA"),
+                NewTalent("Schwimmen", "B", "GE", "KO", "KK", "JA"),
+                NewTalent("Selbstbeherrschung", "D", "MU", "MU", "KO", "NEIN"),
+                NewTalent("Singen", "A", "KL", "CH", "KO", "EVTL"),
+                NewTalent("Sinnesschärfe", "D", "KL", "IN", "IN", "EVTL"),
+                NewTalent("Tanzen", "A", "KL", "CH", "GE", "JA"),
+                NewTalent("Taschendiebstahl", "B", "MU", "FF", "GE", "JA"),
+                NewTalent("Verbergen", "C", "MU", "IN", "GE", "JA"),
+                NewTalent("Zechen", "A", "KL", "KO", "KK", "NEIN")
+            }),
+            new TalentGroup("Gesellschaftstalente", new[]
+            {
+                NewTalent("Bekehren & Überzeugen", "B", "MU", "KL", "CH", "NEIN"),
+                NewTalent("Betören", "B", "MU", "CH", "CH", "EVTL"),
+                NewTalent("Einschüchtern", "B", "MU", "IN", "CH", "NEIN"),
+                NewTalent("Etikette", "B", "KL", "IN", "CH", "EVTL"),
+                NewTalent("Gassenwissen", "C", "KL", "IN", "CH", "EVTL"),
+                NewTalent("Menschenkenntnis", "C", "KL", "IN", "CH", "NEIN"),
+                NewTalent("Überreden", "C", "MU", "IN", "CH", "NEIN"),
+                NewTalent("Verkleiden", "B", "IN", "CH", "GE", "EVTL"),
+                NewTalent("Willenskraft", "D", "MU", "IN", "CH", "NEIN")
+            }),
+            new TalentGroup("Naturtalente", new[]
+            {
+                NewTalent("Fährtensuchen", "C", "MU", "IN", "GE", "JA"),
+                NewTalent("Fesseln", "A", "KL", "FF", "KK", "EVTL"),
+                NewTalent("Fischen & Angeln", "A", "FF", "GE", "KO", "EVTL"),
+                NewTalent("Orientierung", "B", "KL", "IN", "IN", "NEIN"),
+                NewTalent("Pflanzenkunde", "C", "KL", "FF", "KO", "EVTL"),
+                NewTalent("Tierkunde", "C", "MU", "MU", "CH", "JA"),
+                NewTalent("Wildnisleben", "C", "MU", "GE", "KO", "JA")
+            }),
+            new TalentGroup("Wissenstalente", new[]
+            {
+                NewTalent("Brett- & Glücksspiel", "A", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Geographie", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Geschichtswissen", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Götter & Kulte", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Kriegskunst", "B", "MU", "KL", "IN", "NEIN"),
+                NewTalent("Magiekunde", "C", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Mechanik", "B", "KL", "KL", "FF", "NEIN"),
+                NewTalent("Rechnen", "A", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Rechtskunde", "A", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Sagen & Legenden", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Spährenkunde", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Sternkunde", "A", "KL", "KL", "IN", "NEIN")
+            }),
+            new TalentGroup("Handwerkstalente", new[]
+            {
+                NewTalent("Alchemie", "C", "MU", "KL", "FF", "JA"),
+                NewTalent("Boote & Schiffe", "B", "FF", "GE", "KK", "JA"),
+                NewTalent("Fahrzeuge", "A", "CH", "FF", "KO", "JA"),
+                NewTalent("Handel", "B", "KL", "IN", "CH", "NEIN"),
+                NewTalent("Heilkunde Gift", "B", "MU", "KL", "IN", "JA"),
+                NewTalent("Heilkunde Krankheiten", "B", "MU", "IN", "KO", "JA"),
+                NewTalent("Heilkunde Seele", "B", "IN", "CH", "KO", "NEIN"),
+                NewTalent("Heilkunde Wunden", "D", "KL", "FF", "FF", "JA"),
+                NewTalent("Holzbearbeitung", "B", "FF", "GE", "KK", "JA"),
+                NewTalent("Lebensmittelbearbeitung", "A", "IN", "FF", "FF", "JA"),
+                NewTalent("Lederbearbeitung", "B", "FF", "GE", "KO", "JA"),
+                NewTalent("Malen & Zeichnen", "A", "IN", "FF", "FF", "JA"),
+                NewTalent("Musizieren", "A", "CH", "FF", "KO", "JA"),
+                NewTalent("Schlösserknacken", "C", "IN", "FF", "FF", "JA"),
+                NewTalent("Steinbearbeitung", "A", "FF", "FF", "KK", "JA"),
+                NewTalent("Stoffbearbeitung", "A", "KL", "FF", "FF", "JA"),
+                NewTalent("Erdbearbeitung", "A", "FF", "KO", "KK", "JA"),
+                NewTalent("Metallbearbeitung", "C", "FF", "KO", "KK", "JA")
+            })
+        ];
+    }
+
+    private static TalentRow NewTalent(string talent, string faktor, string probe1, string probe2, string probe3, string belastungseinfluss)
+    {
+        return new TalentRow
+        {
+            Talent = talent,
+            Steigerungsfaktor = faktor,
+            Probe1 = probe1,
+            Probe2 = probe2,
+            Probe3 = probe3,
+            Belastungseinfluss = belastungseinfluss
+        };
     }
 
     private void SetProperty<T>(T oldValue, T newValue, Action<T> setter, [CallerMemberName] string? propertyName = null)
