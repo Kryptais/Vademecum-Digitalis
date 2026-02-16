@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using VademecumDigitalis.Models;
 
@@ -11,11 +12,39 @@ public class MainPageViewModel : INotifyPropertyChanged
     public MainPageViewModel()
     {
         TalentGruppen = BuildTalentGruppen();
+        SpeziesOptionen = BuildSpeziesOptionen();
+        AusgewählteSpeziesOption = SpeziesOptionen.FirstOrDefault(o => o.Name == "Mensch") ?? SpeziesOptionen[0];
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IReadOnlyList<TalentGroup> TalentGruppen { get; }
+
+    public IReadOnlyList<SpeziesOption> SpeziesOptionen { get; }
+
+    private SpeziesOption? _ausgewählteSpeziesOption;
+    public SpeziesOption? AusgewählteSpeziesOption
+    {
+        get => _ausgewählteSpeziesOption;
+        set
+        {
+            if (ReferenceEquals(_ausgewählteSpeziesOption, value))
+            {
+                return;
+            }
+
+            _ausgewählteSpeziesOption = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AusgewählteSpeziesOption)));
+
+            if (value is null)
+            {
+                return;
+            }
+
+            Spezies = value.Name;
+            ApplySpeziesGrundwerte(value);
+        }
+    }
 
     public string Name
     {
@@ -33,6 +62,12 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         get => _sheet.Spezies;
         set => SetProperty(_sheet.Spezies, value, v => _sheet.Spezies = v);
+    }
+
+    public int SpeziesApKosten
+    {
+        get => _sheet.SpeziesApKosten;
+        set => SetProperty(_sheet.SpeziesApKosten, value, v => _sheet.SpeziesApKosten = v);
     }
 
     public string Kultur
@@ -98,19 +133,31 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int Mut
     {
         get => _sheet.Mut;
-        set => SetProperty(_sheet.Mut, value, v => _sheet.Mut = v);
+        set
+        {
+            SetProperty(_sheet.Mut, value, v => _sheet.Mut = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Klugheit
     {
         get => _sheet.Klugheit;
-        set => SetProperty(_sheet.Klugheit, value, v => _sheet.Klugheit = v);
+        set
+        {
+            SetProperty(_sheet.Klugheit, value, v => _sheet.Klugheit = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Intuition
     {
         get => _sheet.Intuition;
-        set => SetProperty(_sheet.Intuition, value, v => _sheet.Intuition = v);
+        set
+        {
+            SetProperty(_sheet.Intuition, value, v => _sheet.Intuition = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Charisma
@@ -128,19 +175,31 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int Gewandtheit
     {
         get => _sheet.Gewandtheit;
-        set => SetProperty(_sheet.Gewandtheit, value, v => _sheet.Gewandtheit = v);
+        set
+        {
+            SetProperty(_sheet.Gewandtheit, value, v => _sheet.Gewandtheit = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Konstitution
     {
         get => _sheet.Konstitution;
-        set => SetProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
+        set
+        {
+            SetProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Körperkraft
     {
         get => _sheet.Körperkraft;
-        set => SetProperty(_sheet.Körperkraft, value, v => _sheet.Körperkraft = v);
+        set
+        {
+            SetProperty(_sheet.Körperkraft, value, v => _sheet.Körperkraft = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int Lebensenergie
@@ -183,6 +242,106 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         get => _sheet.Geschwindigkeit;
         set => SetProperty(_sheet.Geschwindigkeit, value, v => _sheet.Geschwindigkeit = v);
+    }
+
+    public int LebensenergieZukauf
+    {
+        get => _sheet.LebensenergieZukauf;
+        set
+        {
+            SetProperty(_sheet.LebensenergieZukauf, value, v => _sheet.LebensenergieZukauf = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int LebensenergieBoni
+    {
+        get => _sheet.LebensenergieBoni;
+        set
+        {
+            SetProperty(_sheet.LebensenergieBoni, value, v => _sheet.LebensenergieBoni = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int SeelenkraftZukauf
+    {
+        get => _sheet.SeelenkraftZukauf;
+        set
+        {
+            SetProperty(_sheet.SeelenkraftZukauf, value, v => _sheet.SeelenkraftZukauf = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int SeelenkraftBoni
+    {
+        get => _sheet.SeelenkraftBoni;
+        set
+        {
+            SetProperty(_sheet.SeelenkraftBoni, value, v => _sheet.SeelenkraftBoni = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int ZähigkeitZukauf
+    {
+        get => _sheet.ZähigkeitZukauf;
+        set
+        {
+            SetProperty(_sheet.ZähigkeitZukauf, value, v => _sheet.ZähigkeitZukauf = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int ZähigkeitBoni
+    {
+        get => _sheet.ZähigkeitBoni;
+        set
+        {
+            SetProperty(_sheet.ZähigkeitBoni, value, v => _sheet.ZähigkeitBoni = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int InitiativeBasisZukauf
+    {
+        get => _sheet.InitiativeBasisZukauf;
+        set
+        {
+            SetProperty(_sheet.InitiativeBasisZukauf, value, v => _sheet.InitiativeBasisZukauf = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int InitiativeBasisBoni
+    {
+        get => _sheet.InitiativeBasisBoni;
+        set
+        {
+            SetProperty(_sheet.InitiativeBasisBoni, value, v => _sheet.InitiativeBasisBoni = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int GeschwindigkeitZukauf
+    {
+        get => _sheet.GeschwindigkeitZukauf;
+        set
+        {
+            SetProperty(_sheet.GeschwindigkeitZukauf, value, v => _sheet.GeschwindigkeitZukauf = v);
+            RecalculateBasiswerte();
+        }
+    }
+
+    public int GeschwindigkeitBoni
+    {
+        get => _sheet.GeschwindigkeitBoni;
+        set
+        {
+            SetProperty(_sheet.GeschwindigkeitBoni, value, v => _sheet.GeschwindigkeitBoni = v);
+            RecalculateBasiswerte();
+        }
     }
 
     public int AbenteuerpunkteGesamt
@@ -321,6 +480,37 @@ public class MainPageViewModel : INotifyPropertyChanged
         ];
     }
 
+    private static IReadOnlyList<SpeziesOption> BuildSpeziesOptionen()
+    {
+        return
+        [
+            new SpeziesOption("Mensch", 0, 5, -5, -5, 8),
+            new SpeziesOption("Elf", 110, 3, -4, -6, 8),
+            new SpeziesOption("Halbelf", 20, 5, -5, -5, 8),
+            new SpeziesOption("Zwerg", 80, 7, -4, -4, 6)
+        ];
+    }
+
+    private SpeziesOption AktiveSpezies => AusgewählteSpeziesOption ?? SpeziesOptionen.First();
+
+    private void ApplySpeziesGrundwerte(SpeziesOption option)
+    {
+        SpeziesApKosten = option.ApKosten;
+        RecalculateBasiswerte();
+    }
+
+    private void RecalculateBasiswerte()
+    {
+        var spezies = AktiveSpezies;
+
+        Lebensenergie = spezies.LebensenergieGrundwert + (2 * Konstitution) + LebensenergieZukauf + LebensenergieBoni;
+        Seelenkraft = spezies.SeelenkraftGrundwert + ((Mut + Klugheit + Intuition) / 6) + SeelenkraftZukauf + SeelenkraftBoni;
+        Zähigkeit = spezies.ZähigkeitGrundwert + ((Konstitution + Konstitution + Körperkraft) / 6) + ZähigkeitZukauf + ZähigkeitBoni;
+        InitiativeBasis = (int)Math.Ceiling((Mut + Gewandtheit) / 2d) + InitiativeBasisZukauf + InitiativeBasisBoni;
+        Geschwindigkeit = spezies.GeschwindigkeitGrundwert + GeschwindigkeitZukauf + GeschwindigkeitBoni;
+
+    }
+
     private static TalentRow NewTalent(string talent, string faktor, string probe1, string probe2, string probe3, string belastungseinfluss)
     {
         return new TalentRow
@@ -333,6 +523,14 @@ public class MainPageViewModel : INotifyPropertyChanged
             Belastungseinfluss = belastungseinfluss
         };
     }
+
+    public sealed record SpeziesOption(
+        string Name,
+        int ApKosten,
+        int LebensenergieGrundwert,
+        int SeelenkraftGrundwert,
+        int ZähigkeitGrundwert,
+        int GeschwindigkeitGrundwert);
 
     private void SetProperty<T>(T oldValue, T newValue, Action<T> setter, [CallerMemberName] string? propertyName = null)
     {

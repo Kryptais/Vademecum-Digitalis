@@ -49,7 +49,10 @@
                     <Entry Placeholder="Spieler" Text="{Binding Spieler}" />
 
                     <Label Text="Spezies" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="Spezies" Text="{Binding Spezies}" />
+                    <Picker Title="Spezies wählen"
+                            ItemsSource="{Binding SpeziesOptionen}"
+                            ItemDisplayBinding="{Binding Name}"
+                            SelectedItem="{Binding AusgewählteSpeziesOption}" />
 
                     <Label Text="Kultur" FontAttributes="Bold" FontSize="13" />
                     <Entry Placeholder="Kultur" Text="{Binding Kultur}" />
@@ -86,9 +89,13 @@
             <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Basiswerte" FontSize="18" FontAttributes="Bold" />
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
                         <Label Grid.Row="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
                         <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Lebensenergie}" />
+                        <HorizontalStackLayout Grid.Row="0" Grid.Column="2" Spacing="6">
+                            <Entry WidthRequest="70" Keyboard="Numeric" Placeholder="Zukauf" Text="{Binding LebensenergieZukauf}" />
+                            <Entry WidthRequest="70" Keyboard="Numeric" Placeholder="Boni" Text="{Binding LebensenergieBoni}" />
+                        </HorizontalStackLayout>
 
                         <Label Grid.Row="1" Text="Astralenergie (AsP)" VerticalOptions="Center" />
                         <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Astralenergie}" />
@@ -104,9 +111,10 @@
 
                         <Label Grid.Row="5" Text="Initiative-Basis" VerticalOptions="Center" />
                         <Entry Grid.Row="5" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding InitiativeBasis}" />
-
-                        <Label Grid.Row="6" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
-                        <Entry Grid.Row="6" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Geschwindigkeit}" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto" ColumnSpacing="12" RowSpacing="8">
+                        <Label Grid.Row="0" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Geschwindigkeit}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
