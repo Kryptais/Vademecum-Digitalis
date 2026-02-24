@@ -241,8 +241,8 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private static IReadOnlyList<TalentGroup> BuildTalentGruppen()
     {
-        return
-        [
+        return new[]
+        {
             new TalentGroup("Körpertalente", new[]
             {
                 NewTalent("Fliegen", "B", "MU", "IN", "GE", "JA"),
@@ -318,7 +318,7 @@ public class MainPageViewModel : INotifyPropertyChanged
                 NewTalent("Erdbearbeitung", "A", "FF", "KO", "KK", "JA"),
                 NewTalent("Metallbearbeitung", "C", "FF", "KO", "KK", "JA")
             })
-        ];
+        };
     }
 
     private static TalentRow NewTalent(string talent, string faktor, string probe1, string probe2, string probe3, string belastungseinfluss)
