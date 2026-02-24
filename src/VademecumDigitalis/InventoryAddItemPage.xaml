@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.InventoryAddItemPage"
+             Title="Neues Item">
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Name" />
+            <Entry x:Name="NameEntry" />
+
+            <Label Text="Anzahl" />
+            <Entry x:Name="QuantityEntry" Keyboard="Numeric" Text="1" />
+
+            <Label Text="Gewicht pro Einheit (Stein)" />
+            <Entry x:Name="WeightEntry" Keyboard="Numeric" Text="0.0" />
+
+            <Label Text="Details" />
+            <Editor x:Name="DetailsEditor" HeightRequest="120" />
+
+            <HorizontalStackLayout Spacing="12">
+                <Button Text="Abbrechen" Clicked="OnCancel" />
+                <Button Text="OK" Clicked="OnOk" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

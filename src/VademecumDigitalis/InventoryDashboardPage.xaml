@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
+             x:Class="VademecumDigitalis.InventoryDashboardPage"
+             Title="Inventar">
+
+    <!-- BindingContext is assigned in code-behind from DI to share the VM instance -->
+
+    <ScrollView Margin="10">
+        <VerticalStackLayout  Spacing="12">
+            <Label Text="Global Bank" FontAttributes="Bold" Margin="10"  FontSize="20" />
+            <Border BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
+                <Grid  ColumnSpacing="10" Margin="10" RowSpacing="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />   
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                    <!-- Dukaten: Gold -->
+                    <Label Text="Dukaten:" Grid.Row="0" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" />
+                    <Label x:Name="DukatenLabel" Text="0" Grid.Row="0" Grid.Column="1" TextColor="Gold" />
+                    <!-- Silbertaler: Silber -->
+                    <Label Text="Silbertaler:" Grid.Row="1" Grid.Column="0" FontAttributes="Bold" TextColor="Silver" />
+                    <Label x:Name="SilbertalerLabel" Text="0" Grid.Row="1" Grid.Column="1" TextColor="Silver" />
+                    <!-- Heller: Bronze (Hex) -->
+                    <Label Text="Heller:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32" />
+                    <Label x:Name="HellerLabel" Text="0" Grid.Row="2" Grid.Column="1" TextColor="#CD7F32" />
+                    <!-- Kreuzer: Eisern (stahlgrau) -->
+                    <Label Text="Kreuzer:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" />
+                    <Label x:Name="KreuzerLabel" Text="0" Grid.Row="3" Grid.Column="1" TextColor="#6E6E6E" />
+                </Grid>
+            </Border>
+
+            <Label Text="Inventare:" HorizontalTextAlignment="Center" FontSize="20" FontAttributes="Bold" />
+
+            <!-- Weight Summary -->
+            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto" Margin="5">
+                <Label Text="Gesamtgewicht:" FontAttributes="Bold" Grid.Row="0" Grid.Column="0" />
+                <Label x:Name="AllInventoriesWeightLabel" Text="0.00 stein" Grid.Row="0" Grid.Column="1" />
+                
+                <Label Text="Getragenes Gewicht:" FontAttributes="Bold" Grid.Row="1" Grid.Column="0" />
+                <Label x:Name="CarriedInventoriesWeightLabel" Text="0.00 stein" Grid.Row="1" Grid.Column="1" />
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Label Text="Übersicht der Container" Grid.Column="0" VerticalOptions="Center" />
+                <Button Text="Neu" Clicked="OnCreateNewContainer" Grid.Column="1" />
+            </Grid>
+
+            <CollectionView ItemsSource="{Binding Containers}" SelectionMode="Single" SelectionChanged="OnContainerSelected">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Item-Container als Border mit VisualState für Selected -->
+                        <Border Padding="8" Margin="4" StrokeShape="RoundRectangle 8" BackgroundColor="Transparent">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Normal">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <!-- gewünschte Selektionsfarbe hier setzen (halbtransparent dunkel) -->
+                                            <Setter Property="BackgroundColor" Value="#33333388" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
+                            <Grid RowSpacing="6">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <Grid Grid.Row="0" Padding="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Label Text="{Binding Name}" FontAttributes="Bold" VerticalOptions="Center" TextColor="White"/>
+                                    <Label Grid.Column="1" Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" VerticalOptions="Center" TextColor="White" />
+                                </Grid>
+
+                                <Grid Grid.Row="1" ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackLayout Orientation="Horizontal" Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="D:" FontAttributes="Bold" TextColor="Gold" />
+                                        <Label Text="{Binding Money.Dukaten}" TextColor="Gold" />
+                                    </StackLayout>
+
+                                    <StackLayout Orientation="Horizontal" Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="S:" FontAttributes="Bold" TextColor="Silver" />
+                                        <Label Text="{Binding Money.Silbertaler}" TextColor="Silver" />
+                                    </StackLayout>
+
+                                    <StackLayout Orientation="Horizontal" Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="H:" FontAttributes="Bold" TextColor="#CD7F32" />
+                                        <Label Text="{Binding Money.Heller}" TextColor="#CD7F32" />
+                                    </StackLayout>
+
+                                    <StackLayout Orientation="Horizontal" Grid.Column="3" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="K:" FontAttributes="Bold" TextColor="#6E6E6E" />
+                                        <Label Text="{Binding Money.Kreuzer}" TextColor="#6E6E6E" />
+                                    </StackLayout>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -26,6 +26,11 @@
             Title="Kampf"
             ContentTemplate="{DataTemplate local:CombatTalentsPage}"
             Route="CombatTalentsPage" />
+
+        <ShellContent
+            Title="Inventar"
+            ContentTemplate="{DataTemplate local:InventoryDashboardPage}"
+            Route="InventoryDashboardPage" />
     </TabBar>
 
 </Shell>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.InventoryContainerPage"
+             Title=""
+             BackgroundColor="#121212">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Zurück" Clicked="OnBackClicked" />
+    </ContentPage.ToolbarItems>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" TextColor="#E6F0FF" />
+
+            <!-- In-page back button directly under the tab -->
+            <Button Text="Zurück" Clicked="OnBackClicked" HorizontalOptions="Start" />
+
+            <Frame BorderColor="#333" Padding="8" BackgroundColor="#1E1E1E">
+                <VerticalStackLayout Padding="6" Spacing="8">
+                    <Grid ColumnDefinitions="*, Auto">
+                        <Label Text="Geld (Bank)" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center" />
+                        <StackLayout Orientation="Horizontal" Grid.Column="1" Spacing="8">
+                            <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
+                            <CheckBox IsChecked="{Binding IncludeCoinWeight}" />
+                        </StackLayout>
+                    </Grid>
+                    
+                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
+                        <Label Text="Dukaten:" TextColor="Gold" />
+                        <Entry Text="{Binding Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="80"
+                               BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
+                        <Label Text="Silber:" TextColor="Silver" />
+                        <Entry Text="{Binding Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="80"
+                               BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
+                        <Label Text="Heller:" TextColor="#CD7F32" />
+                        <Entry Text="{Binding Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="80"
+                               BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
+                        <Label Text="Kreuzer:" TextColor="#6E6E6E" />
+                        <Entry Text="{Binding Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="80"
+                               BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Frame>
+
+            <Label Text="Items" FontAttributes="Bold" TextColor="#E6E6E6" />
+            
+            <HorizontalStackLayout Spacing="8">
+                <Label Text="Gesamtgewicht:" TextColor="#E6E6E6" />
+                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" FontAttributes="Bold" TextColor="#E6E6E6" />
+            </HorizontalStackLayout>
+
+            <CollectionView ItemsSource="{Binding Items}">
+                <CollectionView.Header>
+                    <Grid Padding="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Name" FontAttributes="Bold" TextColor="#E6E6E6" />
+                        <Label Grid.Column="1" Text="Anzahl" FontAttributes="Bold" TextColor="#E6E6E6" />
+                        <Label Grid.Column="2" Text="Gewicht" FontAttributes="Bold" TextColor="#E6E6E6" />
+                        <Label Grid.Column="3" Text="Aktionen" FontAttributes="Bold" TextColor="#E6E6E6" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Padding="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Label Text="{Binding Name}" TextColor="#FFFFFF" />
+                            <Label Grid.Column="1" Text="{Binding Quantity}" TextColor="#FFFFFF" />
+                            <Label Grid.Column="2" Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" />
+
+                            <HorizontalStackLayout Grid.Column="3" Spacing="6">
+                                <Button Text="Edit" Clicked="OnEditItem" CommandParameter="{Binding .}" />
+                                <Button Text="+" Clicked="OnIncreaseItem" CommandParameter="{Binding .}" />
+                                <Button Text="-" Clicked="OnDecreaseItem" CommandParameter="{Binding .}" />
+                                <Button Text="Verbrauch" Clicked="OnConsumeItem" CommandParameter="{Binding .}" />
+                                <Button Text="Entfernen" Clicked="OnRemoveItem" CommandParameter="{Binding .}" />
+                                <Button Text="Log" Clicked="OnShowItemLog" CommandParameter="{Binding .}" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Button Text="Item hinzufügen" Clicked="OnAddItem" />
+            <Button Text="Geld transferieren" Clicked="OnTransferMoney" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
