@@ -6,7 +6,7 @@
 
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="14">
-            <Label Text="Vorteile & Nachteile" FontSize="24" FontAttributes="Bold" />
+            <Label Text="Vorteile &amp; Nachteile" FontSize="24" FontAttributes="Bold" />
             <Label Text="Eintrag pro Zeile (V1 als Freitext)." TextColor="#4B5563" />
 
             <Label Text="Vorteile" FontAttributes="Bold" />
