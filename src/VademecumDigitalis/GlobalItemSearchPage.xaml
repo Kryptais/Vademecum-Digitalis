@@ -6,7 +6,7 @@
              BackgroundColor="#121212">
 
     <VerticalStackLayout Padding="16" Spacing="12">
-        <Button Text="Zurueck" Clicked="OnBackClicked" HorizontalOptions="Start" />
+        <Button Text="Zurück" Clicked="OnBackClicked" HorizontalOptions="Start" />
         <Label Text="Gegenstand suchen" Style="{StaticResource HeadlineLabel}" />
         <SearchBar Placeholder="Suchbegriff..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" />
         

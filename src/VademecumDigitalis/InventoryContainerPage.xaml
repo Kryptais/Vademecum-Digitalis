@@ -8,7 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <!-- Header Area -->
-            <Button Text="Zurueck" Clicked="OnBackClicked" HorizontalOptions="Start" />
+            <Button Text="Zurück" Clicked="OnBackClicked" HorizontalOptions="Start" />
             <Label Text="{Binding Name}" Style="{StaticResource HeadlineLabel}" />
 
             <!-- Money Area -->
@@ -31,7 +31,7 @@
                     <Label Text="Geld (Bank)" Style="{StaticResource SubheadLabel}" VerticalOptions="Center" Grid.Row="0" />
                     
                     <StackLayout Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Spacing="8">
-                        <Label Text="Muenzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
+                        <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
                         <CheckBox IsChecked="{Binding IncludeCoinWeight}" />
                     </StackLayout>
                     
@@ -67,7 +67,7 @@
             <Label Text="Items" Style="{StaticResource SubheadLabel}" />
             
             <HorizontalStackLayout Spacing="8">
-                <Button Text="Item hinzufuegen" Clicked="OnAddItem" ZIndex="1" Margin="0,0,12,0"/>
+                <Button Text="Item hinzufügen" Clicked="OnAddItem" ZIndex="1" Margin="0,0,12,0"/>
                 <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
                 <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
             </HorizontalStackLayout>

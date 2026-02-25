@@ -89,7 +89,7 @@
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <!-- Item-Container als Border mit VisualState fuer Selected -->
+                        <!-- Item-Container als Border mit VisualState für Selected -->
                         <Border Padding="12" Margin="4" StrokeShape="RoundRectangle 8" BackgroundColor="#1E1E1E" Stroke="#333" StrokeThickness="1">
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup Name="CommonStates">
@@ -100,7 +100,7 @@
                                     </VisualState>
                                     <VisualState Name="Selected">
                                         <VisualState.Setters>
-                                            <!-- gewuenschte Selektionsfarbe hier setzen (halbtransparent dunkel) -->
+                                            <!-- gewünschte Selektionsfarbe hier setzen (halbtransparent dunkel) -->
                                             <Setter Property="BackgroundColor" Value="#333333" />
                                             <Setter Property="Stroke" Value="#666" />
                                         </VisualState.Setters>
