@@ -11,6 +11,8 @@ namespace VademecumDigitalis
     public partial class InventoryDashboardPage : ContentPage
     {
         InventoryViewModel VM => BindingContext as InventoryViewModel ?? throw new System.InvalidOperationException("VM not resolved");
+        
+        public System.Collections.ObjectModel.ObservableCollection<InventoryContainer> FilteredContainers { get; private set; } = new System.Collections.ObjectModel.ObservableCollection<InventoryContainer>();
 
         public InventoryDashboardPage()
         {
@@ -21,6 +23,7 @@ namespace VademecumDigitalis
 
             UpdateGlobalBankLabel();
             UpdateTotalWeightsLabel();
+            UpdateFilteredContainers();
 
             // subscribe to containers collection changes to update bank and weights
             VM.Containers.CollectionChanged += Containers_CollectionChanged;
@@ -30,6 +33,40 @@ namespace VademecumDigitalis
             {
                 SubscribeContainer(c);
             }
+        }
+        
+        // Ensure UI is updated when returning to this page
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            UpdateGlobalBankLabel();
+            UpdateTotalWeightsLabel();
+            // Also refresh list just in case
+            UpdateFilteredContainers();
+        }
+
+        private void UpdateFilteredContainers(string searchText = "")
+        {
+            FilteredContainers.Clear();
+            if (BindingContext is InventoryViewModel vm)
+            {
+                var query = vm.Containers.AsEnumerable();
+                if (!string.IsNullOrWhiteSpace(searchText))
+                {
+                    // Search for containers that have at least one item matching the search text
+                    // OR if the container name matches
+                    query = query.Where(c => 
+                        c.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                        c.Items.Any(i => i.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
+                    );
+                }
+                foreach (var c in query) FilteredContainers.Add(c);
+            }
+        }
+
+        private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
+        {
+            UpdateFilteredContainers(e.NewTextValue);
         }
 
         private void Containers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -50,6 +87,7 @@ namespace VademecumDigitalis
             }
             UpdateGlobalBankLabel();
             UpdateTotalWeightsLabel();
+            UpdateFilteredContainers();
         }
 
         private void SubscribeContainer(InventoryContainer c)
@@ -127,6 +165,11 @@ namespace VademecumDigitalis
             if (container == null) return;
             await Navigation.PushAsync(new InventoryContainerPage(container));
             ((CollectionView)sender).SelectedItem = null;
+        }
+
+        private async void OnGlobalSearch(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new GlobalItemSearchPage());
         }
     }
 }

@@ -5,8 +5,63 @@
              x:Class="VademecumDigitalis.App">
     <Application.Resources>
         <ResourceDictionary>
-                <Color x:Key="Primary">#2563EB</Color>
-                <converters:IntStringConverter x:Key="IntStringConverter" />
+            <Color x:Key="Primary">#2563EB</Color>
+            <Color x:Key="BackgroundDark">#121212</Color>
+            <Color x:Key="CardBackground">#1E1E1E</Color>
+            <Color x:Key="TextPrimary">#E6E6E6</Color>
+            <Color x:Key="TextSecondary">#B0B0B0</Color>
+            <Color x:Key="BorderColor">#333333</Color>
+
+            <converters:IntStringConverter x:Key="IntStringConverter" />
+
+            <!-- Headline Style (Large, Bold) -->
+            <Style x:Key="HeadlineLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="Margin" Value="0,10,0,10" />
+            </Style>
+
+            <!-- Subhead Style (Medium, Bold) -->
+            <Style x:Key="SubheadLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="20" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="Margin" Value="0,8,0,4" />
+            </Style>
+
+            <!-- Table Header Label Style -->
+            <Style x:Key="TableHeaderLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <!-- Card Border Style -->
+            <Style x:Key="CardBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}" />
+                <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
+                <Setter Property="Padding" Value="12" />
+                <Setter Property="Margin" Value="4" />
+            </Style>
+
+            <!-- Button Style -->
+            <Style TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="14,10" />
+                <Setter Property="FontAttributes" Value="Bold" />
+            </Style>
+
+            <!-- Default Page Background -->
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundDark}" />
+            </Style>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

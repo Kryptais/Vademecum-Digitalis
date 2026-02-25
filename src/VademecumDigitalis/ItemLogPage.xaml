@@ -12,6 +12,6 @@
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
-        <Button Text="Kommentar hinzufügen" Clicked="OnAddLog" />
+        <Button Text="Kommentar hinzufuegen" Clicked="OnAddLog" />
     </VerticalStackLayout>
 </ContentPage>

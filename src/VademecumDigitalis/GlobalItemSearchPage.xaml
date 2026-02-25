@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.GlobalItemSearchPage"
+             Title="Gegenstandsuche"
+             BackgroundColor="#121212">
+
+    <VerticalStackLayout Padding="16" Spacing="12">
+        <Button Text="Zurueck" Clicked="OnBackClicked" HorizontalOptions="Start" />
+        <Label Text="Gegenstand suchen" Style="{StaticResource HeadlineLabel}" />
+        <SearchBar Placeholder="Suchbegriff..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" />
+        
+        <CollectionView x:Name="ResultsCollectionView">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="12" Margin="0,4">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnItemTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding ItemName}" TextColor="White" FontAttributes="Bold" FontSize="16" />
+                                <Label Text="{Binding ContainerName, StringFormat='in {0}'}" TextColor="#999" FontSize="12" />
+                            </VerticalStackLayout>
+                            
+                            <Label Grid.Column="1" Text="{Binding QuantityText}" TextColor="White" FontAttributes="Bold" VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </VerticalStackLayout>
+</ContentPage>

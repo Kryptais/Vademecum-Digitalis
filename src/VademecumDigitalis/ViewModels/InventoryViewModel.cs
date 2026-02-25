@@ -19,6 +19,20 @@ namespace VademecumDigitalis.ViewModels
         {
             MoveItemCommand = new RelayCommand(p => ExecuteMoveItem(p));
             TransferMoneyCommand = new RelayCommand(p => ExecuteTransferMoney(p));
+
+            // Create default Treasury if none exists
+            if (!Containers.Any(c => c.IsFixedTreasury))
+            {
+                var treasury = new InventoryContainer
+                {
+                    Name = "Tresor",
+                    IsFixedTreasury = true,
+                    IsCarried = false,
+                    IncludeCoinWeight = true,
+                    Details = "Der zentrale Tresor für Ersparnisse."
+                };
+                Containers.Add(treasury);
+            }
         }
 
         private void ExecuteMoveItem(object? param)

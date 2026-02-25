@@ -12,7 +12,7 @@
             <Label Text="Vorteile" FontAttributes="Bold" />
             <Editor AutoSize="TextChanges"
                     MinimumHeightRequest="160"
-                    Placeholder="z. B. Begabung (Sinnesschärfe), Glück I"
+                    Placeholder="z. B. Begabung (Sinnesschaerfe), Glueck I"
                     Text="{Binding Vorteile}" />
 
             <Label Text="Nachteile" FontAttributes="Bold" />

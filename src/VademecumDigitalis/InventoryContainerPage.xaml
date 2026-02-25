@@ -5,104 +5,132 @@
              Title=""
              BackgroundColor="#121212">
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Zurück" Clicked="OnBackClicked" />
-    </ContentPage.ToolbarItems>
-
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
-            <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="20" TextColor="#E6F0FF" />
+            <!-- Header Area -->
+            <Button Text="Zurueck" Clicked="OnBackClicked" HorizontalOptions="Start" />
+            <Label Text="{Binding Name}" Style="{StaticResource HeadlineLabel}" />
 
-            <!-- In-page back button directly under the tab -->
-            <Button Text="Zurück" Clicked="OnBackClicked" HorizontalOptions="Start" />
-
-            <Frame BorderColor="#333" Padding="8" BackgroundColor="#1E1E1E">
-                <VerticalStackLayout Padding="6" Spacing="8">
-                    <Grid ColumnDefinitions="*, Auto">
-                        <Label Text="Geld (Bank)" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center" />
-                        <StackLayout Orientation="Horizontal" Grid.Column="1" Spacing="8">
-                            <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
-                            <CheckBox IsChecked="{Binding IncludeCoinWeight}" />
-                        </StackLayout>
-                    </Grid>
+            <!-- Money Area -->
+            <Border BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
+                <Grid  ColumnSpacing="10" Margin="10" RowSpacing="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Label Text="Geld (Bank)" Style="{StaticResource SubheadLabel}" VerticalOptions="Center" Grid.Row="0" />
                     
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
-                        <Label Text="Dukaten:" TextColor="Gold" />
-                        <Entry Text="{Binding Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
-                               Keyboard="Numeric" WidthRequest="80"
-                               BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" />
-                    </Grid>
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
-                        <Label Text="Silber:" TextColor="Silver" />
-                        <Entry Text="{Binding Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
-                               Keyboard="Numeric" WidthRequest="80"
-                               BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" />
-                    </Grid>
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
-                        <Label Text="Heller:" TextColor="#CD7F32" />
-                        <Entry Text="{Binding Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
-                               Keyboard="Numeric" WidthRequest="80"
-                               BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" />
-                    </Grid>
-                    <Grid ColumnDefinitions="Auto,Auto" ColumnSpacing="6" >
-                        <Label Text="Kreuzer:" TextColor="#6E6E6E" />
-                        <Entry Text="{Binding Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
-                               Keyboard="Numeric" WidthRequest="80"
-                               BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Frame>
+                    <StackLayout Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Spacing="8">
+                        <Label Text="Muenzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
+                        <CheckBox IsChecked="{Binding IncludeCoinWeight}" />
+                    </StackLayout>
+                    
+                    <Label Text="Dukaten:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" VerticalTextAlignment="Center" />
+                    <Entry Text="{Binding Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                        Keyboard="Numeric" WidthRequest="80"
+                        BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2" />
+                        
+                    <Label Text="Silbertaler:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="Silver" VerticalTextAlignment="Center" />
+                    <Entry Text="{Binding Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                           Keyboard="Numeric" WidthRequest="80"
+                           BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3" />
+                           
+                    <Label Text="Heller:" Grid.Row="4" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32"  VerticalTextAlignment="Center"/>
+                    <Entry Text="{Binding Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                       Keyboard="Numeric" WidthRequest="80"
+                       BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4" />
+                       
+                    <Label Text="Kreuzer:" Grid.Row="5" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" VerticalTextAlignment="Center" />
+                    <Entry Text="{Binding Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                        Keyboard="Numeric" WidthRequest="80"
+                        BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5"/>
 
-            <Label Text="Items" FontAttributes="Bold" TextColor="#E6E6E6" />
+                    <!-- Money Action Buttons -->
+                    <Button Text="Geld transferieren" Clicked="OnTransferMoney" 
+                            Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0"/>
+                    <Button Text="Geld in Tresor transferieren" Clicked="OnTransferToTreasury" 
+                            BackgroundColor="#2A2A2A" TextColor="Gold" BorderColor="Gold" BorderWidth="1"
+                            Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0"/>
+                </Grid>
+            </Border>
+
+            <Label Text="Items" Style="{StaticResource SubheadLabel}" />
             
             <HorizontalStackLayout Spacing="8">
-                <Label Text="Gesamtgewicht:" TextColor="#E6E6E6" />
-                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" FontAttributes="Bold" TextColor="#E6E6E6" />
+                <Button Text="Item hinzufuegen" Clicked="OnAddItem" ZIndex="1" Margin="0,0,12,0"/>
+                <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
             </HorizontalStackLayout>
+            
+            <SearchBar Placeholder="Items suchen..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
 
-            <CollectionView ItemsSource="{Binding Items}">
+            <CollectionView x:Name="ItemsCollectionView">
                 <CollectionView.Header>
-                    <Grid Padding="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Label Text="Name" FontAttributes="Bold" TextColor="#E6E6E6" />
-                        <Label Grid.Column="1" Text="Anzahl" FontAttributes="Bold" TextColor="#E6E6E6" />
-                        <Label Grid.Column="2" Text="Gewicht" FontAttributes="Bold" TextColor="#E6E6E6" />
-                        <Label Grid.Column="3" Text="Aktionen" FontAttributes="Bold" TextColor="#E6E6E6" />
-                    </Grid>
+                    <Border StrokeThickness="0" BackgroundColor="#333" Padding="0" Margin="0,0,0,4">
+                        <Grid Padding="8" ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Text="Name" Style="{StaticResource TableHeaderLabel}" Grid.Column="0">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSortByName" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Text="Anzahl" Style="{StaticResource TableHeaderLabel}" Grid.Column="1">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSortByQuantity" />
+                                </Label.GestureRecognizers>
+                            </Label>
+                            <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="2">
+                                <Label.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnSortByWeight" />
+                                </Label.GestureRecognizers>
+                            </Label>    
+                            <Label Text="Aktionen" Style="{StaticResource TableHeaderLabel}" Grid.Column="3"/>
+                        </Grid>
+                    </Border>
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <Grid Padding="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Label Text="{Binding Name}" TextColor="#FFFFFF" />
-                            <Label Grid.Column="1" Text="{Binding Quantity}" TextColor="#FFFFFF" />
-                            <Label Grid.Column="2" Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" />
+                        <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="0" Margin="0,2">
+                            <Grid Padding="8" ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="2*" />
+                                </Grid.ColumnDefinitions>
+                                <Label Text="{Binding Name}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="0" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding Quantity}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="1" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="2" HorizontalTextAlignment="Center"/>
 
-                            <HorizontalStackLayout Grid.Column="3" Spacing="6">
-                                <Button Text="Edit" Clicked="OnEditItem" CommandParameter="{Binding .}" />
-                                <Button Text="+" Clicked="OnIncreaseItem" CommandParameter="{Binding .}" />
-                                <Button Text="-" Clicked="OnDecreaseItem" CommandParameter="{Binding .}" />
-                                <Button Text="Verbrauch" Clicked="OnConsumeItem" CommandParameter="{Binding .}" />
-                                <Button Text="Entfernen" Clicked="OnRemoveItem" CommandParameter="{Binding .}" />
-                                <Button Text="Log" Clicked="OnShowItemLog" CommandParameter="{Binding .}" />
-                            </HorizontalStackLayout>
-                        </Grid>
+                                <HorizontalStackLayout Grid.Column="3" Spacing="6" HorizontalOptions="Center">
+                                    <Button Text="Edit" Clicked="OnEditItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Kopieren" Clicked="OnCopyItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Verschieben" Clicked="OnMoveItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="+" Clicked="OnIncreaseItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
+                                    <Button Text="-" Clicked="OnDecreaseItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
+                                    <Button Text="Entfernen" Clicked="OnRemoveItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Log" Clicked="OnShowItemLog" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                </HorizontalStackLayout>
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-
-            <Button Text="Item hinzufügen" Clicked="OnAddItem" />
-            <Button Text="Geld transferieren" Clicked="OnTransferMoney" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

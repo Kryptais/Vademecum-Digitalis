@@ -7,7 +7,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="20" Spacing="14">
             <Label Text="Kampftalente" FontSize="24" FontAttributes="Bold" />
-            <Label Text="V1: Freitextliste. Später mit Waffenprofilen und AT/PA-Details." TextColor="#4B5563" />
+            <Label Text="V1: Freitextliste. Spaeter mit Waffenprofilen und AT/PA-Details." TextColor="#4B5563" />
 
             <Editor AutoSize="TextChanges"
                     MinimumHeightRequest="420"

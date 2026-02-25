@@ -92,6 +92,15 @@ namespace VademecumDigitalis.Models
             }
         }
 
+        public string Details
+        {
+            get => _details;
+            set { if (_details != value) { _details = value; OnPropertyChanged(nameof(Details)); } }
+        }
+        private string _details = string.Empty;
+
+        public bool IsFixedTreasury { get; set; } = false;
+
         // TotalWeight respects IncludeCoinWeight
         public double TotalWeight => Items.Sum(i => i.TotalWeight) + (IncludeCoinWeight ? Money.TotalWeight : 0);
 
