@@ -26,6 +26,8 @@ namespace VademecumDigitalis.Models
                     _dukaten = value;
                     OnPropertyChanged(nameof(Dukaten));
                     OnPropertyChanged(nameof(TotalWeight));
+                    OnPropertyChanged(nameof(TotalValueInSilver)); 
+                    OnPropertyChanged(nameof(TotalValueInDukaten));
                 }
             }
         }
@@ -40,6 +42,8 @@ namespace VademecumDigitalis.Models
                     _silbertaler = value;
                     OnPropertyChanged(nameof(Silbertaler));
                     OnPropertyChanged(nameof(TotalWeight));
+                    OnPropertyChanged(nameof(TotalValueInSilver));
+                    OnPropertyChanged(nameof(TotalValueInDukaten));
                 }
             }
         }
@@ -54,6 +58,8 @@ namespace VademecumDigitalis.Models
                     _heller = value;
                     OnPropertyChanged(nameof(Heller));
                     OnPropertyChanged(nameof(TotalWeight));
+                    OnPropertyChanged(nameof(TotalValueInSilver));
+                    OnPropertyChanged(nameof(TotalValueInDukaten));
                 }
             }
         }
@@ -68,6 +74,8 @@ namespace VademecumDigitalis.Models
                     _kreuzer = value;
                     OnPropertyChanged(nameof(Kreuzer));
                     OnPropertyChanged(nameof(TotalWeight));
+                    OnPropertyChanged(nameof(TotalValueInSilver));
+                    OnPropertyChanged(nameof(TotalValueInDukaten));
                 }
             }
         }
@@ -77,6 +85,49 @@ namespace VademecumDigitalis.Models
             Silbertaler * WeightPerSilbertaler +
             Heller * WeightPerHeller +
             Kreuzer * WeightPerKreuzer;
+
+        // Approximate value in Silbertaler
+        public double TotalValueInSilver => (Dukaten * 10) + Silbertaler + (Heller / 10.0) + (Kreuzer / 100.0);
+        
+        // Approximate value in Dukaten
+        public double TotalValueInDukaten => TotalValueInSilver / 10.0;
+
+        /// <summary>
+        /// Konvertiert einen Silbertaler-Wert in einen formatierten String (D S H K).
+        /// Beispiel: 12.55 Silbertaler -> "1 D 2 S 5 H 5 K"
+        /// </summary>
+        public static string FormatValue(double valueInSilver)
+        {
+            var parts = CalculateParts(valueInSilver);
+            var strings = new System.Collections.Generic.List<string>();
+            
+            if (parts.dukaten > 0) strings.Add($"{parts.dukaten} D");
+            if (parts.silbertaler > 0) strings.Add($"{parts.silbertaler} S");
+            if (parts.heller > 0) strings.Add($"{parts.heller} H");
+            if (parts.kreuzer > 0) strings.Add($"{parts.kreuzer} K");
+            
+            if (strings.Count == 0) return "0 S";
+
+            return string.Join(" ", strings);
+        }
+
+        public static (long dukaten, long silbertaler, long heller, long kreuzer) CalculateParts(double valueInSilver)
+        {
+            long totalKreuzer = (long)Math.Round(valueInSilver * 100);
+
+            if (totalKreuzer == 0) return (0, 0, 0, 0);
+
+            long dukaten = totalKreuzer / 1000;
+            long rest = totalKreuzer % 1000;
+
+            long silbertaler = rest / 100;
+            rest = rest % 100;
+
+            long heller = rest / 10;
+            long kreuzer = rest % 10;
+            
+            return (dukaten, silbertaler, heller, kreuzer);
+        }
 
         public void TransferTo(CurrencyAccount target, long dukaten, long silbertaler, long heller, long kreuzer)
         {

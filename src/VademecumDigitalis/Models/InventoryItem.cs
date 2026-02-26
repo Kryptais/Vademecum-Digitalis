@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace VademecumDigitalis.Models
 {
@@ -12,8 +13,10 @@ namespace VademecumDigitalis.Models
         private int _quantity = 1;
         private string _details = string.Empty;
         private DateTime _acquiredDate = DateTime.UtcNow;
+        private bool _isConsumable;
+        private double _value; // Wert in Silbertaler (als Basis)
         private List<string> _tags = new List<string>();
-        private System.Collections.ObjectModel.ObservableCollection<InventoryLogEntry> _log = new System.Collections.ObjectModel.ObservableCollection<InventoryLogEntry>();
+        private ObservableCollection<InventoryLogEntry> _log = new ObservableCollection<InventoryLogEntry>();
 
         public Guid Id
         {
@@ -30,16 +33,57 @@ namespace VademecumDigitalis.Models
         public double WeightPerUnit
         {
             get => _weightPerUnit;
-            set { if (Math.Abs(_weightPerUnit - value) > 0.0001) { _weightPerUnit = value; OnPropertyChanged(nameof(WeightPerUnit)); OnPropertyChanged(nameof(TotalWeight)); } }
+            set 
+            { 
+                if (Math.Abs(_weightPerUnit - value) > 0.0001) 
+                { 
+                    _weightPerUnit = value; 
+                    OnPropertyChanged(nameof(WeightPerUnit)); 
+                    OnPropertyChanged(nameof(TotalWeight)); 
+                    OnPropertyChanged(nameof(TotalValue));
+                } 
+            }
         }
 
         public int Quantity
         {
             get => _quantity;
-            set { if (_quantity != value) { _quantity = value; OnPropertyChanged(nameof(Quantity)); OnPropertyChanged(nameof(TotalWeight)); } }
+            set 
+            { 
+                if (_quantity != value) 
+                { 
+                    _quantity = value; 
+                    OnPropertyChanged(nameof(Quantity)); 
+                    OnPropertyChanged(nameof(TotalWeight)); 
+                    OnPropertyChanged(nameof(TotalValue)); 
+                } 
+            }
         }
 
         public double TotalWeight => WeightPerUnit * Quantity;
+
+        public bool IsConsumable
+        {
+            get => _isConsumable;
+            set { if (_isConsumable != value) { _isConsumable = value; OnPropertyChanged(nameof(IsConsumable)); } }
+        }
+
+        public double Value
+        {
+            get => _value;
+            set 
+            { 
+                if (Math.Abs(_value - value) > 0.0001) 
+                { 
+                    _value = value; 
+                    OnPropertyChanged(nameof(Value)); 
+                    OnPropertyChanged(nameof(TotalValue)); 
+                    OnPropertyChanged(nameof(TotalWeight));
+                } 
+            }
+        }
+
+        public double TotalValue => Value * Quantity;
 
         public string Details
         {

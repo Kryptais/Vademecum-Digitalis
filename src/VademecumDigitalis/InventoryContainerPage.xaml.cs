@@ -35,6 +35,16 @@ namespace VademecumDigitalis
             
             // Subscribe to container items changes to refresh list
             Container.Items.CollectionChanged += (s, e) => UpdateFilteredItems();
+            
+            // To update UI when item values change (not just list changing)
+            Container.PropertyChanged += (s, e) => {
+                 if (e.PropertyName == nameof(InventoryContainer.TotalValue) ||
+                     e.PropertyName == nameof(InventoryContainer.TotalWeight))
+                 {
+                     // UpdateFilteredItems(); // not needed if items list is same
+                     // Just let bindings work. XAML binds to Container.TotalWeight/TotalValue
+                 }
+            };
         }
 
         private void UpdateFilteredItems(string searchText = "")
@@ -396,6 +406,27 @@ namespace VademecumDigitalis
         private void OnSearchBarTextChanged(object sender, TextChangedEventArgs e)
         {
             UpdateFilteredItems(e.NewTextValue);
+        }
+
+        private async void OnUseItem(object sender, EventArgs e)
+        {
+            if (sender is Button b && b.CommandParameter is InventoryItem item)
+            {
+                if (item.Quantity <= 0)
+                {
+                    await DisplayAlert("Info", "Keine Anzahl vorhanden.", "OK");
+                    return;
+                }
+
+                item.Quantity -= 1;
+                item.AddLog($"Item verwendet. Restmenge: {item.Quantity}");
+                
+                // Visual feedback
+                // await DisplayAlert("Verwendet", $"{item.Name} wurde verwendet.", "OK");
+                
+                var svc = GetLogService();
+                svc?.Append($"Verwendet: 1x {item.Name} aus {Container.Name}. (Rest: {item.Quantity})");
+            }
         }
     }
 }

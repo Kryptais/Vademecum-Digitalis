@@ -69,7 +69,49 @@
             <HorizontalStackLayout Spacing="8">
                 <Button Text="Item hinzufügen" Clicked="OnAddItem" ZIndex="1" Margin="0,0,12,0"/>
                 <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
-                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="{Binding TotalWeight, Mode=TwoWay,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text=" | " FontSize="18" TextColor="#999" VerticalOptions="Center"/>
+                <Label Text="Wert:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="{Binding FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
+
+                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                     <HorizontalStackLayout Spacing="4">
+                        <HorizontalStackLayout.Triggers>
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Dukaten}" Value="0">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                        </HorizontalStackLayout.Triggers>
+                        <Label Text="{Binding TotalValueAsCurrency.Dukaten}"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+                        <Label Text="D"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                     <HorizontalStackLayout Spacing="4">
+                        <HorizontalStackLayout.Triggers>
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Silbertaler}" Value="0">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                        </HorizontalStackLayout.Triggers>
+                        <Label Text="{Binding TotalValueAsCurrency.Silbertaler}"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+                        <Label Text="S"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="4">
+                        <HorizontalStackLayout.Triggers>
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Heller}" Value="0">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                        </HorizontalStackLayout.Triggers>
+                        <Label Text="{Binding TotalValueAsCurrency.Heller}"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+                        <Label Text="H"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="4">
+                        <HorizontalStackLayout.Triggers>
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Kreuzer}" Value="0">
+                                <Setter Property="IsVisible" Value="False"/>
+                            </DataTrigger>
+                        </HorizontalStackLayout.Triggers>
+                        <Label Text="{Binding TotalValueAsCurrency.Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                        <Label Text="K" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
             </HorizontalStackLayout>
             
             <SearchBar Placeholder="Items suchen..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
@@ -80,6 +122,7 @@
                         <Grid Padding="8" ColumnSpacing="10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="2*" />
+                                <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="2*" />
@@ -94,12 +137,13 @@
                                     <TapGestureRecognizer Tapped="OnSortByQuantity" />
                                 </Label.GestureRecognizers>
                             </Label>
-                            <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="2">
+                            <Label Text="Wert" Style="{StaticResource TableHeaderLabel}" Grid.Column="2" />
+                            <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="3">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnSortByWeight" />
                                 </Label.GestureRecognizers>
                             </Label>    
-                            <Label Text="Aktionen" Style="{StaticResource TableHeaderLabel}" Grid.Column="3"/>
+                            <Label Text="Aktionen" Style="{StaticResource TableHeaderLabel}" Grid.Column="4"/>
                         </Grid>
                     </Border>
                 </CollectionView.Header>
@@ -111,13 +155,16 @@
                                     <ColumnDefinition Width="2*" />
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="2*" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding Name}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="0" HorizontalTextAlignment="Center"/>
-                                <Label Text="{Binding Quantity}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="1" HorizontalTextAlignment="Center"/>
-                                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="2" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding Quantity }" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="1" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding TotalValue, StringFormat='{0:N1} S'}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="2" HorizontalTextAlignment="Center"/>
+                                <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="3" HorizontalTextAlignment="Center"/>
 
-                                <HorizontalStackLayout Grid.Column="3" Spacing="6" HorizontalOptions="Center">
+                                <HorizontalStackLayout Grid.Column="4" Spacing="6" HorizontalOptions="Center">
+                                    <Button Text="Use" Clicked="OnUseItem" CommandParameter="{Binding .}" IsVisible="{Binding IsConsumable}" BackgroundColor="#1E88E5" FontSize="12" Padding="8,4" HeightRequest="32"/>
                                     <Button Text="Edit" Clicked="OnEditItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
                                     <Button Text="Kopieren" Clicked="OnCopyItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
                                     <Button Text="Verschieben" Clicked="OnMoveItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>

@@ -25,6 +25,7 @@ namespace VademecumDigitalis
 
             UpdateGlobalBankLabel();
             UpdateTotalWeightsLabel();
+            UpdateTotalValueLabel();
             UpdateFilteredContainers();
 
             // subscribe to containers collection changes to update bank and weights
@@ -45,6 +46,7 @@ namespace VademecumDigitalis
                     // re-init UI after load
                     UpdateGlobalBankLabel();
                     UpdateTotalWeightsLabel();
+                    UpdateTotalValueLabel();
                     UpdateFilteredContainers();
                     foreach (var c in vm.Containers) SubscribeContainer(c);
                 });
@@ -57,6 +59,7 @@ namespace VademecumDigitalis
             base.OnAppearing();
             UpdateGlobalBankLabel();
             UpdateTotalWeightsLabel();
+            UpdateTotalValueLabel();
             // Also refresh list just in case
             UpdateFilteredContainers();
         }
@@ -103,6 +106,7 @@ namespace VademecumDigitalis
             }
             UpdateGlobalBankLabel();
             UpdateTotalWeightsLabel();
+            UpdateTotalValueLabel();
             UpdateFilteredContainers();
         }
 
@@ -111,7 +115,7 @@ namespace VademecumDigitalis
             if (c == null) return;
             c.PropertyChanged += Container_PropertyChanged;
             // also ensure money changes bubble up — InventoryContainer already does this and raises TotalWeight
-            c.Money.PropertyChanged += (s, e) => { UpdateGlobalBankLabel(); UpdateTotalWeightsLabel(); };
+            c.Money.PropertyChanged += (s, e) => { UpdateGlobalBankLabel(); UpdateTotalWeightsLabel(); UpdateTotalValueLabel(); };
             // subscribe existing items changes handled inside InventoryContainer
         }
 
@@ -130,6 +134,12 @@ namespace VademecumDigitalis
             {
                 UpdateTotalWeightsLabel();
             }
+            // value change
+            if (e.PropertyName == nameof(InventoryContainer.TotalValue))
+            {
+                UpdateTotalValueLabel();
+            }
+
             // money changes are handled separately for the global bank labels
             UpdateGlobalBankLabel();
         }
@@ -162,6 +172,38 @@ namespace VademecumDigitalis
             CarriedInventoriesWeightLabel.Text = $"{carried:N2} stein";
         }
 
+        void UpdateTotalValueLabel()
+        {
+            // Gesamtwert aller Inventare
+            double totalAll = VM.Containers.Sum(c => c.TotalValue);
+            
+            var parts = CurrencyAccount.CalculateParts(totalAll);
+            
+            DukatenTotalLabel.Text = parts.dukaten.ToString();
+            DukatenTotalStack.IsVisible = parts.dukaten > 0;
+            
+            SilbertalerTotalLabel.Text = parts.silbertaler.ToString();
+            SilbertalerTotalStack.IsVisible = parts.silbertaler > 0;
+            
+            HellerTotalLabel.Text = parts.heller.ToString();
+            HellerTotalStack.IsVisible = parts.heller > 0;
+            
+            KreuzerTotalLabel.Text = parts.kreuzer.ToString();
+            KreuzerTotalStack.IsVisible = parts.kreuzer > 0;
+            
+            // hide whole stack if 0? Or show "0 S"?
+            if (totalAll == 0)
+            {
+                SilbertalerTotalLabel.Text = "0";
+                SilbertalerTotalStack.IsVisible = true;
+                AllInventoriesValueStack.IsVisible = true;
+            }
+            else
+            {
+                 AllInventoriesValueStack.IsVisible = true;
+            }
+        }
+        
         private async void OnCreateNewContainer(object sender, EventArgs e)
         {
             var result = await DisplayPromptAsync("Neues Inventar", "Name des Containers:", "OK", "Abbrechen", "Neuer Container");
@@ -171,6 +213,7 @@ namespace VademecumDigitalis
                 VM.Containers.Add(c);
                 UpdateGlobalBankLabel();
                 UpdateTotalWeightsLabel();
+                UpdateTotalValueLabel();
             }
         }
 
@@ -278,9 +321,11 @@ namespace VademecumDigitalis
                                 targetContainer.Items.Add(item);
                             }
                             
+
                             // Move money
                             container.Money.TransferTo(targetContainer.Money, container.Money.Dukaten, container.Money.Silbertaler, container.Money.Heller, container.Money.Kreuzer);
                             
+
                             VM.Containers.Remove(container);
                         }
                     }

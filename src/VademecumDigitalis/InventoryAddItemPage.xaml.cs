@@ -20,6 +20,8 @@ namespace VademecumDigitalis
             NameEntry.Text = item.Name;
             QuantityEntry.Text = item.Quantity.ToString();
             WeightEntry.Text = item.WeightPerUnit.ToString();
+            ValueEntry.Text = item.Value.ToString();
+            ConsumableCheckBox.IsChecked = item.IsConsumable;
             DetailsEditor.Text = item.Details;
         }
 
@@ -39,14 +41,19 @@ namespace VademecumDigitalis
             }
             if (!int.TryParse(QuantityEntry.Text, out var qty)) qty = 1;
             if (!double.TryParse(WeightEntry.Text, out var w)) w = 0.0;
+            if (!double.TryParse(ValueEntry.Text, out var v)) v = 0.0;
+            bool isConsumable = ConsumableCheckBox.IsChecked;
 
             if (_editingItem != null)
             {
                 // check if anything changed
-                var changed = _editingItem.Name != name || _editingItem.Quantity != qty || Math.Abs(_editingItem.WeightPerUnit - w) > 0.0001 || _editingItem.Details != (DetailsEditor.Text ?? string.Empty);
+                var changed = _editingItem.Name != name || _editingItem.Quantity != qty || Math.Abs(_editingItem.WeightPerUnit - w) > 0.0001 || _editingItem.Details != (DetailsEditor.Text ?? string.Empty) ||
+                              Math.Abs(_editingItem.Value - v) > 0.0001 || _editingItem.IsConsumable != isConsumable;
                 _editingItem.Name = name;
                 _editingItem.Quantity = qty;
                 _editingItem.WeightPerUnit = w;
+                _editingItem.Value = v;
+                _editingItem.IsConsumable = isConsumable;
                 _editingItem.Details = DetailsEditor.Text ?? string.Empty;
                 if (changed)
                 {
@@ -65,6 +72,8 @@ namespace VademecumDigitalis
                     Name = name,
                     Quantity = qty,
                     WeightPerUnit = w,
+                    Value = v,
+                    IsConsumable = isConsumable,
                     Details = DetailsEditor.Text ?? string.Empty,
                     AcquiredDate = DateTime.UtcNow
                 };

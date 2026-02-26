@@ -55,7 +55,7 @@
             </Grid>
 
             <!-- Weight Summary -->
-            <Grid ColumnDefinitions="*, *" RowDefinitions="*, *" Margin="0">
+            <Grid ColumnDefinitions="*, *" RowDefinitions="Auto, Auto, Auto" Margin="0">
                 <Border Grid.Row="0" Grid.Column="0" VerticalOptions="Center" Grid.ColumnSpan="2" BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
                     <Grid ColumnDefinitions="Auto,Auto" VerticalOptions="Center" Margin="10" >
                         <Label Text="Gesamtgewicht:" VerticalOptions="Center" FontAttributes="Bold" Grid.Column="0" FontSize="16"  />
@@ -70,7 +70,32 @@
                                BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666" HeightRequest="30" Margin="9"  />
                     </Grid>
                 </Border>
-
+                <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
+                    <Grid ColumnDefinitions="Auto,auto" VerticalOptions="Center" Margin="10" >
+                        <Label Text="Gesamtwert:" FontAttributes="Bold" VerticalOptions="Center" Grid.Column="0" FontSize="16"  />
+                        <Entry x:Name="AllInventoriesValueLabel" Grid.Column="1" FontSize="16" FontAttributes="Bold"  IsReadOnly="True" Text="0.00 S" WidthRequest="150"
+                               BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" HeightRequest="30" Margin="9" IsVisible="False" />
+                        
+                        <HorizontalStackLayout x:Name="AllInventoriesValueStack" Spacing="8" VerticalOptions="Center" Grid.Column="1" Margin="9">
+                            <HorizontalStackLayout x:Name="DukatenTotalStack" Spacing="4">
+                                <Label x:Name="DukatenTotalLabel" FontSize="16" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+                                <Label Text="D" FontSize="16" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout x:Name="SilbertalerTotalStack" Spacing="4">
+                                <Label x:Name="SilbertalerTotalLabel" FontSize="16" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+                                <Label Text="S" FontSize="16" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout x:Name="HellerTotalStack" Spacing="4">
+                                <Label x:Name="HellerTotalLabel" FontSize="16" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+                                <Label Text="H" FontSize="16" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout x:Name="KreuzerTotalStack" Spacing="4">
+                                <Label x:Name="KreuzerTotalLabel" FontSize="16" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                                <Label Text="K" FontSize="16" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
             </Grid>
 
             <CollectionView ItemsSource="{Binding FilteredContainers, Source={RelativeSource AncestorType={x:Type local:InventoryDashboardPage}}}" SelectionMode="Single" SelectionChanged="OnContainerSelected">
@@ -82,13 +107,15 @@
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" /> <!-- New column for value -->
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Label Text="Name" Style="{StaticResource TableHeaderLabel}" Grid.Column="0" />
                             <Label Text="Getragen" Style="{StaticResource TableHeaderLabel}" Grid.Column="1" />
                             <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="2" />
                             <Label Text="Geld" Style="{StaticResource TableHeaderLabel}" Grid.Column="3" />
-                            <Label Text="Aktion" Style="{StaticResource TableHeaderLabel}" Grid.Column="4" />
+                            <Label Text="Wert" Style="{StaticResource TableHeaderLabel}" Grid.Column="4" /> <!-- Header for value -->
+                            <Label Text="Aktion" Style="{StaticResource TableHeaderLabel}" Grid.Column="5" /> <!-- Shifted -->
                         </Grid>
                     </Border>
                 </CollectionView.Header>
@@ -119,6 +146,7 @@
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" /> <!-- New column for value -->
                                     <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding Name}" HorizontalOptions="Center"  FontAttributes="Bold" Grid.Column="0"  TextColor="White" FontSize="16" VerticalTextAlignment="Center"/>
@@ -147,7 +175,46 @@
                                     </HorizontalStackLayout>
                                 </HorizontalStackLayout>
                                 
-                                <Button Grid.Column="4" Text="⋮" Clicked="OnContainerActionClicked" CommandParameter="{Binding .}" 
+                                <HorizontalStackLayout Grid.Column="4" Spacing="8" VerticalOptions="Center" HorizontalOptions="Center">
+                                     <HorizontalStackLayout Spacing="4">
+                                        <HorizontalStackLayout.Triggers>
+                                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Dukaten}" Value="0">
+                                                <Setter Property="IsVisible" Value="False"/>
+                                            </DataTrigger>
+                                        </HorizontalStackLayout.Triggers>
+                                        <Label Text="{Binding TotalValueAsCurrency.Dukaten}" TextColor="Gold"  Style="{StaticResource  TableHeaderLabel}"/>
+                                        <Label Text="D" TextColor="Gold" FontAttributes="Bold" Style="{StaticResource  TableHeaderLabel}" />
+                                    </HorizontalStackLayout>
+                                     <HorizontalStackLayout Spacing="4">
+                                        <HorizontalStackLayout.Triggers>
+                                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Silbertaler}" Value="0">
+                                                <Setter Property="IsVisible" Value="False"/>
+                                            </DataTrigger>
+                                        </HorizontalStackLayout.Triggers>
+                                        <Label Text="{Binding TotalValueAsCurrency.Silbertaler}" TextColor="Silver" Style="{StaticResource  TableHeaderLabel}"/>
+                                        <Label Text="S" TextColor="Silver" FontAttributes="Bold" Style="{StaticResource  TableHeaderLabel}" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <HorizontalStackLayout.Triggers>
+                                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Heller}" Value="0">
+                                                <Setter Property="IsVisible" Value="False"/>
+                                            </DataTrigger>
+                                        </HorizontalStackLayout.Triggers>
+                                        <Label Text="{Binding TotalValueAsCurrency.Heller}" TextColor="#CD7F32" Style="{StaticResource  TableHeaderLabel}"/>
+                                        <Label Text="H" TextColor="#CD7F32" FontAttributes="Bold" Style="{StaticResource  TableHeaderLabel}" />
+                                    </HorizontalStackLayout>
+                                    <HorizontalStackLayout Spacing="4">
+                                        <HorizontalStackLayout.Triggers>
+                                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Kreuzer}" Value="0">
+                                                <Setter Property="IsVisible" Value="False"/>
+                                            </DataTrigger>
+                                        </HorizontalStackLayout.Triggers>
+                                        <Label Text="{Binding TotalValueAsCurrency.Kreuzer}" TextColor="#6E6E6E" Style="{StaticResource  TableHeaderLabel}" />
+                                        <Label Text="K" TextColor="#6E6E6E" FontAttributes="Bold" Style="{StaticResource  TableHeaderLabel}" />
+                                    </HorizontalStackLayout>
+                                </HorizontalStackLayout>
+                                
+                                <Button Grid.Column="5" Text="⋮" Clicked="OnContainerActionClicked" CommandParameter="{Binding .}" 
                                         BackgroundColor="Transparent" TextColor="White" FontSize="20" 
                                         FontAttributes="Bold" VerticalOptions="Center" Padding="0" WidthRequest="40" HeightRequest="40"/>
                             </Grid>
