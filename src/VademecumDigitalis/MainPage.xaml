@@ -33,7 +33,7 @@
                         <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Fingerfertigkeit}" />
                         <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Gewandtheit}" />
                         <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Konstitution}" />
-                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Koerperkraft}" />
+                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Körperkraft}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
@@ -67,7 +67,7 @@
                     <Entry Placeholder="Alter" Text="{Binding Alter}" />
 
                     <Label Text="Groesse" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="Groesse" Text="{Binding Groesse}" />
+                    <Entry Placeholder="Groesse" Text="{Binding Größe}" />
 
                     <Label Text="Gewicht" FontAttributes="Bold" FontSize="13" />
                     <Entry Placeholder="Gewicht" Text="{Binding Gewicht}" />

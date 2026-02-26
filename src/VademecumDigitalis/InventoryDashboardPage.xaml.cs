@@ -5,6 +5,7 @@ using VademecumDigitalis.ViewModels;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace VademecumDigitalis
 {
@@ -13,6 +14,7 @@ namespace VademecumDigitalis
         InventoryViewModel VM => BindingContext as InventoryViewModel ?? throw new System.InvalidOperationException("VM not resolved");
         
         public System.Collections.ObjectModel.ObservableCollection<InventoryContainer> FilteredContainers { get; private set; } = new System.Collections.ObjectModel.ObservableCollection<InventoryContainer>();
+        private static bool _dataLoaded = false;
 
         public InventoryDashboardPage()
         {
@@ -32,6 +34,20 @@ namespace VademecumDigitalis
             foreach (var c in VM.Containers)
             {
                 SubscribeContainer(c);
+            }
+            
+            // Trigger LoadDataAsync if first run
+            if (!_dataLoaded && BindingContext is InventoryViewModel vm)
+            {
+                _dataLoaded = true;
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await vm.LoadDataAsync();
+                    // re-init UI after load
+                    UpdateGlobalBankLabel();
+                    UpdateTotalWeightsLabel();
+                    UpdateFilteredContainers();
+                    foreach (var c in vm.Containers) SubscribeContainer(c);
+                });
             }
         }
         
@@ -170,6 +186,114 @@ namespace VademecumDigitalis
         private async void OnGlobalSearch(object sender, EventArgs e)
         {
             await Navigation.PushAsync(new GlobalItemSearchPage());
+        }
+
+        private async void OnSaveClicked(object sender, EventArgs e)
+        {
+            if (BindingContext is InventoryViewModel vm)
+            {
+                // Trigger command manually
+                if (vm.SaveDataCommand.CanExecute(null))
+                {
+                    vm.SaveDataCommand.Execute(null);
+                }
+                
+                // Visual feedback animation
+                await SaveButton.ScaleTo(0.9, 50, Easing.CubicOut);
+                await SaveButton.ScaleTo(1.0, 50, Easing.CubicIn);
+                
+                // Optional: Show toast or small alert
+                // await DisplayAlert("Info", "Daten gespeichert.", "OK");
+            }
+        }
+
+        private async void OnContainerActionClicked(object sender, EventArgs e)
+        {
+            if (sender is Button b && b.CommandParameter is InventoryContainer container)
+            {
+                string editAction = "Container bearbeiten (Name/Details)";
+                string deleteAction = "Container löschen";
+                string moveAction = "Alles verschieben nach..."; // Only if we delete? Or separate action?
+                
+                // Prompt user for action
+                // Using actionsheet
+                
+                var options = new System.Collections.Generic.List<string>();
+                options.Add(editAction);
+                
+                if (!container.IsFixedTreasury)
+                {
+                    options.Add(deleteAction);
+                }
+                
+                var action = await DisplayActionSheet($"Optionen: {container.Name}", "Abbrechen", null, options.ToArray());
+                
+                if (action == editAction)
+                {
+                    // Existing edit logic from ContainerPage can be reused or replicated
+                    // Or ask specifically what to edit
+                    string subAction = await DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name ändern", "Details ändern", "Münzgewicht an/aus");
+                    if (subAction == "Name ändern")
+                    {
+                        string newName = await DisplayPromptAsync("Name", "Neuer Name:", initialValue: container.Name);
+                        if (!string.IsNullOrWhiteSpace(newName)) container.Name = newName;
+                    }
+                    else if (subAction == "Details ändern")
+                    {
+                        string newDetails = await DisplayPromptAsync("Details", "Details:", initialValue: container.Details);
+                       if (newDetails != null) container.Details = newDetails;
+                    }
+                    else if (subAction == "Münzgewicht an/aus")
+                    {
+                        container.IncludeCoinWeight = !container.IncludeCoinWeight;
+                    }
+                }
+                else if (action == deleteAction)
+                {
+                    string delOption = await DisplayActionSheet($"Löschen: {container.Name}", "Abbrechen", "Löschen & Inhalt vernichten", "Löschen & Inhalt verschieben");
+                    
+                    if (delOption == "Abbrechen" || delOption == null) return;
+                    
+                    if (delOption == "Löschen & Inhalt verschieben")
+                    {
+                        // Select target
+                        var targets = VM.Containers.Where(c => c != container).Select(c => c.Name).ToArray();
+                        if (targets.Length == 0)
+                        {
+                            await DisplayAlert("Fehler", "Kein Ziel-Container verfügbar.", "OK");
+                            return; // Cannot move
+                        }
+                        
+                        string targetName = await DisplayActionSheet("Ziel wählen", "Abbrechen", null, targets);
+                        if (string.IsNullOrWhiteSpace(targetName) || targetName == "Abbrechen") return;
+                        
+                        var targetContainer = VM.Containers.FirstOrDefault(c => c.Name == targetName);
+                        if (targetContainer != null)
+                        {
+                            // Move items
+                            var itemsToMove = container.Items.ToList();
+                            foreach(var item in itemsToMove)
+                            {
+                                container.Items.Remove(item);
+                                targetContainer.Items.Add(item);
+                            }
+                            
+                            // Move money
+                            container.Money.TransferTo(targetContainer.Money, container.Money.Dukaten, container.Money.Silbertaler, container.Money.Heller, container.Money.Kreuzer);
+                            
+                            VM.Containers.Remove(container);
+                        }
+                    }
+                    else if (delOption == "Löschen & Inhalt vernichten")
+                    {
+                        bool confirm = await DisplayAlert("Sicher?", "Wirklich alles vernichten?", "Ja, weg damit", "Nein");
+                        if (confirm)
+                        {
+                            VM.Containers.Remove(container);
+                        }
+                    }
+                }
+            }
         }
     }
 }

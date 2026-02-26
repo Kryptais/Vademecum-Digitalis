@@ -45,10 +45,13 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <SearchBar Grid.Column="0" Placeholder="Container suchen..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,5,5"/>
                 <Button Grid.Column="1" Text="Item suchen" Clicked="OnGlobalSearch" Margin="0,0,5,5" BackgroundColor="#333" FontAttributes="None" FontSize="14" Padding="10,0"/>
-                <Button Grid.Column="2" Text="Neu" Clicked="OnCreateNewContainer" Margin="0,0,0,5"  FontAttributes="None" FontSize="14" Padding="10,0"/>
+                <!-- Updated Save Button with Clicked handler for visual feedback -->
+                <Button x:Name="SaveButton" Grid.Column="2" Text="Speichern" Clicked="OnSaveClicked" Margin="0,0,5,5"  BackgroundColor="#1E88E5" FontAttributes="None" FontSize="14" Padding="10,0"/>
+                <Button Grid.Column="3" Text="Neu" Clicked="OnCreateNewContainer" Margin="0,0,0,5"  FontAttributes="None" FontSize="14" Padding="10,0"/>
             </Grid>
 
             <!-- Weight Summary -->
@@ -79,11 +82,13 @@
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
                                 <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Label Text="Name" Style="{StaticResource TableHeaderLabel}" Grid.Column="0" />
                             <Label Text="Getragen" Style="{StaticResource TableHeaderLabel}" Grid.Column="1" />
                             <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="2" />
                             <Label Text="Geld" Style="{StaticResource TableHeaderLabel}" Grid.Column="3" />
+                            <Label Text="Aktion" Style="{StaticResource TableHeaderLabel}" Grid.Column="4" />
                         </Grid>
                     </Border>
                 </CollectionView.Header>
@@ -114,6 +119,7 @@
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
                                 <Label Text="{Binding Name}" HorizontalOptions="Center"  FontAttributes="Bold" Grid.Column="0"  TextColor="White" FontSize="16" VerticalTextAlignment="Center"/>
                                 <HorizontalStackLayout Grid.Column="1" Spacing="8" HorizontalOptions="Center">
@@ -140,6 +146,10 @@
                                         <Label Text="K" TextColor="#6E6E6E" FontAttributes="Bold" Style="{StaticResource  TableHeaderLabel}" />
                                     </HorizontalStackLayout>
                                 </HorizontalStackLayout>
+                                
+                                <Button Grid.Column="4" Text="⋮" Clicked="OnContainerActionClicked" CommandParameter="{Binding .}" 
+                                        BackgroundColor="Transparent" TextColor="White" FontSize="20" 
+                                        FontAttributes="Bold" VerticalOptions="Center" Padding="0" WidthRequest="40" HeightRequest="40"/>
                             </Grid>
                         </Border>
                     </DataTemplate>
