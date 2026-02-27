@@ -1,44 +1,29 @@
 using System;
 using Microsoft.Maui.Controls;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.ViewModels;
 
 namespace VademecumDigitalis
 {
     public partial class MoneyTransferPage : ContentPage
     {
-        public int Dukaten { get; private set; }
-        public int Silbertaler { get; private set; }
-        public int Heller { get; private set; }
-        public int Kreuzer { get; private set; }
+        // Public properties to access result
+        public bool Confirmed => (BindingContext as MoneyTransferViewModel)?.Confirmed ?? false;
+        public int Dukaten => (BindingContext as MoneyTransferViewModel)?.Dukaten ?? 0;
+        public int Silbertaler => (BindingContext as MoneyTransferViewModel)?.Silbertaler ?? 0;
+        public int Heller => (BindingContext as MoneyTransferViewModel)?.Heller ?? 0;
+        public int Kreuzer => (BindingContext as MoneyTransferViewModel)?.Kreuzer ?? 0;
 
-        public bool Confirmed { get; private set; }
-
-        public MoneyTransferPage(InventoryContainer source)
+        public MoneyTransferPage(Models.InventoryContainer source)
         {
             InitializeComponent();
-            BindingContext = source; // Bind to source to show available funds if needed
-        }
+            var vm = new MoneyTransferViewModel(source);
+            BindingContext = vm;
 
-        private async void OnCancel(object sender, EventArgs e)
-        {
-            Confirmed = false;
-            await Navigation.PopModalAsync();
-        }
-
-        private async void OnOk(object sender, EventArgs e)
-        {
-            int.TryParse(DukatenEntry.Text, out var d);
-            int.TryParse(SilbertalerEntry.Text, out var s);
-            int.TryParse(HellerEntry.Text, out var h);
-            int.TryParse(KreuzerEntry.Text, out var k);
-
-            Dukaten = d;
-            Silbertaler = s;
-            Heller = h;
-            Kreuzer = k;
-            
-            Confirmed = true;
-            await Navigation.PopModalAsync();
+            vm.RequestClose += (s, e) =>
+            {
+                Navigation.PopModalAsync();
+            };
         }
     }
 }

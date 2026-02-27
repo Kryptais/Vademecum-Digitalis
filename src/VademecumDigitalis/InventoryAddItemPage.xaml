@@ -1,33 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
              x:Class="VademecumDigitalis.InventoryAddItemPage"
+             x:DataType="viewmodels:InventoryAddItemViewModel"
              Title="Neues Item">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <Label Text="Name" />
-            <Entry x:Name="NameEntry" />
+            <Entry Text="{Binding Name}" />
 
             <Label Text="Anzahl" />
-            <Entry x:Name="QuantityEntry" Keyboard="Numeric" Text="1" />
+            <Entry Text="{Binding QuantityText}" Keyboard="Numeric" />
 
             <Label Text="Gewicht pro Einheit (Stein)" />
-            <Entry x:Name="WeightEntry" Keyboard="Numeric" Text="0.0" />
+            <Entry Text="{Binding WeightText}" Keyboard="Numeric" />
 
             <Label Text="Wert (Silbertaler)" />
-            <Entry x:Name="ValueEntry" Keyboard="Numeric" Text="0.0" />
+            <Entry Text="{Binding ValueText}" Keyboard="Numeric" />
 
             <HorizontalStackLayout Spacing="8">
                 <Label Text="Verbrauchsgegenstand?" VerticalOptions="Center"/>
-                <CheckBox x:Name="ConsumableCheckBox" />
+                <CheckBox IsChecked="{Binding IsConsumable}" />
             </HorizontalStackLayout>
 
             <Label Text="Details" />
-            <Editor x:Name="DetailsEditor" HeightRequest="120" />
+            <Editor Text="{Binding Details}" HeightRequest="120" />
 
             <HorizontalStackLayout Spacing="12">
-                <Button Text="Abbrechen" Clicked="OnCancel" />
-                <Button Text="OK" Clicked="OnOk" />
+                <Button Text="Abbrechen" Command="{Binding CancelCommand}" />
+                <Button Text="OK" Command="{Binding SaveCommand}" />
             </HorizontalStackLayout>
         </VerticalStackLayout>
     </ScrollView>

@@ -1,38 +1,55 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Controls;
 using VademecumDigitalis.Models;
 using VademecumDigitalis.Services;
 
 namespace VademecumDigitalis.ViewModels
 {
-    public class InventoryViewModel : INotifyPropertyChanged
+    public partial class InventoryViewModel : ObservableObject
     {
-        private readonly InventoryService _service = new InventoryService();
-        private readonly PersistenceService _persistence = new PersistenceService();
+        private readonly InventoryService _service;
+        private readonly PersistenceService _persistence;
 
         public ObservableCollection<InventoryContainer> Containers { get; } = new ObservableCollection<InventoryContainer>();
 
-        public RelayCommand MoveItemCommand { get; }
-        public RelayCommand TransferMoneyCommand { get; }
-        public RelayCommand SaveDataCommand { get; }
+        // Gefilterte Liste für die UI
+        public ObservableCollection<InventoryContainer> FilteredContainers { get; } = new ObservableCollection<InventoryContainer>();
 
-        public InventoryViewModel()
+        [ObservableProperty]
+        private string _searchText = string.Empty;
+
+        // Gesamtwerte für die UI
+        [ObservableProperty]
+        private double _totalWeight;
+
+        [ObservableProperty]
+        private double _carriedWeight;
+
+        [ObservableProperty]
+        private CurrencyAccount _totalBank = new();
+
+        [ObservableProperty]
+        private CurrencyAccount _formattedTotalValue = new();
+
+        public InventoryViewModel(InventoryService service) 
         {
-            MoveItemCommand = new RelayCommand(p => ExecuteMoveItem(p));
-            TransferMoneyCommand = new RelayCommand(p => ExecuteTransferMoney(p));
-            SaveDataCommand = new RelayCommand(async p => await ExecuteSaveData());
-            
-            // Replaced immediate initialization with loading logic
-            // We'll call LoadDataAsync from async context later or constructor wrapper
-            
-            // Subscribe to save changes
+            _service = service;
+            // PersistenceService könnte auch injiziert werden, hier instanziieren wir ihn direkt der Einfachheit halber oder nutzen den aus dem alten Code
+            _persistence = new PersistenceService(); 
+
             Containers.CollectionChanged += Containers_CollectionChanged;
         }
-        
-        // This should be called once after VM creation, e.g. from App.xaml.cs or Page OnAppearing
+
+        partial void OnSearchTextChanged(string value)
+        {
+            UpdateFilteredContainers();
+        }
+
         public async Task LoadDataAsync()
         {
             var loaded = await _persistence.LoadInventoryAsync();
@@ -43,13 +60,11 @@ namespace VademecumDigitalis.ViewModels
                 foreach (var c in loaded)
                 {
                     Containers.Add(c);
-                    // Re-subscribe to inner changes if needed
                     SubscribeToContainerChanges(c);
                 }
             }
             else
             {
-                // Create default Treasury if none exists (first run)
                 var treasury = new InventoryContainer
                 {
                     Name = "Tresor",
@@ -62,6 +77,8 @@ namespace VademecumDigitalis.ViewModels
                 SubscribeToContainerChanges(treasury);
                 await SaveDataAsync();
             }
+            RecalculateTotals();
+            UpdateFilteredContainers();
         }
         
         private async Task SaveDataAsync()
@@ -69,50 +86,176 @@ namespace VademecumDigitalis.ViewModels
              await _persistence.SaveInventoryAsync(Containers);
         }
 
-        private async Task ExecuteSaveData()
+        [RelayCommand]
+        private async Task SaveData()
         {
             await SaveDataAsync();
-            // Optional: You might want to signal completion if the UI needs to show a "Saved" message
-            // For now specific UI feedback is handled in the View if needed, or we just rely on it working.
-            // If we want a toast, we might need a service for that or use a messenger.
-            // But for simple "Button clicked" feedback, the view can handle the click event too.
-            // Let's keep the logic here simple.
+            
+            // Optional: Visuelles Feedback via VM? 
+            // Hier könnte man eine Property "IsSaving" toggeln, die in der UI einen Spinner zeigt.
+        }
+
+        [RelayCommand]
+        private async Task CreateNewContainer()
+        {
+            string result = await Application.Current.MainPage.DisplayPromptAsync("Neues Inventar", "Name des Containers:", "OK", "Abbrechen", "Neuer Container");
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                var c = new InventoryContainer { Name = result };
+                Containers.Add(c); 
+            }
+        }
+
+        [RelayCommand]
+        private async Task ShowContainerOptions(InventoryContainer container)
+        {
+            if (container == null) return;
+            
+            string editAction = "Container bearbeiten (Name/Details)";
+            string deleteAction = "Container löschen";
+            
+             var options = new System.Collections.Generic.List<string>();
+            options.Add(editAction);
+            
+            if (!container.IsFixedTreasury)
+            {
+                options.Add(deleteAction);
+            }
+            
+            var action = await Application.Current.MainPage.DisplayActionSheet($"Optionen: {container.Name}", "Abbrechen", null, options.ToArray());
+
+            if (action == editAction)
+            {
+                 await EditContainer(container);
+            }
+            else if (action == deleteAction)
+            {
+                await DeleteContainer(container);
+            }
+        }
+
+        private async Task DeleteContainer(InventoryContainer container)
+        {
+            if (container == null || container.IsFixedTreasury) return;
+
+             string delOption = await Application.Current.MainPage.DisplayActionSheet($"Löschen: {container.Name}", "Abbrechen", "Löschen & Inhalt vernichten", "Löschen & Inhalt verschieben");
+                    
+            if (delOption == "Abbrechen" || delOption == null) return;
+            
+            if (delOption == "Löschen & Inhalt verschieben")
+            {
+                var targets = Containers.Where(c => c != container).Select(c => c.Name).ToArray();
+                if (targets.Length == 0)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Fehler", "Kein Ziel-Container verfügbar.", "OK");
+                    return;
+                }
+                
+                string targetName = await Application.Current.MainPage.DisplayActionSheet("Ziel wählen", "Abbrechen", null, targets);
+                if (string.IsNullOrWhiteSpace(targetName) || targetName == "Abbrechen") return;
+                
+                var targetContainer = Containers.FirstOrDefault(c => c.Name == targetName);
+                if (targetContainer != null)
+                {
+                     var itemsToMove = container.Items.ToList();
+                    foreach(var item in itemsToMove)
+                    {
+                        container.Items.Remove(item);
+                        targetContainer.Items.Add(item);
+                    }
+                    container.Money.TransferTo(targetContainer.Money, container.Money.Dukaten, container.Money.Silbertaler, container.Money.Heller, container.Money.Kreuzer);
+                    
+                    Containers.Remove(container);
+                }
+            }
+            else if (delOption == "Löschen & Inhalt vernichten")
+            {
+                bool confirm = await Application.Current.MainPage.DisplayAlert("Sicher?", "Wirklich alles vernichten?", "Ja, weg damit", "Nein");
+                if (confirm)
+                {
+                    Containers.Remove(container);
+                }
+            }
+        }
+
+        private async Task EditContainer(InventoryContainer container)
+        {
+            if (container == null) return;
+
+             string subAction = await Application.Current.MainPage.DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name ändern", "Details ändern", "Münzgewicht an/aus");
+            if (subAction == "Name ändern")
+            {
+                string newName = await Application.Current.MainPage.DisplayPromptAsync("Name", "Neuer Name:", initialValue: container.Name);
+                if (!string.IsNullOrWhiteSpace(newName)) container.Name = newName;
+            }
+            else if (subAction == "Details ändern")
+            {
+                string newDetails = await Application.Current.MainPage.DisplayPromptAsync("Details", "Details:", initialValue: container.Details);
+                if (newDetails != null) container.Details = newDetails;
+            }
+            else if (subAction == "Münzgewicht an/aus")
+            {
+                container.IncludeCoinWeight = !container.IncludeCoinWeight;
+            }
+        }
+
+        [RelayCommand]
+        private async Task NavigateToContainer(InventoryContainer container)
+        {
+            if (container == null) return;
+            
+            // Resolve Page via DI
+            var page = Application.Current.Handler.MauiContext.Services.GetService<InventoryContainerPage>();
+            var vm = page.BindingContext as InventoryContainerViewModel;
+            if (vm != null) vm.Container = container;
+            
+            await Application.Current.MainPage.Navigation.PushAsync(page);
+        }
+
+        [RelayCommand]
+        private async Task NavigateToSearch()
+        {
+            var page = Application.Current.Handler.MauiContext.Services.GetService<GlobalItemSearchPage>();
+            await Application.Current.MainPage.Navigation.PushAsync(page);
         }
 
         private void SubscribeToContainerChanges(InventoryContainer container)
         {
             container.PropertyChanged += async (s, e) => 
             {
-                 // Autosave on property changes
                  await SaveDataAsync();
-            };
-            container.Items.CollectionChanged += async (s, e) =>
-            {
-                 await SaveDataAsync();
-            };
-            container.Money.PropertyChanged += async (s, e) =>
-            {
-                await SaveDataAsync();
+                 RecalculateTotals(); 
             };
             
-            // Also need to subscribe to items inside for deep changes?
-            // Yes, ideally. For now we listen to container level.
-            // If items properties change (Quant, Name), we should attach there too.
-            foreach(var item in container.Items)
-            {
-                item.PropertyChanged += async (s, e) => await SaveDataAsync();
-            }
-            container.Items.CollectionChanged += (s, e) =>
+            container.Items.CollectionChanged += async (s, e) =>
             {
                 if (e.NewItems != null)
                 {
                     foreach (InventoryItem item in e.NewItems) 
-                        item.PropertyChanged += async (s1, e1) => await SaveDataAsync();
+                        item.PropertyChanged += async (s1, e1) => { await SaveDataAsync(); RecalculateTotals(); };
                 }
+                 await SaveDataAsync();
+                 RecalculateTotals();
             };
+            
+            container.Money.PropertyChanged += async (s, e) =>
+            {
+                await SaveDataAsync();
+                RecalculateTotals();
+            };
+
+             foreach(var item in container.Items)
+            {
+                item.PropertyChanged += async (s, e) => { await SaveDataAsync(); RecalculateTotals(); };
+            }
         }
 
-        private async void Containers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void UnsubscribeContainer(InventoryContainer container)
+        {
+             // Optional: Cleanup logic
+        }
+
+        private void Containers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {
@@ -121,42 +264,63 @@ namespace VademecumDigitalis.ViewModels
                     SubscribeToContainerChanges(c);
                 }
             }
+             if (e.OldItems != null)
+            {
+                foreach (InventoryContainer c in e.OldItems)
+                {
+                    UnsubscribeContainer(c);
+                }
+            }
             
-            await SaveDataAsync();
+            RecalculateTotals();
+            UpdateFilteredContainers();
+            SaveDataAsync().FireAndForgetSafeAsync();
         }
 
-        private void ExecuteMoveItem(object? param)
+        private void RecalculateTotals()
         {
-            // expecting a tuple-like object or a small DTO - keep simple for now
-            if (param is not object[] arr || arr.Length < 4) return;
-            var from = arr[0] as InventoryContainer;
-            var to = arr[1] as InventoryContainer;
-            var item = arr[2] as InventoryItem;
-            var qty = (int)arr[3];
-            if (from == null || to == null || item == null) return;
-            _service.MoveItem(from, to, item, qty);
-            OnPropertyChanged(nameof(Containers));
-            // Save happens via collection/property changes
+            TotalWeight = Containers.Sum(c => c.TotalWeight);
+            CarriedWeight = Containers.Where(c => c.IsCarried).Sum(c => c.TotalWeight);
+            
+            long d = 0, s = 0, h = 0, k = 0;
+            foreach (var c in Containers)
+            {
+                d += c.Money.Dukaten;
+                s += c.Money.Silbertaler;
+                h += c.Money.Heller;
+                k += c.Money.Kreuzer;
+            }
+            TotalBank = new CurrencyAccount { Dukaten = d, Silbertaler = s, Heller = h, Kreuzer = k };
+
+            double totalVal = Containers.Sum(c => c.TotalValue);
+            var parts = CurrencyAccount.CalculateParts(totalVal);
+             FormattedTotalValue = new CurrencyAccount { Dukaten = parts.dukaten, Silbertaler = parts.silbertaler, Heller = parts.heller, Kreuzer = parts.kreuzer };
         }
 
-        private void ExecuteTransferMoney(object? param)
+        private void UpdateFilteredContainers()
         {
-            if (param is not object[] arr || arr.Length < 6) return;
-            var from = arr[0] as InventoryContainer;
-            var to = arr[1] as InventoryContainer;
-            var duk = (int)arr[2];
-            var sil = (int)arr[3];
-            var hel = (int)arr[4];
-            var kre = (int)arr[5];
-            if (from == null || to == null) return;
-            _service.TransferMoney(from, to, duk, sil, hel, kre);
-            OnPropertyChanged(nameof(Containers));
-             // Save happens via collection/property changes
+            FilteredContainers.Clear();
+             var query = Containers.AsEnumerable();
+            if (!string.IsNullOrWhiteSpace(SearchText))
+            {
+                query = query.Where(c => 
+                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                    c.Items.Any(i => i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                );
+            }
+            foreach (var c in query) FilteredContainers.Add(c);
         }
-
-        public double TotalCarriedWeight => Containers.Where(c => c.IsCarried).Sum(c => c.TotalWeight);
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+    
+    public static class TaskExtensions
+    {
+        public static async void FireAndForgetSafeAsync(this Task task)
+        {
+            try
+            {
+                await task;
+            }
+            catch { }
+        }
     }
 }

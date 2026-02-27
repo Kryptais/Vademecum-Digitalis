@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
              x:Class="VademecumDigitalis.InventoryContainerPage"
+             x:DataType="viewmodels:InventoryContainerViewModel"
              Title=""
              BackgroundColor="#121212">
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
             <!-- Header Area -->
-            <Button Text="Zurück" Clicked="OnBackClicked" HorizontalOptions="Start" />
-            <Label Text="{Binding Name}" Style="{StaticResource HeadlineLabel}" />
+            <Button Text="Zurück" Command="{Binding NavigateBackCommand}" HorizontalOptions="Start" />
+            <Label Text="{Binding Container.Name}" Style="{StaticResource HeadlineLabel}" />
 
             <!-- Money Area -->
             <Border BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
@@ -32,33 +35,33 @@
                     
                     <StackLayout Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Spacing="8">
                         <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
-                        <CheckBox IsChecked="{Binding IncludeCoinWeight}" />
+                        <CheckBox IsChecked="{Binding Container.IncludeCoinWeight}" />
                     </StackLayout>
                     
                     <Label Text="Dukaten:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" VerticalTextAlignment="Center" />
-                    <Entry Text="{Binding Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                    <Entry Text="{Binding Container.Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
                         BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2" />
                         
                     <Label Text="Silbertaler:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="Silver" VerticalTextAlignment="Center" />
-                    <Entry Text="{Binding Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                    <Entry Text="{Binding Container.Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                            Keyboard="Numeric" WidthRequest="80"
                            BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3" />
                            
                     <Label Text="Heller:" Grid.Row="4" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32"  VerticalTextAlignment="Center"/>
-                    <Entry Text="{Binding Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                    <Entry Text="{Binding Container.Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                        Keyboard="Numeric" WidthRequest="80"
                        BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4" />
                        
                     <Label Text="Kreuzer:" Grid.Row="5" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" VerticalTextAlignment="Center" />
-                    <Entry Text="{Binding Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                    <Entry Text="{Binding Container.Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
                         BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5"/>
 
                     <!-- Money Action Buttons -->
-                    <Button Text="Geld transferieren" Clicked="OnTransferMoney" 
+                    <Button Text="Geld transferieren" Command="{Binding TransferMoneyCommand}" 
                             Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0"/>
-                    <Button Text="Geld in Tresor transferieren" Clicked="OnTransferToTreasury" 
+                    <Button Text="Geld in Tresor transferieren" Command="{Binding TransferToTreasuryCommand}" 
                             BackgroundColor="#2A2A2A" TextColor="Gold" BorderColor="Gold" BorderWidth="1"
                             Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0"/>
                 </Grid>
@@ -67,56 +70,56 @@
             <Label Text="Items" Style="{StaticResource SubheadLabel}" />
             
             <HorizontalStackLayout Spacing="8">
-                <Button Text="Item hinzufügen" Clicked="OnAddItem" ZIndex="1" Margin="0,0,12,0"/>
+                <Button Text="Item hinzufügen" Command="{Binding AddItemCommand}" ZIndex="1" Margin="0,0,12,0"/>
                 <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
-                <Label Text="{Binding TotalWeight, Mode=TwoWay,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="{Binding Container.TotalWeight, Mode=TwoWay,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
                 <Label Text=" | " FontSize="18" TextColor="#999" VerticalOptions="Center"/>
                 <Label Text="Wert:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
-                <Label Text="{Binding FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
+                <Label Text="{Binding Container.FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
 
                 <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
                      <HorizontalStackLayout Spacing="4">
                         <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Dukaten}" Value="0">
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Dukaten}" Value="0">
                                 <Setter Property="IsVisible" Value="False"/>
                             </DataTrigger>
                         </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding TotalValueAsCurrency.Dukaten}"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+                        <Label Text="{Binding Container.TotalValueAsCurrency.Dukaten}"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
                         <Label Text="D"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                      <HorizontalStackLayout Spacing="4">
                         <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Silbertaler}" Value="0">
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Silbertaler}" Value="0">
                                 <Setter Property="IsVisible" Value="False"/>
                             </DataTrigger>
                         </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding TotalValueAsCurrency.Silbertaler}"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+                        <Label Text="{Binding Container.TotalValueAsCurrency.Silbertaler}"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
                         <Label Text="S"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
                         <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Heller}" Value="0">
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Heller}" Value="0">
                                 <Setter Property="IsVisible" Value="False"/>
                             </DataTrigger>
                         </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding TotalValueAsCurrency.Heller}"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+                        <Label Text="{Binding Container.TotalValueAsCurrency.Heller}"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
                         <Label Text="H"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                     <HorizontalStackLayout Spacing="4">
                         <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding TotalValueAsCurrency.Kreuzer}" Value="0">
+                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Kreuzer}" Value="0">
                                 <Setter Property="IsVisible" Value="False"/>
                             </DataTrigger>
                         </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding TotalValueAsCurrency.Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                        <Label Text="{Binding Container.TotalValueAsCurrency.Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
                         <Label Text="K" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
                     </HorizontalStackLayout>
                 </HorizontalStackLayout>
             </HorizontalStackLayout>
             
-            <SearchBar Placeholder="Items suchen..." TextChanged="OnSearchBarTextChanged" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
+            <SearchBar Placeholder="Items suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
 
-            <CollectionView x:Name="ItemsCollectionView">
+            <CollectionView x:Name="ItemsCollectionView" ItemsSource="{Binding FilteredItems}">
                 <CollectionView.Header>
                     <Border StrokeThickness="0" BackgroundColor="#333" Padding="0" Margin="0,0,0,4">
                         <Grid Padding="8" ColumnSpacing="10">
@@ -129,18 +132,18 @@
                             </Grid.ColumnDefinitions>
                             <Label Text="Name" Style="{StaticResource TableHeaderLabel}" Grid.Column="0">
                                 <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnSortByName" />
+                                    <TapGestureRecognizer Command="{Binding SortByNameCommand}" />
                                 </Label.GestureRecognizers>
                             </Label>
                             <Label Text="Anzahl" Style="{StaticResource TableHeaderLabel}" Grid.Column="1">
                                 <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnSortByQuantity" />
+                                    <TapGestureRecognizer Command="{Binding SortByQuantityCommand}" />
                                 </Label.GestureRecognizers>
                             </Label>
                             <Label Text="Wert" Style="{StaticResource TableHeaderLabel}" Grid.Column="2" />
                             <Label Text="Gewicht" Style="{StaticResource TableHeaderLabel}" Grid.Column="3">
                                 <Label.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnSortByWeight" />
+                                    <TapGestureRecognizer Command="{Binding SortByWeightCommand}" />
                                 </Label.GestureRecognizers>
                             </Label>    
                             <Label Text="Aktionen" Style="{StaticResource TableHeaderLabel}" Grid.Column="4"/>
@@ -148,7 +151,7 @@
                     </Border>
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:InventoryItem">
                         <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="0" Margin="0,2">
                             <Grid Padding="8" ColumnSpacing="10">
                                 <Grid.ColumnDefinitions>
@@ -164,14 +167,14 @@
                                 <Label Text="{Binding TotalWeight, StringFormat='{0:N2} stein'}" TextColor="#FFFFFF" VerticalOptions="Center" Grid.Column="3" HorizontalTextAlignment="Center"/>
 
                                 <HorizontalStackLayout Grid.Column="4" Spacing="6" HorizontalOptions="Center">
-                                    <Button Text="Use" Clicked="OnUseItem" CommandParameter="{Binding .}" IsVisible="{Binding IsConsumable}" BackgroundColor="#1E88E5" FontSize="12" Padding="8,4" HeightRequest="32"/>
-                                    <Button Text="Edit" Clicked="OnEditItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
-                                    <Button Text="Kopieren" Clicked="OnCopyItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
-                                    <Button Text="Verschieben" Clicked="OnMoveItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
-                                    <Button Text="+" Clicked="OnIncreaseItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
-                                    <Button Text="-" Clicked="OnDecreaseItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
-                                    <Button Text="Entfernen" Clicked="OnRemoveItem" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
-                                    <Button Text="Log" Clicked="OnShowItemLog" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Use" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=UseItemCommand}" CommandParameter="{Binding .}" IsVisible="{Binding IsConsumable}" BackgroundColor="#1E88E5" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Edit" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=EditItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Kopieren" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=CopyItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Verschieben" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=MoveItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="+" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=IncreaseItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
+                                    <Button Text="-" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=DecreaseItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32" WidthRequest="32"/>
+                                    <Button Text="Entfernen" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=RemoveItemCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
+                                    <Button Text="Log" Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryContainerViewModel}}, Path=ShowLogCommand}" CommandParameter="{Binding .}" FontSize="12" Padding="8,4" HeightRequest="32"/>
                                 </HorizontalStackLayout>
                             </Grid>
                         </Border>
