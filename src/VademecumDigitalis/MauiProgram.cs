@@ -15,6 +15,7 @@ public static class MauiProgram
     builder.Services.AddSingleton<InventoryService>();
     builder.Services.AddSingleton<InventoryViewModel>();
     builder.Services.AddSingleton<InventoryLogService>();
+    builder.Services.AddSingleton<IDialogService, DialogService>();
     
     // Pages + VMs
     builder.Services.AddTransient<InventoryContainerPage>();

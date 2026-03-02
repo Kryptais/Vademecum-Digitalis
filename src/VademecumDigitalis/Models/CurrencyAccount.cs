@@ -1,84 +1,38 @@
-using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace VademecumDigitalis.Models
 {
-    public class CurrencyAccount : INotifyPropertyChanged
+    public partial class CurrencyAccount : ObservableObject
     {
-        private long _dukaten;
-        private long _silbertaler;
-        private long _heller;
-        private long _kreuzer;
-
         // approximate weight per coin in 'stein' (units used by InventoryItem.TotalWeight).
-        // Adjust values if you have real weights.
         private const double WeightPerDukaten = 0.1;
         private const double WeightPerSilbertaler = 0.1;
         private const double WeightPerHeller = 0.1;
         private const double WeightPerKreuzer = 0.1;
 
-        public long Dukaten
-        {
-            get => _dukaten;
-            set
-            {
-                if (_dukaten != value)
-                {
-                    _dukaten = value;
-                    OnPropertyChanged(nameof(Dukaten));
-                    OnPropertyChanged(nameof(TotalWeight));
-                    OnPropertyChanged(nameof(TotalValueInSilver)); 
-                    OnPropertyChanged(nameof(TotalValueInDukaten));
-                }
-            }
-        }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalWeight))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
+        private long _dukaten;
 
-        public long Silbertaler
-        {
-            get => _silbertaler;
-            set
-            {
-                if (_silbertaler != value)
-                {
-                    _silbertaler = value;
-                    OnPropertyChanged(nameof(Silbertaler));
-                    OnPropertyChanged(nameof(TotalWeight));
-                    OnPropertyChanged(nameof(TotalValueInSilver));
-                    OnPropertyChanged(nameof(TotalValueInDukaten));
-                }
-            }
-        }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalWeight))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
+        private long _silbertaler;
 
-        public long Heller
-        {
-            get => _heller;
-            set
-            {
-                if (_heller != value)
-                {
-                    _heller = value;
-                    OnPropertyChanged(nameof(Heller));
-                    OnPropertyChanged(nameof(TotalWeight));
-                    OnPropertyChanged(nameof(TotalValueInSilver));
-                    OnPropertyChanged(nameof(TotalValueInDukaten));
-                }
-            }
-        }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalWeight))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
+        private long _heller;
 
-        public long Kreuzer
-        {
-            get => _kreuzer;
-            set
-            {
-                if (_kreuzer != value)
-                {
-                    _kreuzer = value;
-                    OnPropertyChanged(nameof(Kreuzer));
-                    OnPropertyChanged(nameof(TotalWeight));
-                    OnPropertyChanged(nameof(TotalValueInSilver));
-                    OnPropertyChanged(nameof(TotalValueInDukaten));
-                }
-            }
-        }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalWeight))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
+        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
+        private long _kreuzer;
 
         public double TotalWeight =>
             Dukaten * WeightPerDukaten +
@@ -146,7 +100,5 @@ namespace VademecumDigitalis.Models
             target.Kreuzer += kreuzer;
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 }

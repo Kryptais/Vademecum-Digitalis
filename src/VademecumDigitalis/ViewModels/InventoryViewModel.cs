@@ -316,10 +316,8 @@ namespace VademecumDigitalis.ViewModels
              var query = Containers.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
-                query = query.Where(c => 
-                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
-                    c.Items.Any(i => i.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                );
+                query = query.Where(c =>
+                    c.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase));
             }
             foreach (var c in query) FilteredContainers.Add(c);
         }
