@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             x:Class="VademecumDigitalis.CoinDisplayView"
+             x:Name="coinDisplayRoot">
+
+    <HorizontalStackLayout Spacing="8" VerticalOptions="Center"
+                           BindingContext="{Binding Source={x:Reference coinDisplayRoot}, Path=Currency}">
+
+        <!-- Dukaten -->
+        <HorizontalStackLayout Spacing="4">
+            <HorizontalStackLayout.Triggers>
+                <DataTrigger TargetType="HorizontalStackLayout"
+                             Binding="{Binding Dukaten}" Value="0">
+                    <Setter Property="IsVisible" Value="False"/>
+                </DataTrigger>
+            </HorizontalStackLayout.Triggers>
+            <Label Text="{Binding Dukaten}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+            <Label Text="D"                FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <!-- Silbertaler -->
+        <HorizontalStackLayout Spacing="4">
+            <HorizontalStackLayout.Triggers>
+                <DataTrigger TargetType="HorizontalStackLayout"
+                             Binding="{Binding Silbertaler}" Value="0">
+                    <Setter Property="IsVisible" Value="False"/>
+                </DataTrigger>
+            </HorizontalStackLayout.Triggers>
+            <Label Text="{Binding Silbertaler}" FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+            <Label Text="S"                     FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <!-- Heller -->
+        <HorizontalStackLayout Spacing="4">
+            <HorizontalStackLayout.Triggers>
+                <DataTrigger TargetType="HorizontalStackLayout"
+                             Binding="{Binding Heller}" Value="0">
+                    <Setter Property="IsVisible" Value="False"/>
+                </DataTrigger>
+            </HorizontalStackLayout.Triggers>
+            <Label Text="{Binding Heller}" FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+            <Label Text="H"               FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+        <!-- Kreuzer -->
+        <HorizontalStackLayout Spacing="4">
+            <HorizontalStackLayout.Triggers>
+                <DataTrigger TargetType="HorizontalStackLayout"
+                             Binding="{Binding Kreuzer}" Value="0">
+                    <Setter Property="IsVisible" Value="False"/>
+                </DataTrigger>
+            </HorizontalStackLayout.Triggers>
+            <Label Text="{Binding Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center"/>
+            <Label Text="K"                 FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center"/>
+        </HorizontalStackLayout>
+
+    </HorizontalStackLayout>
+</ContentView>

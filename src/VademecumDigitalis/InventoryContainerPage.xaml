@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             xmlns:local="clr-namespace:VademecumDigitalis"
              x:Class="VademecumDigitalis.InventoryContainerPage"
              x:DataType="viewmodels:InventoryContainerViewModel"
              Title=""
@@ -89,44 +90,7 @@
                 <Label Text="Wert:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
                 <Label Text="{Binding Container.FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
 
-                <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                     <HorizontalStackLayout Spacing="4">
-                        <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Dukaten}" Value="0">
-                                <Setter Property="IsVisible" Value="False"/>
-                            </DataTrigger>
-                        </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding Container.TotalValueAsCurrency.Dukaten}"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
-                        <Label Text="D"  FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
-                     <HorizontalStackLayout Spacing="4">
-                        <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Silbertaler}" Value="0">
-                                <Setter Property="IsVisible" Value="False"/>
-                            </DataTrigger>
-                        </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding Container.TotalValueAsCurrency.Silbertaler}"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
-                        <Label Text="S"  FontSize="18" FontAttributes="Bold" TextColor="Silver" VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Spacing="4">
-                        <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Heller}" Value="0">
-                                <Setter Property="IsVisible" Value="False"/>
-                            </DataTrigger>
-                        </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding Container.TotalValueAsCurrency.Heller}"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
-                        <Label Text="H"  FontSize="18" FontAttributes="Bold" TextColor="#CD7F32" VerticalOptions="Center"/>
-                    </HorizontalStackLayout>
-                    <HorizontalStackLayout Spacing="4">
-                        <HorizontalStackLayout.Triggers>
-                            <DataTrigger TargetType="HorizontalStackLayout" Binding="{Binding Container.TotalValueAsCurrency.Kreuzer}" Value="0">
-                                <Setter Property="IsVisible" Value="False"/>
-                            </DataTrigger>
-                        </HorizontalStackLayout.Triggers>
-                        <Label Text="{Binding Container.TotalValueAsCurrency.Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
-                        <Label Text="K" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
-                    </HorizontalStackLayout>
-                </HorizontalStackLayout>
+                <local:CoinDisplayView Currency="{Binding Container.TotalValueAsCurrency}" VerticalOptions="Center"/>
             </HorizontalStackLayout>
             
             <SearchBar Placeholder="Items suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
