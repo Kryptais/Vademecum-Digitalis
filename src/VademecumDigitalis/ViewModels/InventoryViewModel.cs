@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Threading; // Added for CancellationTokenSource
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls;
@@ -14,6 +15,8 @@ namespace VademecumDigitalis.ViewModels
     {
         private readonly InventoryService _service;
         private readonly PersistenceService _persistence;
+        private CancellationTokenSource? _saveCts; // Added for Debouncing
+        private CancellationTokenSource? _recalcCts; // Added for Recalculation Debouncing
 
         public ObservableCollection<InventoryContainer> Containers { get; } = new ObservableCollection<InventoryContainer>();
 
@@ -86,12 +89,79 @@ namespace VademecumDigitalis.ViewModels
         
         private async Task SaveDataAsync()
         {
-             await _persistence.SaveInventoryAsync(Containers);
+            // Nur speichern, wenn nicht busy (optional, aber gut gegen Reentrancy wenn manuell getriggert)
+             // Wir nutzen hier aber Fire&Forget oft, daher kein harter Lock.
+             // PersistenceService sollte File-Locks handhaben.
+             try
+             {
+                 IsBusy = true;
+                 await _persistence.SaveInventoryAsync(Containers);
+             }
+             finally
+             {
+                 IsBusy = false;
+             }
+        }
+
+        // Neue Methode für Debounced Saving
+        private void RequestDelayedSave()
+        {
+            _saveCts?.Cancel();
+            _saveCts = new CancellationTokenSource();
+            var token = _saveCts.Token;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    // Wartezeit: 2 Sekunden - genug Zeit um Tippen abzuschließen
+                    await Task.Delay(2000, token);
+                    if (token.IsCancellationRequested) return;
+
+                    // Speichern auf dem MainThread antriggern (falls Zugriff auf ObservableCollection nötig, was save macht)
+                    // SaveDataAsync setzt IsBusy, was UI updated -> MainThread erforderlich
+                    MainThread.BeginInvokeOnMainThread(async () =>
+                    {
+                        if (!token.IsCancellationRequested)
+                        {
+                            await SaveDataAsync();
+                        }
+                    });
+                }
+                catch (TaskCanceledException) { /* expected */ }
+            });
+        }
+
+        private void RequestDelayedRecalculate()
+        {
+            _recalcCts?.Cancel();
+            _recalcCts = new CancellationTokenSource();
+            var token = _recalcCts.Token;
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    // 500ms warten um UI zu entlasten beim schnellen Tippen
+                    await Task.Delay(500, token);
+                    if (token.IsCancellationRequested) return;
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (!token.IsCancellationRequested)
+                            RecalculateTotals();
+                    });
+                }
+                catch (TaskCanceledException) { }
+            });
         }
 
         [RelayCommand]
         private async Task SaveData()
         {
+            // Manuelles Speichern bricht laufende Delays ab und speichert sofort
+            _saveCts?.Cancel();
+            
             if (IsBusy) return;
 
             try
@@ -234,32 +304,32 @@ namespace VademecumDigitalis.ViewModels
 
         private void SubscribeToContainerChanges(InventoryContainer container)
         {
-            container.PropertyChanged += async (s, e) => 
+            container.PropertyChanged += (s, e) => 
             {
-                 await SaveDataAsync();
-                 RecalculateTotals(); 
+                 RequestDelayedSave();
+                 RequestDelayedRecalculate(); 
             };
             
-            container.Items.CollectionChanged += async (s, e) =>
+            container.Items.CollectionChanged += (s, e) =>
             {
                 if (e.NewItems != null)
                 {
                     foreach (InventoryItem item in e.NewItems) 
-                        item.PropertyChanged += async (s1, e1) => { await SaveDataAsync(); RecalculateTotals(); };
+                        item.PropertyChanged += (s1, e1) => { RequestDelayedSave(); RequestDelayedRecalculate(); };
                 }
-                 await SaveDataAsync();
-                 RecalculateTotals();
+                 RequestDelayedSave();
+                 RequestDelayedRecalculate();
             };
             
-            container.Money.PropertyChanged += async (s, e) =>
+            container.Money.PropertyChanged += (s, e) =>
             {
-                await SaveDataAsync();
-                RecalculateTotals();
+                RequestDelayedSave();
+                RequestDelayedRecalculate();
             };
 
              foreach(var item in container.Items)
             {
-                item.PropertyChanged += async (s, e) => { await SaveDataAsync(); RecalculateTotals(); };
+                item.PropertyChanged += (s, e) => { RequestDelayedSave(); RequestDelayedRecalculate(); };
             }
         }
 
@@ -287,7 +357,7 @@ namespace VademecumDigitalis.ViewModels
             
             RecalculateTotals();
             UpdateFilteredContainers();
-            SaveDataAsync().FireAndForgetSafeAsync();
+            RequestDelayedSave(); // Auch hier verzögern statt sofort
         }
 
         private void RecalculateTotals()

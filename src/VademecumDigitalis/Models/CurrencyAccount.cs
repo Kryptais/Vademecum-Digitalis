@@ -1,8 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using System.ComponentModel;
+using System.Threading;
+using System.Timers;
 
 namespace VademecumDigitalis.Models
 {
-    public partial class CurrencyAccount : ObservableObject
+    public class CurrencyAccount : ObservableObject
     {
         // approximate weight per coin in 'stein' (units used by InventoryItem.TotalWeight).
         private const double WeightPerDukaten = 0.1;
@@ -10,36 +13,119 @@ namespace VademecumDigitalis.Models
         private const double WeightPerHeller = 0.1;
         private const double WeightPerKreuzer = 0.1;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalWeight))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
         private long _dukaten;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalWeight))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
         private long _silbertaler;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalWeight))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
         private long _heller;
-
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalWeight))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInSilver))]
-        [NotifyPropertyChangedFor(nameof(TotalValueInDukaten))]
         private long _kreuzer;
+
+        // Timer für Debouncing (ersetzt durch CancellationTokenSource für besseres Threading-Verhalten in UI)
+        private CancellationTokenSource? _debounceCts;
+
+        public CurrencyAccount()
+        {
+        }
+
+        public long Dukaten
+        {
+            get => _dukaten;
+            set
+            {
+                if (_dukaten == value) return;
+                
+                if (SetProperty(ref _dukaten, value))
+                {
+                    OnCoinInputChanged();
+                }
+            }
+        }
+
+        public long Silbertaler
+        {
+            get => _silbertaler;
+            set
+            {
+                if (_silbertaler == value) return;
+
+                if (SetProperty(ref _silbertaler, value))
+                {
+                    OnCoinInputChanged();
+                }
+            }
+        }
+
+        public long Heller
+        {
+            get => _heller;
+            set
+            {
+                if (_heller == value) return;
+
+                if (SetProperty(ref _heller, value))
+                {
+                    OnCoinInputChanged();
+                }
+            }
+        }
+
+        public long Kreuzer
+        {
+            get => _kreuzer;
+            set
+            {
+                if (_kreuzer == value) return;
+
+                if (SetProperty(ref _kreuzer, value))
+                {
+                    OnCoinInputChanged();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Wird aufgerufen, wenn sich irgendeine Münzanzahl ändert (User-Input).
+        /// Startet/Restartet den Timer.
+        /// </summary>
+        private void OnCoinInputChanged()
+        {
+            // Vorherigen Timer abbrechen (Debouncing)
+            _debounceCts?.Cancel();
+            _debounceCts = new CancellationTokenSource();
+            var token = _debounceCts.Token;
+
+            // Neuer Task
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(1000, token);
+                    if (token.IsCancellationRequested) return;
+
+                    // Events feuern
+                    NotifyDependentProperties();
+                }
+                catch (TaskCanceledException)
+                {
+                    // Erwartet bei Abbruch/Neustart
+                }
+            });
+        }
+
+        /// <summary>
+        /// Feuert Events für alle abhängigen Eigenschaften auf einmal.
+        /// </summary>
+        private void NotifyDependentProperties()
+        {
+            OnPropertyChanged(nameof(TotalWeight));
+            OnPropertyChanged(nameof(TotalValueInSilver)); 
+            OnPropertyChanged(nameof(TotalValueInDukaten));
+        }
 
         public double TotalWeight =>
             Dukaten * WeightPerDukaten +
             Silbertaler * WeightPerSilbertaler +
             Heller * WeightPerHeller +
             Kreuzer * WeightPerKreuzer;
-
+        
         // Approximate value in Silbertaler
         public double TotalValueInSilver => (Dukaten * 10) + Silbertaler + (Heller / 10.0) + (Kreuzer / 100.0);
         

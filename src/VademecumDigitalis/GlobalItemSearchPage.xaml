@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
              x:Class="VademecumDigitalis.GlobalItemSearchPage"
              x:DataType="viewmodels:GlobalItemSearchViewModel"
              Title="Gegenstandsuche"
@@ -13,8 +14,13 @@
         <SearchBar Placeholder="Suchbegriff..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" />
         
         <CollectionView ItemsSource="{Binding SearchResults}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="10" Padding="20">
+                    <Label Text="Keine Gegenstände gefunden" TextColor="Gray" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:GlobalSearchResult">
                     <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="12" Margin="0,4">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:GlobalItemSearchViewModel}}, Path=ShowItemCommand}" CommandParameter="{Binding .}" />

@@ -66,25 +66,37 @@ namespace VademecumDigitalis.Models
         // TotalWeight respects IncludeCoinWeight
         public double TotalWeight => Items.Sum(i => i.TotalWeight) + (IncludeCoinWeight ? Money.TotalWeight : 0);
 
-        // Total value of all items plus coins in this container (in Silbertaler)
+        // New: Total value of all items in this container (simple sum in Silbertaler, does not include actual money coins?)
+        // Let's include items value only.
         public double TotalValue => Items.Sum(i => i.TotalValue) + Money.TotalValueInSilver;
 
         public string FormattedTotalValue => CurrencyAccount.FormatValue(TotalValue);
 
-        public CurrencyAccount TotalValueAsCurrency => CalculateTotalCurrency();
-
-        private CurrencyAccount CalculateTotalCurrency()
+        // Backing field für das fixe Anzeige-Objekt
+        private readonly CurrencyAccount _cachedTotalValueDisplay = new CurrencyAccount();
+        
+        // Gibt immer das GLEICHE Objekt zurück, damit Bindings stabil bleiben.
+        public CurrencyAccount TotalValueAsCurrency 
         {
-            var parts = CurrencyAccount.CalculateParts(TotalValue);
-            return new CurrencyAccount
+            get
             {
-                Dukaten = parts.dukaten,
-                Silbertaler = parts.silbertaler,
-                Heller = parts.heller,
-                Kreuzer = parts.kreuzer
-            };
+                UpdateTotalCurrencyDisplay();
+                return _cachedTotalValueDisplay;
+            }
         }
 
+        private void UpdateTotalCurrencyDisplay()
+        {
+            // Berechne die Werte basierend auf dem aktuellen TotalValue
+            var parts = CurrencyAccount.CalculateParts(TotalValue);
+            
+            // Setze die Werte direkt auf dem bestehenden Objekt -> feuert PropertyChanged nur für die Zahlen
+            _cachedTotalValueDisplay.Dukaten = parts.dukaten;
+            _cachedTotalValueDisplay.Silbertaler = parts.silbertaler;
+            _cachedTotalValueDisplay.Heller = parts.heller;
+            _cachedTotalValueDisplay.Kreuzer = parts.kreuzer;
+        }
+        
         /// <summary>
         /// Fires PropertyChanged for all computed total properties so the UI updates immediately.
         /// Call this from the ViewModel whenever items or money change.
@@ -99,6 +111,22 @@ namespace VademecumDigitalis.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void OnPropertyChanged(string name)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            
+            // If TotalValue changed, update dependent properties
+            if (name == nameof(TotalValue))
+            {
+                // Aktualisiere das Anzeige-Objekt sofort
+                UpdateTotalCurrencyDisplay();
+
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FormattedTotalValue)));
+                // Hinweis: Da TotalValueAsCurrency immerDasselbe Objekt liefert, 
+                // ist ein PropertyChanged hier streng genommen für das "Objekt" nicht nötig, 
+                // aber nützlich falls jemand auf das Property selbst lauscht.
+                // Wichtiger ist, dass _cachedTotalValueDisplay SEINE PropertyChanged events feuert (macht es automatisch).
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TotalValueAsCurrency)));
+            }
+        }
     }
 }
