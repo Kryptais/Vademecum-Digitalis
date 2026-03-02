@@ -25,6 +25,12 @@ namespace VademecumDigitalis.ViewModels
         // Anzeige des Quellcontainers
         public string SourceName => _sourceContainer?.Name ?? "";
         
+        // Verfügbare Beträge für die Anzeige
+        public long AvailableDukaten => _sourceContainer?.Money?.Dukaten ?? 0;
+        public long AvailableSilbertaler => _sourceContainer?.Money?.Silbertaler ?? 0;
+        public long AvailableHeller => _sourceContainer?.Money?.Heller ?? 0;
+        public long AvailableKreuzer => _sourceContainer?.Money?.Kreuzer ?? 0;
+
         // Ergebnis
         public bool Confirmed { get; private set; }
         public int Dukaten { get; private set; }

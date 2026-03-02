@@ -26,7 +26,7 @@ namespace VademecumDigitalis.Models
         {
             if (string.IsNullOrEmpty(propertyName)) return;
 
-            // Relevant für Gewicht?
+            // Relevant fr Gewicht?
             if (propertyName == nameof(CurrencyAccount.TotalWeight) ||
                 propertyName == nameof(CurrencyAccount.Dukaten) ||
                 propertyName == nameof(CurrencyAccount.Silbertaler) ||
@@ -36,7 +36,7 @@ namespace VademecumDigitalis.Models
                 OnPropertyChanged(nameof(TotalWeight));
             }
 
-            // Relevant für Wert?
+            // Relevant fr Wert?
             if (propertyName == nameof(CurrencyAccount.TotalValueInSilver) || 
                 propertyName == nameof(CurrencyAccount.Dukaten) ||
                 propertyName == nameof(CurrencyAccount.Silbertaler) ||

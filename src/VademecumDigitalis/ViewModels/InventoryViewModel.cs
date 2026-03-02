@@ -23,6 +23,9 @@ namespace VademecumDigitalis.ViewModels
         [ObservableProperty]
         private string _searchText = string.Empty;
 
+        [ObservableProperty]
+        private bool _isBusy;
+
         // Gesamtwerte für die UI
         [ObservableProperty]
         private double _totalWeight;
@@ -89,10 +92,20 @@ namespace VademecumDigitalis.ViewModels
         [RelayCommand]
         private async Task SaveData()
         {
-            await SaveDataAsync();
-            
-            // Optional: Visuelles Feedback via VM? 
-            // Hier könnte man eine Property "IsSaving" toggeln, die in der UI einen Spinner zeigt.
+            if (IsBusy) return;
+
+            try
+            {
+                IsBusy = true;
+                await SaveDataAsync();
+                
+                // Kurzes Feedback (optional, aber meist hilfreich für den User zu sehen "es ist fertig")
+                await Task.Delay(500); 
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]

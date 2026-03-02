@@ -13,6 +13,18 @@
             <!-- Header Area -->
             <Button Text="Zurück" Command="{Binding NavigateBackCommand}" HorizontalOptions="Start" />
             <Label Text="{Binding Container.Name}" Style="{StaticResource HeadlineLabel}" />
+            
+            <!-- Details Label with DataTrigger for Visibility -->
+            <Label Text="{Binding Container.Details}" FontAttributes="Italic" TextColor="#AAA" Margin="0,-5,0,10">
+                <Label.Triggers>
+                    <DataTrigger TargetType="Label" Binding="{Binding Container.Details}" Value="">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Label" Binding="{Binding Container.Details}" Value="{x:Null}">
+                        <Setter Property="IsVisible" Value="False" />
+                    </DataTrigger>
+                </Label.Triggers>
+            </Label>
 
             <!-- Money Area -->
             <Border BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
@@ -39,7 +51,7 @@
                     </StackLayout>
                     
                     <Label Text="Dukaten:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" VerticalTextAlignment="Center" />
-                    <Entry Text="{Binding Container.Money.Dukaten, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                    <Entry Text="{Binding Container.Money.Dukaten, Mode=TwoWay , Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
                         BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2" />
                         
@@ -72,7 +84,7 @@
             <HorizontalStackLayout Spacing="8">
                 <Button Text="Item hinzufügen" Command="{Binding AddItemCommand}" ZIndex="1" Margin="0,0,12,0"/>
                 <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
-                <Label Text="{Binding Container.TotalWeight, Mode=TwoWay,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="{Binding Container.TotalWeight,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
                 <Label Text=" | " FontSize="18" TextColor="#999" VerticalOptions="Center"/>
                 <Label Text="Wert:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
                 <Label Text="{Binding Container.FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
