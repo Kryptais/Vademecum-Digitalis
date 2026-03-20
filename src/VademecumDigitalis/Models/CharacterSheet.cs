@@ -27,8 +27,16 @@ public class CharacterSheet
     public int Konstitution { get; set; } = 8;
     public int Körperkraft { get; set; } = 8;
 
-    // Basiswerte
-    public int Lebensenergie { get; set; } = 25;
+    // Basiswerte – zugekaufte Modifikatoren (über Vor-/Nachteile, AP-Käufe etc.)
+    // Die Berechnung erfolgt im ViewModel: Basis = Formel(Attribute, Spezies) + Zugekauft
+    public int LebensenergieZugekauft { get; set; } = 0;
+    public int AstralenergieZugekauft { get; set; } = 0;
+    public int KarmaenergieZugekauft { get; set; } = 0;
+    public int SeelenkraftZugekauft { get; set; } = 0;
+    public int ZähigkeitZugekauft { get; set; } = 0;
+
+    // Legacy-Felder für Abwärtskompatibilität (werden beim Laden migriert)
+    public int Lebensenergie { get; set; } = 0;
     public int Astralenergie { get; set; } = 0;
     public int Karmaenergie { get; set; } = 0;
     public int Seelenkraft { get; set; } = 0;

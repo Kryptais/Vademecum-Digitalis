@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:converters="clr-namespace:VademecumDigitalis.Converters"
+             xmlns:vm="clr-namespace:VademecumDigitalis.ViewModels"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             x:Class="VademecumDigitalis.BoronKalenderPage"
+             Title="Kalender">
+
+    <ContentPage.Resources>
+        <converters:BoolToColorConverter x:Key="HeuteBackground"
+                                         TrueColor="#0E7490"
+                                         FalseColor="#2A2A2A" />
+        <converters:BoolToColorConverter x:Key="HeuteBorder"
+                                         TrueColor="#14B8A6"
+                                         FalseColor="#444444" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <!-- Aktuelles Spielwelt-Datum -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Aktuelles Spielwelt-Datum" Style="{StaticResource SectionHeaderLabel}" />
+
+                    <Label Text="{Binding AktuellesDatumText}"
+                           FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource AccentCyan}"
+                           HorizontalOptions="Center" />
+
+                    <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="- Tag"
+                                Command="{Binding TagZur&#xFC;ckCommand}"
+                                FontSize="13" Padding="8,6" />
+                        <Button Grid.Column="1" Text="Tag +"
+                                Command="{Binding TagVorCommand}"
+                                FontSize="13" Padding="8,6" />
+                        <Button Grid.Column="2" Text="+7 Tage"
+                                Command="{Binding WocheVorCommand}"
+                                FontSize="13" Padding="8,6" />
+                        <Button Grid.Column="3" Text="Heute"
+                                Command="{Binding SpringeZuHeuteCommand}"
+                                FontSize="13" Padding="8,6"
+                                BackgroundColor="{StaticResource AccentCyan}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Monatsnavigation -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                        <Button Grid.Column="0" Text="&lt;" Command="{Binding VorherigerMonatCommand}"
+                                WidthRequest="50" FontSize="18" Padding="4" />
+                        <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                            <Label Text="{Binding AngezeigterMonatName}"
+                                   FontSize="20" FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" />
+                            <Label Text="{Binding AngezeigtesJahr, StringFormat='{0} BF'}"
+                                   FontSize="14" TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="2" Text="&gt;" Command="{Binding N&#xE4;chsterMonatCommand}"
+                                WidthRequest="50" FontSize="18" Padding="4" />
+                    </Grid>
+
+                    <!-- Tagesraster -->
+                    <FlexLayout BindableLayout.ItemsSource="{Binding AngezeigtesTage}"
+                                Wrap="Wrap"
+                                JustifyContent="Start"
+                                AlignItems="Start"
+                                Margin="0,8,0,0">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="vm:KalenderTag">
+                                <Border WidthRequest="48" HeightRequest="48"
+                                        Margin="3"
+                                        StrokeShape="RoundRectangle 6"
+                                        Stroke="{Binding IstHeute, Converter={StaticResource HeuteBorder}}"
+                                        BackgroundColor="{Binding IstHeute, Converter={StaticResource HeuteBackground}}"
+                                        StrokeThickness="2">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BoronKalenderViewModel}}, Path=TagAusw&#xE4;hlenCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="{Binding Tag}"
+                                           FontSize="16" FontAttributes="Bold"
+                                           HorizontalOptions="Center"
+                                           VerticalOptions="Center" />
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Aventurischer Kalender Referenz -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Aventurische Monate" Style="{StaticResource SectionHeaderLabel}" />
+                    <Label Text="12 Monate a 30 Tage + 5 Namenlose Tage = 365 Tage/Jahr"
+                           FontSize="12" TextColor="{StaticResource TextSecondary}" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" RowSpacing="4" ColumnSpacing="12" Padding="4,8,4,0">
+                        <Label Grid.Column="0" Text="#" FontAttributes="Bold" FontSize="13" />
+                        <Label Grid.Column="1" Text="Monat" FontAttributes="Bold" FontSize="13" />
+                        <Label Grid.Column="2" Text="Tage" FontAttributes="Bold" FontSize="13" HorizontalTextAlignment="End" />
+                    </Grid>
+
+                    <CollectionView ItemsSource="{x:Static models:BoronKalender.Monate}"
+                                    SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="4,3">
+                                    <Label Grid.Column="0" Text="{Binding Index}" FontSize="13"
+                                           TextColor="{StaticResource TextSecondary}" WidthRequest="24" />
+                                    <Label Grid.Column="1" Text="{Binding Name}" FontSize="13" FontAttributes="Bold" />
+                                    <Label Grid.Column="2" Text="{Binding Tage}" FontSize="13"
+                                           HorizontalTextAlignment="End" WidthRequest="30" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- DSA DatePicker im Kalender-Tab -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Datum-Picker" Style="{StaticResource SectionHeaderLabel}" />
+                    <Label Text="DSA-Datum zusammenstellen (z.B. als Geburtstag)."
+                           FontSize="12" TextColor="{StaticResource TextSecondary}" />
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Tag" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                        <Stepper Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="{Binding PickerMaxTage}"
+                                 Value="{Binding PickerTag}" Increment="1" />
+                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding PickerTag}" FontSize="16" FontAttributes="Bold"
+                               VerticalOptions="Center" WidthRequest="30" HorizontalTextAlignment="Center" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="Monat" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                        <Picker Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                ItemsSource="{Binding MonatsNamen}"
+                                SelectedItem="{Binding PickerMonatName, Mode=TwoWay}"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource InputBackground}" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="Jahr" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
+                        <Entry Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                               Keyboard="Numeric" Text="{Binding PickerJahr}"
+                               HorizontalTextAlignment="Center" />
+                    </Grid>
+
+                    <Label Text="{Binding PickerDatumText}" FontSize="16" FontAttributes="Bold"
+                           HorizontalOptions="Center" TextColor="{StaticResource AccentCyan}" Margin="0,4,0,0" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Notizen -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Notizen zum aktuellen Tag" Style="{StaticResource SectionHeaderLabel}" />
+                    <Editor AutoSize="TextChanges"
+                            MinimumHeightRequest="120"
+                            Placeholder="Reisenotizen, Ereignisse, ..."
+                            Text="{Binding Notizen}" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>
