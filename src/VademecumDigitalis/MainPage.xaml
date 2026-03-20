@@ -13,6 +13,21 @@
                    FontSize="16"
                    TextColor="#4B5563" />
 
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Grid.Column="0" 
+                        Text="💾 Speichern" 
+                        Command="{Binding SaveCharacterCommand}"
+                        BackgroundColor="#0E7490"
+                        TextColor="White"
+                        Padding="12,8" />
+                <Button Grid.Column="1" 
+                        Text="📂 Laden" 
+                        Command="{Binding LoadCharacterCommand}"
+                        BackgroundColor="#059669"
+                        TextColor="White"
+                        Padding="12,8" />
+            </Grid>
+
             <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Hauptattribute (immer im Blick)" FontSize="18" FontAttributes="Bold" />
@@ -49,7 +64,7 @@
                     <Entry Placeholder="Spieler" Text="{Binding Spieler}" />
 
                     <Label Text="Spezies" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="Spezies" Text="{Binding Spezies}" />
+                    <Picker ItemsSource="{Binding Spezies_Liste}" SelectedItem="{Binding Spezies}" Title="Spezies wählen" ItemDisplayBinding="{Binding Name}" />
 
                     <Label Text="Kultur" FontAttributes="Bold" FontSize="13" />
                     <Entry Placeholder="Kultur" Text="{Binding Kultur}" />
@@ -86,28 +101,35 @@
             <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Basiswerte" FontSize="18" FontAttributes="Bold" />
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
-                        <Label Grid.Row="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Lebensenergie}" />
 
-                        <Label Grid.Row="1" Text="Astralenergie (AsP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Astralenergie}" />
-
-                        <Label Grid.Row="2" Text="Karmaenergie (KaP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Karmaenergie}" />
-
-                        <Label Grid.Row="3" Text="Seelenkraft (SK)" VerticalOptions="Center" />
-                        <Entry Grid.Row="3" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Seelenkraft}" />
-
-                        <Label Grid.Row="4" Text="Zähigkeit (ZK)" VerticalOptions="Center" />
-                        <Entry Grid.Row="4" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Zähigkeit}" />
-
-                        <Label Grid.Row="5" Text="Initiative-Basis" VerticalOptions="Center" />
-                        <Entry Grid.Row="5" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding InitiativeBasis}" />
-
-                        <Label Grid.Row="6" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
-                        <Entry Grid.Row="6" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Geschwindigkeit}" />
+                    <Grid ColumnDefinitions="2*,1.2*,1.2*,1.2*,1.2*" RowDefinitions="Auto" ColumnSpacing="8" RowSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Basiswert" FontAttributes="Bold" FontSize="12" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="Grundwert" FontAttributes="Bold" FontSize="12" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="2" Text="Zukauf" FontAttributes="Bold" FontSize="12" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="3" Text="Boni" FontAttributes="Bold" FontSize="12" HorizontalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="4" Text="Gesamt" FontAttributes="Bold" FontSize="12" HorizontalOptions="Center" />
                     </Grid>
+
+                    <VerticalStackLayout Spacing="6" BindableLayout.ItemsSource="{Binding Basiswerte}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="2*,1.2*,1.2*,1.2*,1.2*" ColumnSpacing="8" Padding="4,6">
+                                    <Label Grid.Column="0" Text="{Binding Name}" FontSize="12" VerticalOptions="Center" />
+                                    <Label Grid.Column="1" Text="{Binding Grundwert}" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                                    <!-- Zukauf - nur für Lebensenergie, Astralenergie, Karmaenergie -->
+                                    <Entry Grid.Column="2" Keyboard="Numeric" Text="{Binding Zukauf}" FontSize="12" HorizontalTextAlignment="Center" IsVisible="{Binding AllowsZukauf}" />
+                                    <Label Grid.Column="2" Text="-" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding AllowsZukauf, StringFormat='{0}'}" />
+
+                                    <!-- Boni - für alle -->
+                                    <Entry Grid.Column="3" Keyboard="Numeric" Text="{Binding Boni}" FontSize="12" HorizontalTextAlignment="Center" IsVisible="{Binding AllowsBoni}" />
+                                    <Label Grid.Column="3" Text="-" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" IsVisible="{Binding AllowsBoni, StringFormat='{0}'}" />
+
+                                    <Label Grid.Column="4" Text="{Binding Gesamt}" FontAttributes="Bold" FontSize="12" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#0E7490" />
+                                </Grid>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
                 </VerticalStackLayout>
             </Border>
 

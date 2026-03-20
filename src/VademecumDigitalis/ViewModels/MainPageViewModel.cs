@@ -1,21 +1,36 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Services;
 
 namespace VademecumDigitalis.ViewModels;
 
 public class MainPageViewModel : INotifyPropertyChanged
 {
     private readonly CharacterSheet _sheet = new();
+    private readonly ICharacterSaveService _saveService;
 
     public MainPageViewModel()
     {
+        _saveService = new CharacterSaveService();
         TalentGruppen = BuildTalentGruppen();
+        Spezies_Liste = BuildSpezies();
+        Basiswerte = BuildBasiswerte();
+        ToggleExpandCommand = new Command<TalentGroup>(ToggleGroupExpand);
+        SaveCharacterCommand = new Command(SaveCharacter);
+        LoadCharacterCommand = new Command(LoadCharacter);
     }
+
+    public ICommand ToggleExpandCommand { get; }
+    public ICommand SaveCharacterCommand { get; }
+    public ICommand LoadCharacterCommand { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IReadOnlyList<TalentGroup> TalentGruppen { get; }
+    public IReadOnlyList<Species> Spezies_Liste { get; }
+    public List<Basiswert> Basiswerte { get; }
 
     public string Name
     {
@@ -29,10 +44,21 @@ public class MainPageViewModel : INotifyPropertyChanged
         set => SetProperty(_sheet.Spieler, value, v => _sheet.Spieler = v);
     }
 
-    public string Spezies
+    private Species? _selectedSpecies;
+
+    public Species? Spezies
     {
-        get => _sheet.Spezies;
-        set => SetProperty(_sheet.Spezies, value, v => _sheet.Spezies = v);
+        get => _selectedSpecies;
+        set
+        {
+            if (_selectedSpecies != value)
+            {
+                _selectedSpecies = value;
+                _sheet.Spezies = value?.Name ?? string.Empty;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Spezies)));
+                UpdateBasiswerte();
+            }
+        }
     }
 
     public string Kultur
@@ -134,7 +160,11 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int Konstitution
     {
         get => _sheet.Konstitution;
-        set => SetProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
+        set
+        {
+            SetProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
+            UpdateBasiswerte();
+        }
     }
 
     public int Körperkraft
@@ -147,6 +177,54 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         get => _sheet.Lebensenergie;
         set => SetProperty(_sheet.Lebensenergie, value, v => _sheet.Lebensenergie = v);
+    }
+
+    private void UpdateBasiswerte()
+    {
+        var lepEntry = Basiswerte.FirstOrDefault(b => b.Name == "Lebensenergie");
+        if (lepEntry != null)
+        {
+            lepEntry.Grundwert = (_selectedSpecies?.LE ?? 0) + (Konstitution * 2);
+            Lebensenergie = lepEntry.Gesamt;
+        }
+
+        var gsEntry = Basiswerte.FirstOrDefault(b => b.Name == "Geschwindigkeit");
+        if (gsEntry != null)
+        {
+            gsEntry.Grundwert = _selectedSpecies?.GS ?? 8;
+            Geschwindigkeit = gsEntry.Gesamt;
+        }
+
+        // Synchronisiere alle anderen Werte von Basiswerte-Tabelle in die Properties
+        foreach (var bw in Basiswerte)
+        {
+            switch (bw.Name)
+            {
+                case "Astralenergie":
+                    Astralenergie = bw.Gesamt;
+                    break;
+                case "Karmaenergie":
+                    Karmaenergie = bw.Gesamt;
+                    break;
+                case "Seelenkraft":
+                    Seelenkraft = bw.Gesamt;
+                    break;
+                case "Zähigkeit":
+                    Zähigkeit = bw.Gesamt;
+                    break;
+                case "Initiative-Basis":
+                    InitiativeBasis = bw.Gesamt;
+                    break;
+            }
+        }
+    }
+
+    private void ToggleGroupExpand(TalentGroup? group)
+    {
+        if (group != null)
+        {
+            group.IsExpanded = !group.IsExpanded;
+        }
     }
 
     public int Astralenergie
@@ -241,8 +319,8 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private static IReadOnlyList<TalentGroup> BuildTalentGruppen()
     {
-        return
-        [
+        var groups = new[]
+        {
             new TalentGroup("Körpertalente", new[]
             {
                 NewTalent("Fliegen", "B", "MU", "IN", "GE", "JA"),
@@ -318,7 +396,87 @@ public class MainPageViewModel : INotifyPropertyChanged
                 NewTalent("Erdbearbeitung", "A", "FF", "KO", "KK", "JA"),
                 NewTalent("Metallbearbeitung", "C", "FF", "KO", "KK", "JA")
             })
+        };
+
+        // Set indices for zebra striping
+        foreach (var group in groups)
+        {
+            for (int i = 0; i < group.Eintraege.Count; i++)
+            {
+                group.Eintraege[i].Index = i;
+            }
+        }
+
+        return groups;
+    }
+
+    private static IReadOnlyList<Species> BuildSpezies()
+    {
+        return
+        [
+            new Species
+            {
+                Name = "Mensch",
+                LE = 5,
+                SK = -5,
+                ZK = -5,
+                GS = 8,
+                Eigenschaften = "eine beliebige +1",
+                Vorteile = "keine",
+                Nachteile = "keine",
+                APWert = 0
+            },
+            new Species
+            {
+                Name = "Elf",
+                LE = 2,
+                SK = -4,
+                ZK = -6,
+                GS = 8,
+                Eigenschaften = "IN und GE +1; KL oder KK –2",
+                Vorteile = "Zauberer, Zweistimmiger Gesang",
+                Nachteile = "keine",
+                APWert = 18
+            },
+            new Species
+            {
+                Name = "Halbelf",
+                LE = 5,
+                SK = -4,
+                ZK = -6,
+                GS = 8,
+                Eigenschaften = "eine beliebige +1",
+                Vorteile = "keine",
+                Nachteile = "keine",
+                APWert = 0
+            },
+            new Species
+            {
+                Name = "Zwerg",
+                LE = 8,
+                SK = -4,
+                ZK = -4,
+                GS = 6,
+                Eigenschaften = "KO und KK +1; CH oder GE –2",
+                Vorteile = "keine",
+                Nachteile = "keine",
+                APWert = 61
+            }
         ];
+    }
+
+    private List<Basiswert> BuildBasiswerte()
+    {
+        return new List<Basiswert>
+        {
+            new Basiswert { Name = "Lebensenergie", Einheit = "LeP", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = true, AllowsBoni = true },
+            new Basiswert { Name = "Astralenergie", Einheit = "AsP", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = true, AllowsBoni = true },
+            new Basiswert { Name = "Karmaenergie", Einheit = "KaP", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = true, AllowsBoni = true },
+            new Basiswert { Name = "Seelenkraft", Einheit = "SK", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = false, AllowsBoni = true },
+            new Basiswert { Name = "Zähigkeit", Einheit = "ZK", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = false, AllowsBoni = true },
+            new Basiswert { Name = "Initiative-Basis", Einheit = "ini", Grundwert = 0, Zukauf = 0, Boni = 0, AllowsZukauf = false, AllowsBoni = true },
+            new Basiswert { Name = "Geschwindigkeit", Einheit = "GS", Grundwert = 8, Zukauf = 0, Boni = 0, AllowsZukauf = false, AllowsBoni = true }
+        };
     }
 
     private static TalentRow NewTalent(string talent, string faktor, string probe1, string probe2, string probe3, string belastungseinfluss)
@@ -343,5 +501,126 @@ public class MainPageViewModel : INotifyPropertyChanged
 
         setter(newValue);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private async void SaveCharacter()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                await Application.Current!.MainPage!.DisplayAlert(
+                    "Fehler", 
+                    "Bitte geben Sie einen Namen für den Charakter ein.", 
+                    "OK");
+                return;
+            }
+
+            await _saveService.SaveCharacterAsync(_sheet, Name);
+            await Application.Current!.MainPage!.DisplayAlert(
+                "Erfolg", 
+                $"Charakter '{Name}' wurde gespeichert.", 
+                "OK");
+        }
+        catch (Exception ex)
+        {
+            await Application.Current!.MainPage!.DisplayAlert(
+                "Fehler beim Speichern", 
+                ex.Message, 
+                "OK");
+        }
+    }
+
+    private async void LoadCharacter()
+    {
+        try
+        {
+            var savedCharacters = (await _saveService.GetSavedCharactersAsync()).ToList();
+
+            if (savedCharacters.Count == 0)
+            {
+                await Application.Current!.MainPage!.DisplayAlert(
+                    "Keine Charaktere", 
+                    "Es wurden keine gespeicherten Charaktere gefunden.", 
+                    "OK");
+                return;
+            }
+
+            var selectedName = await Application.Current!.MainPage!.DisplayActionSheet(
+                "Charakter laden", 
+                "Abbrechen", 
+                null, 
+                savedCharacters.ToArray());
+
+            if (string.IsNullOrEmpty(selectedName) || selectedName == "Abbrechen")
+                return;
+
+            var savePath = _saveService.GetCharacterPath(selectedName);
+            var loadedSheet = await _saveService.LoadCharacterAsync(savePath);
+
+            if (loadedSheet != null)
+            {
+                LoadSheetData(loadedSheet);
+                await Application.Current!.MainPage!.DisplayAlert(
+                    "Erfolg", 
+                    $"Charakter '{selectedName}' wurde geladen.", 
+                    "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await Application.Current!.MainPage!.DisplayAlert(
+                "Fehler beim Laden", 
+                ex.Message, 
+                "OK");
+        }
+    }
+
+    private void LoadSheetData(CharacterSheet sheet)
+    {
+        _sheet.Name = sheet.Name;
+        _sheet.Spieler = sheet.Spieler;
+        _sheet.Spezies = sheet.Spezies;
+        _sheet.Kultur = sheet.Kultur;
+        _sheet.Profession = sheet.Profession;
+        _sheet.Geschlecht = sheet.Geschlecht;
+        _sheet.Geburtstag = sheet.Geburtstag;
+        _sheet.Alter = sheet.Alter;
+        _sheet.Größe = sheet.Größe;
+        _sheet.Gewicht = sheet.Gewicht;
+        _sheet.Haarfarbe = sheet.Haarfarbe;
+        _sheet.Augenfarbe = sheet.Augenfarbe;
+        _sheet.Sozialstatus = sheet.Sozialstatus;
+
+        _sheet.Mut = sheet.Mut;
+        _sheet.Klugheit = sheet.Klugheit;
+        _sheet.Intuition = sheet.Intuition;
+        _sheet.Charisma = sheet.Charisma;
+        _sheet.Fingerfertigkeit = sheet.Fingerfertigkeit;
+        _sheet.Gewandtheit = sheet.Gewandtheit;
+        _sheet.Konstitution = sheet.Konstitution;
+        _sheet.Körperkraft = sheet.Körperkraft;
+
+        _sheet.Lebensenergie = sheet.Lebensenergie;
+        _sheet.Astralenergie = sheet.Astralenergie;
+        _sheet.Karmaenergie = sheet.Karmaenergie;
+        _sheet.Seelenkraft = sheet.Seelenkraft;
+        _sheet.Zähigkeit = sheet.Zähigkeit;
+        _sheet.InitiativeBasis = sheet.InitiativeBasis;
+        _sheet.Geschwindigkeit = sheet.Geschwindigkeit;
+
+        _sheet.AbenteuerpunkteGesamt = sheet.AbenteuerpunkteGesamt;
+        _sheet.AbenteuerpunkteVerfuegbar = sheet.AbenteuerpunkteVerfuegbar;
+        _sheet.AbenteuerpunkteAusgegeben = sheet.AbenteuerpunkteAusgegeben;
+
+        _sheet.SchicksalspunkteGesamt = sheet.SchicksalspunkteGesamt;
+        _sheet.SchicksalspunkteVerfuegbar = sheet.SchicksalspunkteVerfuegbar;
+
+        _sheet.Vorteile = sheet.Vorteile;
+        _sheet.Nachteile = sheet.Nachteile;
+        _sheet.Talente = sheet.Talente;
+        _sheet.Kampftalente = sheet.Kampftalente;
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
     }
 }

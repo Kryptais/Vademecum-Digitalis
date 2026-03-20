@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="VademecumDigitalis.TalentsPage"
-             Title="Talente">
+             x:Class="VademecumDigitalis.TalentsPageModern"
+             Title="Talente (Modern)">
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12"
@@ -13,7 +13,7 @@
                         <!-- Collapsible Header -->
                         <Grid ColumnDefinitions="Auto,*" Padding="12,10" BackgroundColor="#0E7490" 
                               RowSpacing="0" ColumnSpacing="12">
-                         <Grid.GestureRecognizers>
+                            <Grid.GestureRecognizers>
                                 <TapGestureRecognizer 
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleExpandCommand}"
                                     CommandParameter="{Binding .}" />
@@ -51,7 +51,7 @@
                                         <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
                                               ColumnSpacing="6"
                                               Padding="12,14"
-                                              BackgroundColor="{Binding RowColor}">
+                                              BackgroundColor="DarkGray">
                                             <Label Grid.Column="0" Text="{Binding Talent}" FontSize="12" VerticalOptions="Center" />
                                             <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="12" VerticalOptions="Center" TextColor="#0E7490" />
                                             <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" />
@@ -70,5 +70,4 @@
             </BindableLayout.ItemTemplate>
         </VerticalStackLayout>
     </ScrollView>
-
 </ContentPage>
