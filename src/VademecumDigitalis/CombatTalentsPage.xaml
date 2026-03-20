@@ -5,14 +5,16 @@
              Title="Kampftalente">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="14">
-            <Label Text="Kampftalente" FontSize="24" FontAttributes="Bold" />
-            <Label Text="V1: Freitextliste. Spaeter mit Waffenprofilen und AT/PA-Details." TextColor="#4B5563" />
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Kampftalente" Style="{StaticResource HeadlineLabel}" />
+            <Label Text="V1: Freitextliste. Später mit Waffenprofilen und AT/PA-Details." TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,-8,0,4" />
 
-            <Editor AutoSize="TextChanges"
-                    MinimumHeightRequest="420"
-                    Placeholder="z. B. Schwerter 12, Raufen 8, Dolche 10"
-                    Text="{Binding Kampftalente}" />
+            <Border Style="{StaticResource CardBorder}">
+                <Editor AutoSize="TextChanges"
+                        MinimumHeightRequest="420"
+                        Placeholder="z. B. Schwerter 12, Raufen 8, Dolche 10"
+                        Text="{Binding Kampftalente}" />
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 

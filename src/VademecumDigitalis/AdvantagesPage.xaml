@@ -5,21 +5,29 @@
              Title="Vorteile/Nachteile">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="14">
-            <Label Text="Vorteile &amp; Nachteile" FontSize="24" FontAttributes="Bold" />
-            <Label Text="Eintrag pro Zeile (V1 als Freitext)." TextColor="#4B5563" />
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Vorteile &amp; Nachteile" Style="{StaticResource HeadlineLabel}" />
+            <Label Text="Eintrag pro Zeile (V1 als Freitext)." TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,-8,0,4" />
 
-            <Label Text="Vorteile" FontAttributes="Bold" />
-            <Editor AutoSize="TextChanges"
-                    MinimumHeightRequest="160"
-                    Placeholder="z. B. Begabung (Sinnesschaerfe), Glueck I"
-                    Text="{Binding Vorteile}" />
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Vorteile" Style="{StaticResource SectionHeaderLabel}" />
+                    <Editor AutoSize="TextChanges"
+                            MinimumHeightRequest="160"
+                            Placeholder="z. B. Begabung (Sinnesschärfe), Glück I"
+                            Text="{Binding Vorteile}" />
+                </VerticalStackLayout>
+            </Border>
 
-            <Label Text="Nachteile" FontAttributes="Bold" />
-            <Editor AutoSize="TextChanges"
-                    MinimumHeightRequest="160"
-                    Placeholder="z. B. Neugier 6, Prinzipientreue 5"
-                    Text="{Binding Nachteile}" />
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Nachteile" Style="{StaticResource SectionHeaderLabel}" />
+                    <Editor AutoSize="TextChanges"
+                            MinimumHeightRequest="160"
+                            Placeholder="z. B. Neugier 6, Prinzipientreue 5"
+                            Text="{Binding Nachteile}" />
+                </VerticalStackLayout>
+            </Border>
         </VerticalStackLayout>
     </ScrollView>
 

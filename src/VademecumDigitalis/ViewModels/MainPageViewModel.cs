@@ -1,21 +1,320 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Services;
 
 namespace VademecumDigitalis.ViewModels;
 
 public class MainPageViewModel : INotifyPropertyChanged
 {
     private readonly CharacterSheet _sheet = new();
+    private readonly PersistenceService _persistence;
+    private CancellationTokenSource? _saveCts;
 
-    public MainPageViewModel()
+    public MainPageViewModel() : this(new PersistenceService())
     {
+    }
+
+    public MainPageViewModel(PersistenceService persistence)
+    {
+        _persistence = persistence;
         TalentGruppen = BuildTalentGruppen();
+        SubscribeToTalentChanges();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IReadOnlyList<TalentGroup> TalentGruppen { get; }
+
+    // --- Spezies-Auswahl ---
+
+    /// <summary>Alle verfügbaren Spezies-Namen für den Picker.</summary>
+    public IReadOnlyList<string> SpeziesListe { get; } =
+        SpeziesData.Alle.Select(s => s.Name).ToList();
+
+    /// <summary>Die aktuell gewählte Spezies-Daten (oder null bei unbekannter Spezies).</summary>
+    public SpeziesData? AktuelleSpezies => SpeziesData.FindByName(_sheet.Spezies);
+
+    // --- Laden / Speichern ---
+
+    public async Task LoadDataAsync()
+    {
+        var data = await _persistence.LoadCharacterSheetAsync();
+        if (data == null) return;
+
+        var s = data.Sheet;
+        // Charakterinfos
+        _sheet.Name = s.Name;
+        _sheet.Spieler = s.Spieler;
+        _sheet.Spezies = s.Spezies;
+        _sheet.Kultur = s.Kultur;
+        _sheet.Profession = s.Profession;
+        _sheet.Geschlecht = s.Geschlecht;
+        _sheet.Geburtstag = s.Geburtstag;
+        _sheet.Alter = s.Alter;
+        _sheet.Größe = s.Größe;
+        _sheet.Gewicht = s.Gewicht;
+        _sheet.Haarfarbe = s.Haarfarbe;
+        _sheet.Augenfarbe = s.Augenfarbe;
+        _sheet.Sozialstatus = s.Sozialstatus;
+
+        // Hauptattribute
+        _sheet.Mut = s.Mut;
+        _sheet.Klugheit = s.Klugheit;
+        _sheet.Intuition = s.Intuition;
+        _sheet.Charisma = s.Charisma;
+        _sheet.Fingerfertigkeit = s.Fingerfertigkeit;
+        _sheet.Gewandtheit = s.Gewandtheit;
+        _sheet.Konstitution = s.Konstitution;
+        _sheet.Körperkraft = s.Körperkraft;
+
+        // Migration: Wenn Zugekauft-Felder 0 sind aber Legacy-Felder Werte haben,
+        // berechne den Zugekauft-Anteil als Differenz zum Formelwert.
+        MigrateZugekauft(s);
+
+        // Zugekaufte Modifikatoren
+        _sheet.LebensenergieZugekauft = s.LebensenergieZugekauft;
+        _sheet.AstralenergieZugekauft = s.AstralenergieZugekauft;
+        _sheet.KarmaenergieZugekauft = s.KarmaenergieZugekauft;
+        _sheet.SeelenkraftZugekauft = s.SeelenkraftZugekauft;
+        _sheet.ZähigkeitZugekauft = s.ZähigkeitZugekauft;
+
+        // AP / SchiP
+        _sheet.AbenteuerpunkteGesamt = s.AbenteuerpunkteGesamt;
+        _sheet.AbenteuerpunkteVerfuegbar = s.AbenteuerpunkteVerfuegbar;
+        _sheet.AbenteuerpunkteAusgegeben = s.AbenteuerpunkteAusgegeben;
+        _sheet.SchicksalspunkteGesamt = s.SchicksalspunkteGesamt;
+        _sheet.SchicksalspunkteVerfuegbar = s.SchicksalspunkteVerfuegbar;
+
+        // Freitext
+        _sheet.Vorteile = s.Vorteile;
+        _sheet.Nachteile = s.Nachteile;
+        _sheet.Talente = s.Talente;
+        _sheet.Kampftalente = s.Kampftalente;
+
+        // Talentwerte (FW + Anmerkung) auf TalentRows mappen
+        if (data.TalentValues != null)
+        {
+            var lookup = data.TalentValues.ToDictionary(t => t.Talent, t => t);
+            foreach (var group in TalentGruppen)
+            {
+                foreach (var row in group.Eintraege)
+                {
+                    if (lookup.TryGetValue(row.Talent, out var saved))
+                    {
+                        row.Fw = saved.Fw;
+                        row.Anmerkung = saved.Anmerkung;
+                    }
+                }
+            }
+        }
+
+        // Alle Properties der UI melden
+        NotifyAllProperties();
+    }
+
+    /// <summary>
+    /// Migration: Alte Savegames haben nur Lebensenergie/Seelenkraft etc. als Gesamtwerte.
+    /// Wenn ZugekauftFelder alle 0 sind und ein Legacy-Wert vorhanden ist,
+    /// berechne Zugekauft = LegacyWert - Formelwert.
+    /// </summary>
+    private void MigrateZugekauft(CharacterSheet s)
+    {
+        bool hasLegacy = s.Lebensenergie > 0 || s.Seelenkraft > 0 || s.Zähigkeit > 0;
+        bool hasZugekauft = s.LebensenergieZugekauft != 0 || s.SeelenkraftZugekauft != 0 || s.ZähigkeitZugekauft != 0;
+
+        if (hasLegacy && !hasZugekauft)
+        {
+            var spez = SpeziesData.FindByName(s.Spezies);
+            int lepBasis = spez?.LePBasis ?? 5;
+            int skMod = spez?.SeelenkraftMod ?? -5;
+            int zkMod = spez?.ZähigkeitMod ?? -5;
+
+            int lepFormel = 2 * s.Konstitution + lepBasis;
+            s.LebensenergieZugekauft = s.Lebensenergie - lepFormel;
+
+            int skFormel = (int)Math.Ceiling((s.Mut + s.Klugheit + s.Intuition) / 6.0) + skMod;
+            s.SeelenkraftZugekauft = s.Seelenkraft - skFormel;
+
+            int zkFormel = (int)Math.Ceiling((s.Konstitution + s.Konstitution + s.Körperkraft) / 6.0) + zkMod;
+            s.ZähigkeitZugekauft = s.Zähigkeit - zkFormel;
+
+            s.AstralenergieZugekauft = s.Astralenergie; // AsP hat keine Grundformel ohne Vorteil
+            s.KarmaenergieZugekauft = s.Karmaenergie;   // KaP hat keine Grundformel ohne Vorteil
+        }
+    }
+
+    private CharacterSheetData BuildSaveData()
+    {
+        var talentValues = new List<TalentSaveEntry>();
+        foreach (var group in TalentGruppen)
+        {
+            foreach (var row in group.Eintraege)
+            {
+                if (!string.IsNullOrEmpty(row.Fw) || !string.IsNullOrEmpty(row.Anmerkung))
+                {
+                    talentValues.Add(new TalentSaveEntry
+                    {
+                        Talent = row.Talent,
+                        Fw = row.Fw,
+                        Anmerkung = row.Anmerkung
+                    });
+                }
+            }
+        }
+
+        return new CharacterSheetData
+        {
+            Sheet = new CharacterSheet
+            {
+                Name = _sheet.Name,
+                Spieler = _sheet.Spieler,
+                Spezies = _sheet.Spezies,
+                Kultur = _sheet.Kultur,
+                Profession = _sheet.Profession,
+                Geschlecht = _sheet.Geschlecht,
+                Geburtstag = _sheet.Geburtstag,
+                Alter = _sheet.Alter,
+                Größe = _sheet.Größe,
+                Gewicht = _sheet.Gewicht,
+                Haarfarbe = _sheet.Haarfarbe,
+                Augenfarbe = _sheet.Augenfarbe,
+                Sozialstatus = _sheet.Sozialstatus,
+                Mut = _sheet.Mut,
+                Klugheit = _sheet.Klugheit,
+                Intuition = _sheet.Intuition,
+                Charisma = _sheet.Charisma,
+                Fingerfertigkeit = _sheet.Fingerfertigkeit,
+                Gewandtheit = _sheet.Gewandtheit,
+                Konstitution = _sheet.Konstitution,
+                Körperkraft = _sheet.Körperkraft,
+                // Speichere die Zugekauft-Werte
+                LebensenergieZugekauft = _sheet.LebensenergieZugekauft,
+                AstralenergieZugekauft = _sheet.AstralenergieZugekauft,
+                KarmaenergieZugekauft = _sheet.KarmaenergieZugekauft,
+                SeelenkraftZugekauft = _sheet.SeelenkraftZugekauft,
+                ZähigkeitZugekauft = _sheet.ZähigkeitZugekauft,
+                // Speichere auch die berechneten Gesamtwerte für Abwärtskompatibilität
+                Lebensenergie = Lebensenergie,
+                Astralenergie = Astralenergie,
+                Karmaenergie = Karmaenergie,
+                Seelenkraft = Seelenkraft,
+                Zähigkeit = Zähigkeit,
+                InitiativeBasis = InitiativeBasis,
+                Geschwindigkeit = Geschwindigkeit,
+                AbenteuerpunkteGesamt = _sheet.AbenteuerpunkteGesamt,
+                AbenteuerpunkteVerfuegbar = _sheet.AbenteuerpunkteVerfuegbar,
+                AbenteuerpunkteAusgegeben = _sheet.AbenteuerpunkteAusgegeben,
+                SchicksalspunkteGesamt = _sheet.SchicksalspunkteGesamt,
+                SchicksalspunkteVerfuegbar = _sheet.SchicksalspunkteVerfuegbar,
+                Vorteile = _sheet.Vorteile,
+                Nachteile = _sheet.Nachteile,
+                Talente = _sheet.Talente,
+                Kampftalente = _sheet.Kampftalente
+            },
+            TalentValues = talentValues
+        };
+    }
+
+    private async Task SaveDataAsync()
+    {
+        try
+        {
+            var data = BuildSaveData();
+            await _persistence.SaveCharacterSheetAsync(data);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error saving character sheet: {ex.Message}");
+        }
+    }
+
+    private void RequestDelayedSave()
+    {
+        _saveCts?.Cancel();
+        _saveCts = new CancellationTokenSource();
+        var token = _saveCts.Token;
+
+        Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(2000, token);
+                if (token.IsCancellationRequested) return;
+
+                await SaveDataAsync();
+            }
+            catch (TaskCanceledException) { /* expected */ }
+        });
+    }
+
+    private void SubscribeToTalentChanges()
+    {
+        foreach (var group in TalentGruppen)
+        {
+            foreach (var row in group.Eintraege)
+            {
+                row.PropertyChanged += (_, _) => RequestDelayedSave();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Benachrichtigt die UI über alle berechneten Basiswerte, die sich bei
+    /// Attribut- oder Speziesänderung ändern können.
+    /// </summary>
+    private void NotifyDerivedValues()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasis)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleSpezies)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpeziesInfoText)));
+    }
+
+    private void NotifyAllProperties()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Name)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Spieler)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Spezies)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Kultur)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Profession)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschlecht)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geburtstag)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Alter)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Größe)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Gewicht)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Haarfarbe)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Augenfarbe)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Sozialstatus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Mut)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Klugheit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Intuition)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Charisma)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Fingerfertigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Gewandtheit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Konstitution)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Körperkraft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralenergieZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteVerfuegbar)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteAusgegeben)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchicksalspunkteGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchicksalspunkteVerfuegbar)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Vorteile)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Nachteile)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Talente)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Kampftalente)));
+        NotifyDerivedValues();
+    }
+
+    // --- Properties ---
 
     public string Name
     {
@@ -32,7 +331,25 @@ public class MainPageViewModel : INotifyPropertyChanged
     public string Spezies
     {
         get => _sheet.Spezies;
-        set => SetProperty(_sheet.Spezies, value, v => _sheet.Spezies = v);
+        set
+        {
+            if (_sheet.Spezies == value) return;
+            _sheet.Spezies = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Spezies)));
+            NotifyDerivedValues();
+            RequestDelayedSave();
+        }
+    }
+
+    /// <summary>Info-Text zur gewählten Spezies (LeP-Basis, SK-Mod, ZK-Mod, GS).</summary>
+    public string SpeziesInfoText
+    {
+        get
+        {
+            var sp = AktuelleSpezies;
+            if (sp == null) return string.Empty;
+            return $"LeP-Basis {sp.LePBasis} | SK {sp.SeelenkraftMod:+#;-#;0} | ZK {sp.ZähigkeitMod:+#;-#;0} | GS {sp.Geschwindigkeit} | SchiP {sp.SchicksalspunkteMax}";
+        }
     }
 
     public string Kultur
@@ -95,95 +412,168 @@ public class MainPageViewModel : INotifyPropertyChanged
         set => SetProperty(_sheet.Sozialstatus, value, v => _sheet.Sozialstatus = v);
     }
 
+    // --- Hauptattribute (lösen Neuberechnung der Basiswerte aus) ---
+
     public int Mut
     {
         get => _sheet.Mut;
-        set => SetProperty(_sheet.Mut, value, v => _sheet.Mut = v);
+        set => SetAttributeProperty(_sheet.Mut, value, v => _sheet.Mut = v);
     }
 
     public int Klugheit
     {
         get => _sheet.Klugheit;
-        set => SetProperty(_sheet.Klugheit, value, v => _sheet.Klugheit = v);
+        set => SetAttributeProperty(_sheet.Klugheit, value, v => _sheet.Klugheit = v);
     }
 
     public int Intuition
     {
         get => _sheet.Intuition;
-        set => SetProperty(_sheet.Intuition, value, v => _sheet.Intuition = v);
+        set => SetAttributeProperty(_sheet.Intuition, value, v => _sheet.Intuition = v);
     }
 
     public int Charisma
     {
         get => _sheet.Charisma;
-        set => SetProperty(_sheet.Charisma, value, v => _sheet.Charisma = v);
+        set => SetAttributeProperty(_sheet.Charisma, value, v => _sheet.Charisma = v);
     }
 
     public int Fingerfertigkeit
     {
         get => _sheet.Fingerfertigkeit;
-        set => SetProperty(_sheet.Fingerfertigkeit, value, v => _sheet.Fingerfertigkeit = v);
+        set => SetAttributeProperty(_sheet.Fingerfertigkeit, value, v => _sheet.Fingerfertigkeit = v);
     }
 
     public int Gewandtheit
     {
         get => _sheet.Gewandtheit;
-        set => SetProperty(_sheet.Gewandtheit, value, v => _sheet.Gewandtheit = v);
+        set => SetAttributeProperty(_sheet.Gewandtheit, value, v => _sheet.Gewandtheit = v);
     }
 
     public int Konstitution
     {
         get => _sheet.Konstitution;
-        set => SetProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
+        set => SetAttributeProperty(_sheet.Konstitution, value, v => _sheet.Konstitution = v);
     }
 
     public int Körperkraft
     {
         get => _sheet.Körperkraft;
-        set => SetProperty(_sheet.Körperkraft, value, v => _sheet.Körperkraft = v);
+        set => SetAttributeProperty(_sheet.Körperkraft, value, v => _sheet.Körperkraft = v);
     }
 
+    // --- Berechnete Basiswerte (DSA 5 Formeln) ---
+
+    /// <summary>LeP = 2×KO + SpeziesLeP + Zugekauft</summary>
     public int Lebensenergie
     {
-        get => _sheet.Lebensenergie;
-        set => SetProperty(_sheet.Lebensenergie, value, v => _sheet.Lebensenergie = v);
+        get
+        {
+            int basis = AktuelleSpezies?.LePBasis ?? 5;
+            return 2 * _sheet.Konstitution + basis + _sheet.LebensenergieZugekauft;
+        }
     }
 
-    public int Astralenergie
-    {
-        get => _sheet.Astralenergie;
-        set => SetProperty(_sheet.Astralenergie, value, v => _sheet.Astralenergie = v);
-    }
+    /// <summary>AsP = Zugekauft (nur mit Vorteil Zauberer)</summary>
+    public int Astralenergie => _sheet.AstralenergieZugekauft;
 
-    public int Karmaenergie
-    {
-        get => _sheet.Karmaenergie;
-        set => SetProperty(_sheet.Karmaenergie, value, v => _sheet.Karmaenergie = v);
-    }
+    /// <summary>KaP = Zugekauft (nur mit Vorteil Geweihter)</summary>
+    public int Karmaenergie => _sheet.KarmaenergieZugekauft;
 
+    /// <summary>SK = ceil((MU+KL+IN)/6) + SpeziesMod + Zugekauft</summary>
     public int Seelenkraft
     {
-        get => _sheet.Seelenkraft;
-        set => SetProperty(_sheet.Seelenkraft, value, v => _sheet.Seelenkraft = v);
+        get
+        {
+            int mod = AktuelleSpezies?.SeelenkraftMod ?? -5;
+            return (int)Math.Ceiling((_sheet.Mut + _sheet.Klugheit + _sheet.Intuition) / 6.0) + mod + _sheet.SeelenkraftZugekauft;
+        }
     }
 
+    /// <summary>ZK = ceil((KO+KO+KK)/6) + SpeziesMod + Zugekauft</summary>
     public int Zähigkeit
     {
-        get => _sheet.Zähigkeit;
-        set => SetProperty(_sheet.Zähigkeit, value, v => _sheet.Zähigkeit = v);
+        get
+        {
+            int mod = AktuelleSpezies?.ZähigkeitMod ?? -5;
+            return (int)Math.Ceiling((_sheet.Konstitution + _sheet.Konstitution + _sheet.Körperkraft) / 6.0) + mod + _sheet.ZähigkeitZugekauft;
+        }
     }
 
-    public int InitiativeBasis
+    /// <summary>INI = ceil((MU+GE)/2)</summary>
+    public int InitiativeBasis => (int)Math.Ceiling((_sheet.Mut + _sheet.Gewandtheit) / 2.0);
+
+    /// <summary>GS = SpeziesGS (Zwerg 6, sonst 8)</summary>
+    public int Geschwindigkeit => AktuelleSpezies?.Geschwindigkeit ?? 8;
+
+    // --- Zugekaufte Modifikatoren (editierbar) ---
+
+    public int LebensenergieZugekauft
     {
-        get => _sheet.InitiativeBasis;
-        set => SetProperty(_sheet.InitiativeBasis, value, v => _sheet.InitiativeBasis = v);
+        get => _sheet.LebensenergieZugekauft;
+        set
+        {
+            if (_sheet.LebensenergieZugekauft == value) return;
+            _sheet.LebensenergieZugekauft = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieZugekauft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+            RequestDelayedSave();
+        }
     }
 
-    public int Geschwindigkeit
+    public int AstralenergieZugekauft
     {
-        get => _sheet.Geschwindigkeit;
-        set => SetProperty(_sheet.Geschwindigkeit, value, v => _sheet.Geschwindigkeit = v);
+        get => _sheet.AstralenergieZugekauft;
+        set
+        {
+            if (_sheet.AstralenergieZugekauft == value) return;
+            _sheet.AstralenergieZugekauft = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralenergieZugekauft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Astralenergie)));
+            RequestDelayedSave();
+        }
     }
+
+    public int KarmaenergieZugekauft
+    {
+        get => _sheet.KarmaenergieZugekauft;
+        set
+        {
+            if (_sheet.KarmaenergieZugekauft == value) return;
+            _sheet.KarmaenergieZugekauft = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieZugekauft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Karmaenergie)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int SeelenkraftZugekauft
+    {
+        get => _sheet.SeelenkraftZugekauft;
+        set
+        {
+            if (_sheet.SeelenkraftZugekauft == value) return;
+            _sheet.SeelenkraftZugekauft = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftZugekauft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int ZähigkeitZugekauft
+    {
+        get => _sheet.ZähigkeitZugekauft;
+        set
+        {
+            if (_sheet.ZähigkeitZugekauft == value) return;
+            _sheet.ZähigkeitZugekauft = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitZugekauft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+            RequestDelayedSave();
+        }
+    }
+
+    // --- AP / SchiP ---
 
     public int AbenteuerpunkteGesamt
     {
@@ -215,6 +605,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         set => SetProperty(_sheet.SchicksalspunkteVerfuegbar, value, v => _sheet.SchicksalspunkteVerfuegbar = v);
     }
 
+    // --- Freitext ---
+
     public string Vorteile
     {
         get => _sheet.Vorteile;
@@ -238,6 +630,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         get => _sheet.Kampftalente;
         set => SetProperty(_sheet.Kampftalente, value, v => _sheet.Kampftalente = v);
     }
+
+    // --- Talent-Tabellen (statisch aufgebaut, FW/Anmerkung editierbar) ---
 
     private static IReadOnlyList<TalentGroup> BuildTalentGruppen()
     {
@@ -294,7 +688,7 @@ public class MainPageViewModel : INotifyPropertyChanged
                 NewTalent("Rechnen", "A", "KL", "KL", "IN", "NEIN"),
                 NewTalent("Rechtskunde", "A", "KL", "KL", "IN", "NEIN"),
                 NewTalent("Sagen & Legenden", "B", "KL", "KL", "IN", "NEIN"),
-                NewTalent("Spährenkunde", "B", "KL", "KL", "IN", "NEIN"),
+                NewTalent("Sphärenkunde", "B", "KL", "KL", "IN", "NEIN"),
                 NewTalent("Sternkunde", "A", "KL", "KL", "IN", "NEIN")
             }),
             new TalentGroup("Handwerkstalente", new[]
@@ -334,14 +728,24 @@ public class MainPageViewModel : INotifyPropertyChanged
         };
     }
 
+    /// <summary>Setzt eine einfache Property, feuert PropertyChanged und speichert verzögert.</summary>
     private void SetProperty<T>(T oldValue, T newValue, Action<T> setter, [CallerMemberName] string? propertyName = null)
     {
-        if (EqualityComparer<T>.Default.Equals(oldValue, newValue))
-        {
-            return;
-        }
-
+        if (EqualityComparer<T>.Default.Equals(oldValue, newValue)) return;
         setter(newValue);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        RequestDelayedSave();
+    }
+
+    /// <summary>
+    /// Setzt ein Hauptattribut, feuert PropertyChanged UND aktualisiert alle abgeleiteten Werte.
+    /// </summary>
+    private void SetAttributeProperty(int oldValue, int newValue, Action<int> setter, [CallerMemberName] string? propertyName = null)
+    {
+        if (oldValue == newValue) return;
+        setter(newValue);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        NotifyDerivedValues();
+        RequestDelayedSave();
     }
 }

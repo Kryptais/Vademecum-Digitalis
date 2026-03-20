@@ -28,6 +28,11 @@
             Route="CombatTalentsPage" />
 
         <ShellContent
+            Title="Kalender"
+            ContentTemplate="{DataTemplate local:BoronKalenderPage}"
+            Route="BoronKalenderPage" />
+
+        <ShellContent
             Title="Inventar"
             ContentTemplate="{DataTemplate local:InventoryDashboardPage}"
             Route="InventoryDashboardPage" />

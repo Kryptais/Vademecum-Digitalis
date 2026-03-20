@@ -1,6 +1,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
 
 namespace VademecumDigitalis.Models
 {
@@ -11,6 +14,11 @@ namespace VademecumDigitalis.Models
         private bool _includeCoinWeight = true;
         private string _details = string.Empty;
         private ObservableCollection<InventoryItem> _items = new ObservableCollection<InventoryItem>();
+
+        // Cached computed values – avoid LINQ on every property access
+        private double _cachedTotalWeight;
+        private double _cachedTotalValue;
+        private CancellationTokenSource? _refreshCts;
 
         public string Name
         {
@@ -29,7 +37,7 @@ namespace VademecumDigitalis.Models
                 {
                     _items = value;
                     OnPropertyChanged(nameof(Items));
-                    RefreshTotals();
+                    RefreshTotalsImmediate();
                 }
             }
         }
@@ -37,10 +45,16 @@ namespace VademecumDigitalis.Models
         public bool IsCarried
         {
             get => _isCarried;
-            set { if (_isCarried != value) { _isCarried = value; OnPropertyChanged(nameof(IsCarried)); OnPropertyChanged(nameof(TotalWeight)); } }
+            set
+            {
+                if (_isCarried != value)
+                {
+                    _isCarried = value;
+                    OnPropertyChanged(nameof(IsCarried));
+                }
+            }
         }
 
-        // Whether coin weight is counted for this container (default true)
         public bool IncludeCoinWeight
         {
             get => _includeCoinWeight;
@@ -50,7 +64,7 @@ namespace VademecumDigitalis.Models
                 {
                     _includeCoinWeight = value;
                     OnPropertyChanged(nameof(IncludeCoinWeight));
-                    RefreshTotals();
+                    RefreshTotalsImmediate();
                 }
             }
         }
@@ -63,70 +77,99 @@ namespace VademecumDigitalis.Models
 
         public bool IsFixedTreasury { get; set; } = false;
 
-        // TotalWeight respects IncludeCoinWeight
-        public double TotalWeight => Items.Sum(i => i.TotalWeight) + (IncludeCoinWeight ? Money.TotalWeight : 0);
-
-        // New: Total value of all items in this container (simple sum in Silbertaler, does not include actual money coins?)
-        // Let's include items value only.
-        public double TotalValue => Items.Sum(i => i.TotalValue) + Money.TotalValueInSilver;
-
-        public string FormattedTotalValue => CurrencyAccount.FormatValue(TotalValue);
-
-        // Backing field für das fixe Anzeige-Objekt
-        private readonly CurrencyAccount _cachedTotalValueDisplay = new CurrencyAccount();
-        
-        // Gibt immer das GLEICHE Objekt zurück, damit Bindings stabil bleiben.
-        public CurrencyAccount TotalValueAsCurrency 
-        {
-            get
-            {
-                UpdateTotalCurrencyDisplay();
-                return _cachedTotalValueDisplay;
-            }
-        }
-
-        private void UpdateTotalCurrencyDisplay()
-        {
-            // Berechne die Werte basierend auf dem aktuellen TotalValue
-            var parts = CurrencyAccount.CalculateParts(TotalValue);
-            
-            // Setze die Werte direkt auf dem bestehenden Objekt -> feuert PropertyChanged nur für die Zahlen
-            _cachedTotalValueDisplay.Dukaten = parts.dukaten;
-            _cachedTotalValueDisplay.Silbertaler = parts.silbertaler;
-            _cachedTotalValueDisplay.Heller = parts.heller;
-            _cachedTotalValueDisplay.Kreuzer = parts.kreuzer;
-        }
-        
         /// <summary>
-        /// Fires PropertyChanged for all computed total properties so the UI updates immediately.
-        /// Call this from the ViewModel whenever items or money change.
+        /// Cached total weight – updated via RefreshTotals, not recalculated on every access.
+        /// </summary>
+        public double TotalWeight => _cachedTotalWeight;
+
+        /// <summary>
+        /// Cached total value – updated via RefreshTotals, not recalculated on every access.
+        /// </summary>
+        public double TotalValue => _cachedTotalValue;
+
+        public string FormattedTotalValue => CurrencyAccount.FormatValue(_cachedTotalValue);
+
+        // Stable cached display object for bindings
+        private readonly CurrencyAccount _cachedTotalValueDisplay = new CurrencyAccount();
+        public CurrencyAccount TotalValueAsCurrency => _cachedTotalValueDisplay;
+
+        /// <summary>
+        /// Recalculates cached totals immediately (synchronous).
+        /// Use for initial load or after bulk operations.
+        /// </summary>
+        public void RefreshTotalsImmediate()
+        {
+            RecalculateInternal();
+            NotifyTotalProperties();
+        }
+
+        /// <summary>
+        /// Schedules a debounced recalculation (50ms).
+        /// Use when reacting to rapid input changes (e.g. typing money values).
         /// </summary>
         public void RefreshTotals()
+        {
+            _refreshCts?.Cancel();
+            _refreshCts = new CancellationTokenSource();
+            var token = _refreshCts.Token;
+
+            // Use a very short debounce – just enough to batch multiple property changes
+            // from a single logical edit (e.g. CurrencyAccount fires Dukaten + TotalWeight + TotalValueInSilver)
+            Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.Delay(50, token);
+                    if (token.IsCancellationRequested) return;
+
+                    // Calculate on background
+                    RecalculateInternal();
+
+                    // Push notification to UI thread
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (!token.IsCancellationRequested)
+                            NotifyTotalProperties();
+                    });
+                }
+                catch (TaskCanceledException) { /* expected */ }
+            });
+        }
+
+        private void RecalculateInternal()
+        {
+            double itemWeight = 0;
+            double itemValue = 0;
+            // Snapshot the items to avoid collection-modified issues on background thread
+            var items = _items;
+            for (int i = 0; i < items.Count; i++)
+            {
+                var item = items[i];
+                itemWeight += item.TotalWeight;
+                itemValue += item.TotalValue;
+            }
+
+            double coinWeight = IncludeCoinWeight ? Money.TotalWeight : 0;
+            _cachedTotalWeight = itemWeight + coinWeight;
+            _cachedTotalValue = itemValue + Money.TotalValueInSilver;
+
+            // Update display currency in-place
+            var parts = CurrencyAccount.CalculateParts(_cachedTotalValue);
+            _cachedTotalValueDisplay.UpdateFrom(parts.dukaten, parts.silbertaler, parts.heller, parts.kreuzer);
+        }
+
+        private void NotifyTotalProperties()
         {
             OnPropertyChanged(nameof(TotalWeight));
             OnPropertyChanged(nameof(TotalValue));
             OnPropertyChanged(nameof(FormattedTotalValue));
-            OnPropertyChanged(nameof(TotalValueAsCurrency));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
         protected void OnPropertyChanged(string name)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            
-            // If TotalValue changed, update dependent properties
-            if (name == nameof(TotalValue))
-            {
-                // Aktualisiere das Anzeige-Objekt sofort
-                UpdateTotalCurrencyDisplay();
-
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(FormattedTotalValue)));
-                // Hinweis: Da TotalValueAsCurrency immerDasselbe Objekt liefert, 
-                // ist ein PropertyChanged hier streng genommen für das "Objekt" nicht nötig, 
-                // aber nützlich falls jemand auf das Property selbst lauscht.
-                // Wichtiger ist, dass _cachedTotalValueDisplay SEINE PropertyChanged events feuert (macht es automatisch).
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(TotalValueAsCurrency)));
-            }
         }
     }
 }

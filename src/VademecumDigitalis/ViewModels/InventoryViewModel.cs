@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Threading; // Added for CancellationTokenSource
+using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls;
@@ -15,12 +15,11 @@ namespace VademecumDigitalis.ViewModels
     {
         private readonly InventoryService _service;
         private readonly PersistenceService _persistence;
-        private CancellationTokenSource? _saveCts; // Added for Debouncing
-        private CancellationTokenSource? _recalcCts; // Added for Recalculation Debouncing
+        private CancellationTokenSource? _saveCts;
+        private CancellationTokenSource? _recalcCts;
 
         public ObservableCollection<InventoryContainer> Containers { get; } = new ObservableCollection<InventoryContainer>();
 
-        // Gefilterte Liste für die UI
         public ObservableCollection<InventoryContainer> FilteredContainers { get; } = new ObservableCollection<InventoryContainer>();
 
         [ObservableProperty]
@@ -29,25 +28,20 @@ namespace VademecumDigitalis.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
-        // Gesamtwerte für die UI
         [ObservableProperty]
         private double _totalWeight;
 
         [ObservableProperty]
         private double _carriedWeight;
 
-        [ObservableProperty]
-        private CurrencyAccount _totalBank = new();
+        // Stabile Objekte – Bindings bleiben intakt, Werte werden in-place aktualisiert
+        public CurrencyAccount TotalBank { get; } = new();
+        public CurrencyAccount FormattedTotalValue { get; } = new();
 
-        [ObservableProperty]
-        private CurrencyAccount _formattedTotalValue = new();
-
-        public InventoryViewModel(InventoryService service) 
+        public InventoryViewModel(InventoryService service, PersistenceService persistence)
         {
             _service = service;
-            // PersistenceService könnte auch injiziert werden, hier instanziieren wir ihn direkt der Einfachheit halber oder nutzen den aus dem alten Code
-            _persistence = new PersistenceService(); 
-
+            _persistence = persistence;
             Containers.CollectionChanged += Containers_CollectionChanged;
         }
 
@@ -60,7 +54,7 @@ namespace VademecumDigitalis.ViewModels
         {
             var loaded = await _persistence.LoadInventoryAsync();
             Containers.Clear();
-            
+
             if (loaded != null && loaded.Any())
             {
                 foreach (var c in loaded)
@@ -86,24 +80,19 @@ namespace VademecumDigitalis.ViewModels
             RecalculateTotals();
             UpdateFilteredContainers();
         }
-        
+
         private async Task SaveDataAsync()
         {
-            // Nur speichern, wenn nicht busy (optional, aber gut gegen Reentrancy wenn manuell getriggert)
-             // Wir nutzen hier aber Fire&Forget oft, daher kein harter Lock.
-             // PersistenceService sollte File-Locks handhaben.
-             try
-             {
-                 IsBusy = true;
-                 await _persistence.SaveInventoryAsync(Containers);
-             }
-             finally
-             {
-                 IsBusy = false;
-             }
+            try
+            {
+                await _persistence.SaveInventoryAsync(Containers);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error saving inventory: {ex.Message}");
+            }
         }
 
-        // Neue Methode für Debounced Saving
         private void RequestDelayedSave()
         {
             _saveCts?.Cancel();
@@ -114,18 +103,13 @@ namespace VademecumDigitalis.ViewModels
             {
                 try
                 {
-                    // Wartezeit: 2 Sekunden - genug Zeit um Tippen abzuschließen
                     await Task.Delay(2000, token);
                     if (token.IsCancellationRequested) return;
 
-                    // Speichern auf dem MainThread antriggern (falls Zugriff auf ObservableCollection nötig, was save macht)
-                    // SaveDataAsync setzt IsBusy, was UI updated -> MainThread erforderlich
                     MainThread.BeginInvokeOnMainThread(async () =>
                     {
                         if (!token.IsCancellationRequested)
-                        {
                             await SaveDataAsync();
-                        }
                     });
                 }
                 catch (TaskCanceledException) { /* expected */ }
@@ -142,35 +126,69 @@ namespace VademecumDigitalis.ViewModels
             {
                 try
                 {
-                    // 500ms warten um UI zu entlasten beim schnellen Tippen
-                    await Task.Delay(500, token);
+                    await Task.Delay(200, token);
                     if (token.IsCancellationRequested) return;
 
+                    // Heavy calculation on background thread
+                    var snapshot = Containers.ToArray(); // snapshot to avoid collection-modified
+                    double totalWeight = 0;
+                    double carriedWeight = 0;
+                    long bankD = 0, bankS = 0, bankH = 0, bankK = 0;
+                    double totalVal = 0;
+
+                    foreach (var c in snapshot)
+                    {
+                        if (token.IsCancellationRequested) return;
+
+                        double w = c.TotalWeight;
+                        totalWeight += w;
+                        if (c.IsCarried) carriedWeight += w;
+
+                        bankD += c.Money.Dukaten;
+                        bankS += c.Money.Silbertaler;
+                        bankH += c.Money.Heller;
+                        bankK += c.Money.Kreuzer;
+
+                        totalVal += c.TotalValue;
+                    }
+
+                    var valueParts = CurrencyAccount.CalculateParts(totalVal);
+
+                    // Push results to UI thread
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        if (!token.IsCancellationRequested)
-                            RecalculateTotals();
+                        if (token.IsCancellationRequested) return;
+
+                        TotalWeight = totalWeight;
+                        CarriedWeight = carriedWeight;
+                        TotalBank.UpdateFrom(bankD, bankS, bankH, bankK);
+                        FormattedTotalValue.UpdateFrom(valueParts.dukaten, valueParts.silbertaler, valueParts.heller, valueParts.kreuzer);
                     });
                 }
                 catch (TaskCanceledException) { }
             });
         }
 
+        /// <summary>
+        /// Einzelner Aufruf für beide verzögerten Operationen – reduziert doppelte Timer-Starts.
+        /// </summary>
+        private void OnDataChanged()
+        {
+            RequestDelayedSave();
+            RequestDelayedRecalculate();
+        }
+
         [RelayCommand]
         private async Task SaveData()
         {
-            // Manuelles Speichern bricht laufende Delays ab und speichert sofort
             _saveCts?.Cancel();
-            
             if (IsBusy) return;
 
             try
             {
                 IsBusy = true;
                 await SaveDataAsync();
-                
-                // Kurzes Feedback (optional, aber meist hilfreich für den User zu sehen "es ist fertig")
-                await Task.Delay(500); 
+                await Task.Delay(300);
             }
             finally
             {
@@ -185,7 +203,7 @@ namespace VademecumDigitalis.ViewModels
             if (!string.IsNullOrWhiteSpace(result))
             {
                 var c = new InventoryContainer { Name = result };
-                Containers.Add(c); 
+                Containers.Add(c);
             }
         }
 
@@ -193,38 +211,29 @@ namespace VademecumDigitalis.ViewModels
         private async Task ShowContainerOptions(InventoryContainer container)
         {
             if (container == null) return;
-            
+
             string editAction = "Container bearbeiten (Name/Details)";
             string deleteAction = "Container löschen";
-            
-             var options = new System.Collections.Generic.List<string>();
-            options.Add(editAction);
-            
+
+            var options = new System.Collections.Generic.List<string> { editAction };
             if (!container.IsFixedTreasury)
-            {
                 options.Add(deleteAction);
-            }
-            
+
             var action = await Application.Current.MainPage.DisplayActionSheet($"Optionen: {container.Name}", "Abbrechen", null, options.ToArray());
 
             if (action == editAction)
-            {
-                 await EditContainer(container);
-            }
+                await EditContainer(container);
             else if (action == deleteAction)
-            {
                 await DeleteContainer(container);
-            }
         }
 
         private async Task DeleteContainer(InventoryContainer container)
         {
             if (container == null || container.IsFixedTreasury) return;
 
-             string delOption = await Application.Current.MainPage.DisplayActionSheet($"Löschen: {container.Name}", "Abbrechen", "Löschen & Inhalt vernichten", "Löschen & Inhalt verschieben");
-                    
+            string delOption = await Application.Current.MainPage.DisplayActionSheet($"Löschen: {container.Name}", "Abbrechen", "Löschen & Inhalt vernichten", "Löschen & Inhalt verschieben");
             if (delOption == "Abbrechen" || delOption == null) return;
-            
+
             if (delOption == "Löschen & Inhalt verschieben")
             {
                 var targets = Containers.Where(c => c != container).Select(c => c.Name).ToArray();
@@ -233,21 +242,20 @@ namespace VademecumDigitalis.ViewModels
                     await Application.Current.MainPage.DisplayAlert("Fehler", "Kein Ziel-Container verfügbar.", "OK");
                     return;
                 }
-                
+
                 string targetName = await Application.Current.MainPage.DisplayActionSheet("Ziel wählen", "Abbrechen", null, targets);
                 if (string.IsNullOrWhiteSpace(targetName) || targetName == "Abbrechen") return;
-                
+
                 var targetContainer = Containers.FirstOrDefault(c => c.Name == targetName);
                 if (targetContainer != null)
                 {
-                     var itemsToMove = container.Items.ToList();
-                    foreach(var item in itemsToMove)
+                    var itemsToMove = container.Items.ToList();
+                    foreach (var item in itemsToMove)
                     {
                         container.Items.Remove(item);
                         targetContainer.Items.Add(item);
                     }
                     container.Money.TransferTo(targetContainer.Money, container.Money.Dukaten, container.Money.Silbertaler, container.Money.Heller, container.Money.Kreuzer);
-                    
                     Containers.Remove(container);
                 }
             }
@@ -255,9 +263,7 @@ namespace VademecumDigitalis.ViewModels
             {
                 bool confirm = await Application.Current.MainPage.DisplayAlert("Sicher?", "Wirklich alles vernichten?", "Ja, weg damit", "Nein");
                 if (confirm)
-                {
                     Containers.Remove(container);
-                }
             }
         }
 
@@ -265,7 +271,7 @@ namespace VademecumDigitalis.ViewModels
         {
             if (container == null) return;
 
-             string subAction = await Application.Current.MainPage.DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name ändern", "Details ändern", "Münzgewicht an/aus");
+            string subAction = await Application.Current.MainPage.DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name ändern", "Details ändern", "Münzgewicht an/aus");
             if (subAction == "Name ändern")
             {
                 string newName = await Application.Current.MainPage.DisplayPromptAsync("Name", "Neuer Name:", initialValue: container.Name);
@@ -286,12 +292,11 @@ namespace VademecumDigitalis.ViewModels
         private async Task NavigateToContainer(InventoryContainer container)
         {
             if (container == null) return;
-            
-            // Resolve Page via DI
+
             var page = Application.Current.Handler.MauiContext.Services.GetService<InventoryContainerPage>();
             var vm = page.BindingContext as InventoryContainerViewModel;
             if (vm != null) vm.Container = container;
-            
+
             await Application.Current.MainPage.Navigation.PushAsync(page);
         }
 
@@ -304,86 +309,133 @@ namespace VademecumDigitalis.ViewModels
 
         private void SubscribeToContainerChanges(InventoryContainer container)
         {
-            container.PropertyChanged += (s, e) => 
-            {
-                 RequestDelayedSave();
-                 RequestDelayedRecalculate(); 
-            };
-            
-            container.Items.CollectionChanged += (s, e) =>
-            {
-                if (e.NewItems != null)
-                {
-                    foreach (InventoryItem item in e.NewItems) 
-                        item.PropertyChanged += (s1, e1) => { RequestDelayedSave(); RequestDelayedRecalculate(); };
-                }
-                 RequestDelayedSave();
-                 RequestDelayedRecalculate();
-            };
-            
-            container.Money.PropertyChanged += (s, e) =>
-            {
-                RequestDelayedSave();
-                RequestDelayedRecalculate();
-            };
+            // Container-Properties (Name, IsCarried, IncludeCoinWeight, etc.)
+            container.PropertyChanged += OnContainerPropertyChanged;
 
-             foreach(var item in container.Items)
-            {
-                item.PropertyChanged += (s, e) => { RequestDelayedSave(); RequestDelayedRecalculate(); };
-            }
+            // Items collection
+            container.Items.CollectionChanged += OnItemsCollectionChanged;
+
+            // Money
+            container.Money.PropertyChanged += OnMoneyPropertyChanged;
+
+            // Existing items
+            foreach (var item in container.Items)
+                item.PropertyChanged += OnItemPropertyChanged;
         }
 
         private void UnsubscribeContainer(InventoryContainer container)
         {
-             // Optional: Cleanup logic
+            container.PropertyChanged -= OnContainerPropertyChanged;
+            container.Items.CollectionChanged -= OnItemsCollectionChanged;
+            container.Money.PropertyChanged -= OnMoneyPropertyChanged;
+            foreach (var item in container.Items)
+                item.PropertyChanged -= OnItemPropertyChanged;
+        }
+
+        private void OnContainerPropertyChanged(object? s, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Only trigger recalc/save for properties that affect global totals or need persisting
+            if (e.PropertyName is nameof(InventoryContainer.TotalWeight)
+                or nameof(InventoryContainer.TotalValue)
+                or nameof(InventoryContainer.IsCarried)
+                or nameof(InventoryContainer.Name)
+                or nameof(InventoryContainer.Details)
+                or nameof(InventoryContainer.IncludeCoinWeight))
+            {
+                OnDataChanged();
+            }
+        }
+
+        private void OnMoneyPropertyChanged(object? s, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Only react to actual coin changes, not derived (TotalWeight etc.)
+            if (e.PropertyName is nameof(CurrencyAccount.Dukaten)
+                or nameof(CurrencyAccount.Silbertaler)
+                or nameof(CurrencyAccount.Heller)
+                or nameof(CurrencyAccount.Kreuzer))
+            {
+                OnDataChanged();
+            }
+        }
+
+        private void OnItemPropertyChanged(object? s, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            // Only react to value/weight/quantity changes, not Name, Details, etc.
+            if (e.PropertyName is nameof(InventoryItem.TotalWeight)
+                or nameof(InventoryItem.TotalValue)
+                or nameof(InventoryItem.Quantity)
+                or nameof(InventoryItem.WeightPerUnit)
+                or nameof(InventoryItem.Value)
+                or nameof(InventoryItem.Name)
+                or nameof(InventoryItem.Details)
+                or nameof(InventoryItem.IsConsumable))
+            {
+                OnDataChanged();
+            }
+        }
+
+        private void OnItemsCollectionChanged(object? s, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems != null)
+                foreach (InventoryItem item in e.NewItems)
+                    item.PropertyChanged += OnItemPropertyChanged;
+
+            if (e.OldItems != null)
+                foreach (InventoryItem item in e.OldItems)
+                    item.PropertyChanged -= OnItemPropertyChanged;
+
+            OnDataChanged();
         }
 
         private void Containers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
-            {
                 foreach (InventoryContainer c in e.NewItems)
-                {
                     SubscribeToContainerChanges(c);
-                }
-            }
-             if (e.OldItems != null)
-            {
+
+            if (e.OldItems != null)
                 foreach (InventoryContainer c in e.OldItems)
-                {
                     UnsubscribeContainer(c);
-                }
-            }
-            
+
             RecalculateTotals();
             UpdateFilteredContainers();
-            RequestDelayedSave(); // Auch hier verzögern statt sofort
+            RequestDelayedSave();
         }
 
         private void RecalculateTotals()
         {
-            TotalWeight = Containers.Sum(c => c.TotalWeight);
-            CarriedWeight = Containers.Where(c => c.IsCarried).Sum(c => c.TotalWeight);
-            
-            long d = 0, s = 0, h = 0, k = 0;
+            // Synchronous version for initial load and collection changes
+            double totalWeight = 0;
+            double carriedWeight = 0;
+            long bankD = 0, bankS = 0, bankH = 0, bankK = 0;
+            double totalVal = 0;
+
             foreach (var c in Containers)
             {
-                d += c.Money.Dukaten;
-                s += c.Money.Silbertaler;
-                h += c.Money.Heller;
-                k += c.Money.Kreuzer;
-            }
-            TotalBank = new CurrencyAccount { Dukaten = d, Silbertaler = s, Heller = h, Kreuzer = k };
+                double w = c.TotalWeight;
+                totalWeight += w;
+                if (c.IsCarried) carriedWeight += w;
 
-            double totalVal = Containers.Sum(c => c.TotalValue);
-            var parts = CurrencyAccount.CalculateParts(totalVal);
-             FormattedTotalValue = new CurrencyAccount { Dukaten = parts.dukaten, Silbertaler = parts.silbertaler, Heller = parts.heller, Kreuzer = parts.kreuzer };
+                bankD += c.Money.Dukaten;
+                bankS += c.Money.Silbertaler;
+                bankH += c.Money.Heller;
+                bankK += c.Money.Kreuzer;
+
+                totalVal += c.TotalValue;
+            }
+
+            TotalWeight = totalWeight;
+            CarriedWeight = carriedWeight;
+            TotalBank.UpdateFrom(bankD, bankS, bankH, bankK);
+
+            var valueParts = CurrencyAccount.CalculateParts(totalVal);
+            FormattedTotalValue.UpdateFrom(valueParts.dukaten, valueParts.silbertaler, valueParts.heller, valueParts.kreuzer);
         }
 
         private void UpdateFilteredContainers()
         {
             FilteredContainers.Clear();
-             var query = Containers.AsEnumerable();
+            var query = Containers.AsEnumerable();
             if (!string.IsNullOrWhiteSpace(SearchText))
             {
                 query = query.Where(c =>
@@ -392,16 +444,12 @@ namespace VademecumDigitalis.ViewModels
             foreach (var c in query) FilteredContainers.Add(c);
         }
     }
-    
+
     public static class TaskExtensions
     {
         public static async void FireAndForgetSafeAsync(this Task task)
         {
-            try
-            {
-                await task;
-            }
-            catch { }
+            try { await task; } catch { }
         }
     }
 }

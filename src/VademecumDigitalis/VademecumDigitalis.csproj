@@ -46,7 +46,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <MauiXaml Update="BoronKalenderPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
     <MauiXaml Update="CoinDisplayView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="DsaDatePickerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
     <MauiXaml Update="GlobalItemSearchPage.xaml">

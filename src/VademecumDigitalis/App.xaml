@@ -7,12 +7,58 @@
         <ResourceDictionary>
             <Color x:Key="Primary">#2563EB</Color>
             <Color x:Key="BackgroundDark">#121212</Color>
+            <Color x:Key="SurfaceDark">#1E1E1E</Color>
             <Color x:Key="CardBackground">#1E1E1E</Color>
+            <Color x:Key="InputBackground">#2A2A2A</Color>
             <Color x:Key="TextPrimary">#E6E6E6</Color>
             <Color x:Key="TextSecondary">#B0B0B0</Color>
             <Color x:Key="BorderColor">#333333</Color>
+            <Color x:Key="AccentCyan">#0E7490</Color>
 
             <converters:IntStringConverter x:Key="IntStringConverter" />
+
+            <!-- Default Page Background -->
+            <Style TargetType="ContentPage">
+                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundDark}" />
+            </Style>
+
+            <!-- Default Label -->
+            <Style TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Default Entry (dark) -->
+            <Style TargetType="Entry">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
+                <Setter Property="PlaceholderColor" Value="#666666" />
+            </Style>
+
+            <!-- Default Editor (dark) -->
+            <Style TargetType="Editor">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
+                <Setter Property="PlaceholderColor" Value="#666666" />
+            </Style>
+
+            <!-- Default CheckBox -->
+            <Style TargetType="CheckBox">
+                <Setter Property="Color" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Default SearchBar -->
+            <Style TargetType="SearchBar">
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
+                <Setter Property="PlaceholderColor" Value="#999999" />
+            </Style>
+
+            <!-- Default Picker (dark) -->
+            <Style TargetType="Picker">
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
+                <Setter Property="TitleColor" Value="#666666" />
+            </Style>
 
             <!-- Headline Style (Large, Bold) -->
             <Style x:Key="HeadlineLabel" TargetType="Label">
@@ -30,6 +76,20 @@
                 <Setter Property="Margin" Value="0,8,0,4" />
             </Style>
 
+            <!-- Section Header (for cards) -->
+            <Style x:Key="SectionHeaderLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Field Label (small, bold) -->
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
+            </Style>
+
             <!-- Table Header Label Style -->
             <Style x:Key="TableHeaderLabel" TargetType="Label">
                 <Setter Property="FontSize" Value="14" />
@@ -45,7 +105,7 @@
                 <Setter Property="StrokeThickness" Value="1" />
                 <Setter Property="StrokeShape" Value="RoundRectangle 8" />
                 <Setter Property="Padding" Value="12" />
-                <Setter Property="Margin" Value="4" />
+                <Setter Property="Margin" Value="0,4" />
             </Style>
 
             <!-- Button Style -->
@@ -55,11 +115,6 @@
                 <Setter Property="CornerRadius" Value="8" />
                 <Setter Property="Padding" Value="14,10" />
                 <Setter Property="FontAttributes" Value="Bold" />
-            </Style>
-
-            <!-- Default Page Background -->
-            <Style TargetType="ContentPage">
-                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundDark}" />
             </Style>
 
         </ResourceDictionary>

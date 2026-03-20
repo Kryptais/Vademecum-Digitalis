@@ -60,12 +60,32 @@ namespace VademecumDigitalis.ViewModels
             foreach (var item in value.Items)
                 item.PropertyChanged += OnItemPropertyChanged;
 
-            // Subscribe to money changes -> call RefreshTotals so the UI reacts immediately
-            value.Money.PropertyChanged += (s, e) => value.RefreshTotals();
+            // Subscribe to money changes – only react to the coin value properties,
+            // not to derived properties (TotalWeight, TotalValueInSilver) to avoid cascading refreshes.
+            value.Money.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName is nameof(CurrencyAccount.Dukaten)
+                    or nameof(CurrencyAccount.Silbertaler)
+                    or nameof(CurrencyAccount.Heller)
+                    or nameof(CurrencyAccount.Kreuzer))
+                {
+                    value.RefreshTotals();
+                }
+            };
         }
 
         private void OnItemPropertyChanged(object? sender, PropertyChangedEventArgs e)
-            => Container?.RefreshTotals();
+        {
+            // Only refresh totals when weight/value-relevant properties change
+            if (e.PropertyName is nameof(InventoryItem.TotalWeight)
+                or nameof(InventoryItem.TotalValue)
+                or nameof(InventoryItem.Quantity)
+                or nameof(InventoryItem.WeightPerUnit)
+                or nameof(InventoryItem.Value))
+            {
+                Container?.RefreshTotals();
+            }
+        }
 
         partial void OnSearchTextChanged(string value) => UpdateFilteredItems();
 

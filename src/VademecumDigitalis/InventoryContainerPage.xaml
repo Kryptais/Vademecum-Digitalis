@@ -4,6 +4,7 @@
              xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
              xmlns:local="clr-namespace:VademecumDigitalis"
+             xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
              x:Class="VademecumDigitalis.InventoryContainerPage"
              x:DataType="viewmodels:InventoryContainerViewModel"
              Title=""
@@ -54,22 +55,30 @@
                     <Label Text="Dukaten:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Dukaten, Mode=TwoWay , Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
-                        BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2" />
+                        BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2">
+                        <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                    </Entry>
                         
                     <Label Text="Silbertaler:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="Silver" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                            Keyboard="Numeric" WidthRequest="80"
-                           BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3" />
+                           BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3">
+                        <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                    </Entry>
                            
                     <Label Text="Heller:" Grid.Row="4" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32"  VerticalTextAlignment="Center"/>
                     <Entry Text="{Binding Container.Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                        Keyboard="Numeric" WidthRequest="80"
-                       BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4" />
+                       BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4">
+                        <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                    </Entry>
                        
                     <Label Text="Kreuzer:" Grid.Row="5" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
-                        BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5"/>
+                        BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5">
+                        <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                    </Entry>
 
                     <!-- Money Action Buttons -->
                     <Button Text="Geld transferieren" Command="{Binding TransferMoneyCommand}" 

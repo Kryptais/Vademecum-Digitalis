@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
              x:Class="VademecumDigitalis.TalentsPage"
              Title="Talente">
 
@@ -10,39 +11,44 @@
             <BindableLayout.ItemTemplate>
                 <DataTemplate>
                     <VerticalStackLayout Spacing="8">
-                        <Border Stroke="#0E7490" BackgroundColor="#0E7490" StrokeShape="RoundRectangle 8" Padding="8,6">
+                        <!-- Gruppenname -->
+                        <Border Stroke="{StaticResource AccentCyan}" BackgroundColor="{StaticResource AccentCyan}" StrokeShape="RoundRectangle 8" Padding="8,6">
                             <Label Text="{Binding Gruppe}" TextColor="White" FontAttributes="Bold" FontSize="16" />
                         </Border>
 
+                        <!-- Tabellen-Header -->
                         <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
                               ColumnSpacing="6"
-                              BackgroundColor="#E2E8F0"
+                              BackgroundColor="{StaticResource InputBackground}"
                               Padding="8,6">
                             <Label Grid.Column="0" Text="Talent" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="1" Text="Steigerungsfaktor" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="2" Text="Probe 1" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="3" Text="Probe 2" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="4" Text="Probe 3" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="5" Text="Belastungseinfluss" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="6" Text="FW" FontAttributes="Bold" FontSize="12" />
+                            <Label Grid.Column="1" Text="SF" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="2" Text="P1" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="3" Text="P2" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="4" Text="P3" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="5" Text="BE" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
+                            <Label Grid.Column="6" Text="FW" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
                             <Label Grid.Column="7" Text="Anmerkung" FontAttributes="Bold" FontSize="12" />
                         </Grid>
 
+                        <!-- Talent-Zeilen -->
                         <VerticalStackLayout Spacing="1"
                                              BindableLayout.ItemsSource="{Binding Eintraege}">
                             <BindableLayout.ItemTemplate>
                                 <DataTemplate>
                                     <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
                                           ColumnSpacing="6"
-                                          BackgroundColor="#F8FAFC"
+                                          BackgroundColor="{StaticResource CardBackground}"
                                           Padding="8,6">
                                         <Label Grid.Column="0" Text="{Binding Talent}" FontSize="12" />
                                         <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="12" />
-                                        <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="12" />
-                                        <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="12" />
-                                        <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="12" />
-                                        <Label Grid.Column="5" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="12" />
-                                        <Entry Grid.Column="6" Keyboard="Numeric" Text="{Binding Fw}" FontSize="12" HorizontalTextAlignment="Center" />
+                                        <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                        <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                        <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                        <Label Grid.Column="5" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                                        <Entry Grid.Column="6" Keyboard="Numeric" Text="{Binding Fw}" FontSize="12" HorizontalTextAlignment="Center">
+                                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                                        </Entry>
                                         <Entry Grid.Column="7" Text="{Binding Anmerkung}" FontSize="12" />
                                     </Grid>
                                 </DataTemplate>

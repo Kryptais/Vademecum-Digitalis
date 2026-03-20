@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
              x:Class="VademecumDigitalis.MainPage"
              Title="Charakterbogen">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="16">
-            <Label Text="Vademecum Digitalis"
-                   FontSize="28"
-                   FontAttributes="Bold" />
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Vademecum Digitalis" Style="{StaticResource HeadlineLabel}" />
             <Label Text="Digitaler DSA-5-Charakterbogen (Hauptblatt)"
-                   FontSize="16"
-                   TextColor="#4B5563" />
+                   FontSize="14" TextColor="{StaticResource TextSecondary}" Margin="0,-8,0,4" />
 
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <!-- Hauptattribute -->
+            <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Hauptattribute (immer im Blick)" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="Hauptattribute" Style="{StaticResource SectionHeaderLabel}" />
                     <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
                         <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold" HorizontalOptions="Center" />
                         <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold" HorizontalOptions="Center" />
@@ -26,116 +25,202 @@
                         <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold" HorizontalOptions="Center" />
                         <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold" HorizontalOptions="Center" />
 
-                        <Entry Grid.Row="1" Grid.Column="0" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Mut}" />
-                        <Entry Grid.Row="1" Grid.Column="1" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Klugheit}" />
-                        <Entry Grid.Row="1" Grid.Column="2" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Intuition}" />
-                        <Entry Grid.Row="1" Grid.Column="3" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Charisma}" />
-                        <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Fingerfertigkeit}" />
-                        <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Gewandtheit}" />
-                        <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Konstitution}" />
-                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Körperkraft}" />
+                        <Entry Grid.Row="1" Grid.Column="0" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Mut}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="1" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Klugheit}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="2" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Intuition}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="3" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Charisma}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Fingerfertigkeit}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Gewandtheit}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Konstitution}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Körperkraft}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <!-- Charakterinfos -->
+            <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Charakterinfos" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="Charakterinfos" Style="{StaticResource SectionHeaderLabel}" />
 
-                    <Label Text="Name" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Name" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Name" Text="{Binding Name}" />
 
-                    <Label Text="Spieler" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Spieler" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Spieler" Text="{Binding Spieler}" />
 
-                    <Label Text="Spezies" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="Spezies" Text="{Binding Spezies}" />
+                    <Label Text="Spezies" Style="{StaticResource FieldLabel}" />
+                    <Picker Title="Spezies wählen..."
+                            ItemsSource="{Binding SpeziesListe}"
+                            SelectedItem="{Binding Spezies, Mode=TwoWay}"
+                            TextColor="{StaticResource TextPrimary}"
+                            BackgroundColor="{StaticResource InputBackground}" />
+                    <Label Text="{Binding SpeziesInfoText}"
+                           FontSize="12" TextColor="{StaticResource TextSecondary}"
+                           Margin="4,0,0,0" />
 
-                    <Label Text="Kultur" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Kultur" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Kultur" Text="{Binding Kultur}" />
 
-                    <Label Text="Profession" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Profession" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Profession" Text="{Binding Profession}" />
 
-                    <Label Text="Geschlecht" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Geschlecht" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Geschlecht" Text="{Binding Geschlecht}" />
 
-                    <Label Text="Geburtstag" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="z. B. 12. Rahja 1038 BF" Text="{Binding Geburtstag}" />
+                    <Label Text="Geburtstag" Style="{StaticResource FieldLabel}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry Grid.Column="0" Placeholder="z. B. 12. Rahja 1038 BF" Text="{Binding Geburtstag}" />
+                        <Button Grid.Column="1" Text="📅" FontSize="16" Padding="10,6"
+                                WidthRequest="50"
+                                Clicked="OnGeburtstagPickerClicked"
+                                BackgroundColor="{StaticResource AccentCyan}" />
+                    </Grid>
 
-                    <Label Text="Alter" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Alter" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Alter" Text="{Binding Alter}" />
 
-                    <Label Text="Groesse" FontAttributes="Bold" FontSize="13" />
-                    <Entry Placeholder="Groesse" Text="{Binding Größe}" />
+                    <Label Text="Größe" Style="{StaticResource FieldLabel}" />
+                    <Entry Placeholder="Größe" Text="{Binding Größe}" />
 
-                    <Label Text="Gewicht" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Gewicht" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Gewicht" Text="{Binding Gewicht}" />
 
-                    <Label Text="Haarfarbe" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Haarfarbe" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Haarfarbe" Text="{Binding Haarfarbe}" />
 
-                    <Label Text="Augenfarbe" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Augenfarbe" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Augenfarbe" Text="{Binding Augenfarbe}" />
 
-                    <Label Text="Sozialstatus" FontAttributes="Bold" FontSize="13" />
+                    <Label Text="Sozialstatus" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Sozialstatus" Text="{Binding Sozialstatus}" />
                 </VerticalStackLayout>
             </Border>
 
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <!-- Basiswerte (berechnet + Zugekauft) -->
+            <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Basiswerte" FontSize="18" FontAttributes="Bold" />
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
-                        <Label Grid.Row="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Lebensenergie}" />
+                    <Label Text="Basiswerte" Style="{StaticResource SectionHeaderLabel}" />
+                    <Label Text="Berechnet aus Attributen + Spezies. Zugekaufte Punkte (z.B. über Vorteile/AP) separat eingeben."
+                           FontSize="11" TextColor="{StaticResource TextSecondary}" Margin="0,-4,0,4" />
 
-                        <Label Grid.Row="1" Text="Astralenergie (AsP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Astralenergie}" />
+                    <!-- Header -->
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Padding="0,0,0,4">
+                        <Label Grid.Column="0" Text="" />
+                        <Label Grid.Column="1" Text="Gesamt" FontAttributes="Bold" FontSize="13" WidthRequest="60" HorizontalTextAlignment="Center" />
+                        <Label Grid.Column="2" Text="Zugek." FontAttributes="Bold" FontSize="13" WidthRequest="70" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
 
-                        <Label Grid.Row="2" Text="Karmaenergie (KaP)" VerticalOptions="Center" />
-                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Karmaenergie}" />
+                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                        <!-- LeP -->
+                        <Label Grid.Row="0" Grid.Column="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Lebensenergie}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Entry Grid.Row="0" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding LebensenergieZugekauft}" HorizontalTextAlignment="Center">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
-                        <Label Grid.Row="3" Text="Seelenkraft (SK)" VerticalOptions="Center" />
-                        <Entry Grid.Row="3" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Seelenkraft}" />
+                        <!-- AsP -->
+                        <Label Grid.Row="1" Grid.Column="0" Text="Astralenergie (AsP)" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Astralenergie}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Entry Grid.Row="1" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding AstralenergieZugekauft}" HorizontalTextAlignment="Center">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
-                        <Label Grid.Row="4" Text="Zähigkeit (ZK)" VerticalOptions="Center" />
-                        <Entry Grid.Row="4" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Zähigkeit}" />
+                        <!-- KaP -->
+                        <Label Grid.Row="2" Grid.Column="0" Text="Karmaenergie (KaP)" VerticalOptions="Center" />
+                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Karmaenergie}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Entry Grid.Row="2" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding KarmaenergieZugekauft}" HorizontalTextAlignment="Center">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
-                        <Label Grid.Row="5" Text="Initiative-Basis" VerticalOptions="Center" />
-                        <Entry Grid.Row="5" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding InitiativeBasis}" />
+                        <!-- SK -->
+                        <Label Grid.Row="3" Grid.Column="0" Text="Seelenkraft (SK)" VerticalOptions="Center" />
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Seelenkraft}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Entry Grid.Row="3" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding SeelenkraftZugekauft}" HorizontalTextAlignment="Center">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
-                        <Label Grid.Row="6" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
-                        <Entry Grid.Row="6" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding Geschwindigkeit}" />
+                        <!-- ZK -->
+                        <Label Grid.Row="4" Grid.Column="0" Text="Zähigkeit (ZK)" VerticalOptions="Center" />
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Zähigkeit}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Entry Grid.Row="4" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding ZähigkeitZugekauft}" HorizontalTextAlignment="Center">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
+
+                        <!-- INI (rein berechnet, kein Zugekauft) -->
+                        <Label Grid.Row="5" Grid.Column="0" Text="Initiative-Basis (INI)" VerticalOptions="Center" />
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding InitiativeBasis}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="5" Grid.Column="2" Text="—" WidthRequest="70"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+
+                        <!-- GS (Spezies-abhängig, kein Zugekauft) -->
+                        <Label Grid.Row="6" Grid.Column="0" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
+                        <Label Grid.Row="6" Grid.Column="1" Text="{Binding Geschwindigkeit}" WidthRequest="60"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="6" Grid.Column="2" Text="—" WidthRequest="70"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <!-- Abenteuerpunkte -->
+            <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Abenteuerpunkte" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="Abenteuerpunkte" Style="{StaticResource SectionHeaderLabel}" />
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
                         <Label Grid.Row="0" Text="AP gesamt" VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteGesamt}" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteGesamt}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
                         <Label Grid.Row="1" Text="AP verfügbar" VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteVerfuegbar}" />
+                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteVerfuegbar}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
                         <Label Grid.Row="2" Text="AP ausgegeben" VerticalOptions="Center" />
-                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteAusgegeben}" />
+                        <Entry Grid.Row="2" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding AbenteuerpunkteAusgegeben}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <!-- Schicksalspunkte -->
+            <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Schicksalspunkte" FontSize="18" FontAttributes="Bold" />
+                    <Label Text="Schicksalspunkte" Style="{StaticResource SectionHeaderLabel}" />
                     <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="8">
                         <Label Grid.Row="0" Text="SchiP gesamt" VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteGesamt}" />
+                        <Entry Grid.Row="0" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteGesamt}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
 
                         <Label Grid.Row="1" Text="SchiP verfügbar" VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteVerfuegbar}" />
+                        <Entry Grid.Row="1" Grid.Column="1" WidthRequest="90" Keyboard="Numeric" Text="{Binding SchicksalspunkteVerfuegbar}">
+                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                        </Entry>
                     </Grid>
                 </VerticalStackLayout>
             </Border>

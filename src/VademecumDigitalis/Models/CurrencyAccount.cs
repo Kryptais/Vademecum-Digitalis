@@ -1,7 +1,4 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using System.ComponentModel;
-using System.Threading;
-using System.Timers;
 
 namespace VademecumDigitalis.Models
 {
@@ -18,9 +15,6 @@ namespace VademecumDigitalis.Models
         private long _heller;
         private long _kreuzer;
 
-        // Timer für Debouncing (ersetzt durch CancellationTokenSource für besseres Threading-Verhalten in UI)
-        private CancellationTokenSource? _debounceCts;
-
         public CurrencyAccount()
         {
         }
@@ -30,12 +24,8 @@ namespace VademecumDigitalis.Models
             get => _dukaten;
             set
             {
-                if (_dukaten == value) return;
-                
                 if (SetProperty(ref _dukaten, value))
-                {
-                    OnCoinInputChanged();
-                }
+                    NotifyDependentProperties();
             }
         }
 
@@ -44,12 +34,8 @@ namespace VademecumDigitalis.Models
             get => _silbertaler;
             set
             {
-                if (_silbertaler == value) return;
-
                 if (SetProperty(ref _silbertaler, value))
-                {
-                    OnCoinInputChanged();
-                }
+                    NotifyDependentProperties();
             }
         }
 
@@ -58,12 +44,8 @@ namespace VademecumDigitalis.Models
             get => _heller;
             set
             {
-                if (_heller == value) return;
-
                 if (SetProperty(ref _heller, value))
-                {
-                    OnCoinInputChanged();
-                }
+                    NotifyDependentProperties();
             }
         }
 
@@ -72,51 +54,19 @@ namespace VademecumDigitalis.Models
             get => _kreuzer;
             set
             {
-                if (_kreuzer == value) return;
-
                 if (SetProperty(ref _kreuzer, value))
-                {
-                    OnCoinInputChanged();
-                }
+                    NotifyDependentProperties();
             }
         }
 
         /// <summary>
-        /// Wird aufgerufen, wenn sich irgendeine Münzanzahl ändert (User-Input).
-        /// Startet/Restartet den Timer.
-        /// </summary>
-        private void OnCoinInputChanged()
-        {
-            // Vorherigen Timer abbrechen (Debouncing)
-            _debounceCts?.Cancel();
-            _debounceCts = new CancellationTokenSource();
-            var token = _debounceCts.Token;
-
-            // Neuer Task
-            Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(1000, token);
-                    if (token.IsCancellationRequested) return;
-
-                    // Events feuern
-                    NotifyDependentProperties();
-                }
-                catch (TaskCanceledException)
-                {
-                    // Erwartet bei Abbruch/Neustart
-                }
-            });
-        }
-
-        /// <summary>
-        /// Feuert Events für alle abhängigen Eigenschaften auf einmal.
+        /// Feuert Events für alle abhängigen berechneten Eigenschaften.
+        /// Wird sofort aufgerufen – Debouncing gehört in die ViewModel-Schicht (Save/Recalc).
         /// </summary>
         private void NotifyDependentProperties()
         {
             OnPropertyChanged(nameof(TotalWeight));
-            OnPropertyChanged(nameof(TotalValueInSilver)); 
+            OnPropertyChanged(nameof(TotalValueInSilver));
             OnPropertyChanged(nameof(TotalValueInDukaten));
         }
 
@@ -125,10 +75,10 @@ namespace VademecumDigitalis.Models
             Silbertaler * WeightPerSilbertaler +
             Heller * WeightPerHeller +
             Kreuzer * WeightPerKreuzer;
-        
+
         // Approximate value in Silbertaler
         public double TotalValueInSilver => (Dukaten * 10) + Silbertaler + (Heller / 10.0) + (Kreuzer / 100.0);
-        
+
         // Approximate value in Dukaten
         public double TotalValueInDukaten => TotalValueInSilver / 10.0;
 
@@ -140,12 +90,12 @@ namespace VademecumDigitalis.Models
         {
             var parts = CalculateParts(valueInSilver);
             var strings = new System.Collections.Generic.List<string>();
-            
+
             if (parts.dukaten > 0) strings.Add($"{parts.dukaten} D");
             if (parts.silbertaler > 0) strings.Add($"{parts.silbertaler} S");
             if (parts.heller > 0) strings.Add($"{parts.heller} H");
             if (parts.kreuzer > 0) strings.Add($"{parts.kreuzer} K");
-            
+
             if (strings.Count == 0) return "0 S";
 
             return string.Join(" ", strings);
@@ -165,8 +115,23 @@ namespace VademecumDigitalis.Models
 
             long heller = rest / 10;
             long kreuzer = rest % 10;
-            
+
             return (dukaten, silbertaler, heller, kreuzer);
+        }
+
+        /// <summary>
+        /// Setzt die Werte dieses Accounts aus den Teilen – ohne neue Instanz zu erstellen.
+        /// Nützlich um existierende gebundene Objekte zu aktualisieren.
+        /// </summary>
+        public void UpdateFrom(long dukaten, long silbertaler, long heller, long kreuzer)
+        {
+            // Setze Felder direkt um nur nötige Events zu feuern
+            bool changed = false;
+            if (_dukaten != dukaten) { _dukaten = dukaten; OnPropertyChanged(nameof(Dukaten)); changed = true; }
+            if (_silbertaler != silbertaler) { _silbertaler = silbertaler; OnPropertyChanged(nameof(Silbertaler)); changed = true; }
+            if (_heller != heller) { _heller = heller; OnPropertyChanged(nameof(Heller)); changed = true; }
+            if (_kreuzer != kreuzer) { _kreuzer = kreuzer; OnPropertyChanged(nameof(Kreuzer)); changed = true; }
+            if (changed) NotifyDependentProperties();
         }
 
         public void TransferTo(CurrencyAccount target, long dukaten, long silbertaler, long heller, long kreuzer)
@@ -185,6 +150,5 @@ namespace VademecumDigitalis.Models
             target.Heller += heller;
             target.Kreuzer += kreuzer;
         }
-
     }
 }
