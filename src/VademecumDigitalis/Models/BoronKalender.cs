@@ -44,6 +44,36 @@ public static class BoronKalender
     /// <summary>Liefert den Monat anhand seines Namens.</summary>
     public static Monat? GetMonat(string name) =>
         Monate.FirstOrDefault(m => m.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+
+    // -----------------------------------------------------------------------
+    // Wochentage (Siebentage)
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Die 7 aventurischen Wochentage in Reihenfolge.
+    /// 0=Windstag … 3=Praiostag (Ruhetag) … 6=Wassertag.
+    /// </summary>
+    public static IReadOnlyList<string> Wochentage { get; } =
+        ["Windstag", "Erdstag", "Markttag", "Praiostag", "Rohalstag", "Feuertag", "Wassertag"];
+
+    /// <summary>Kurz-Abkürzungen der 7 Wochentage.</summary>
+    public static IReadOnlyList<string> WochentageKurz { get; } =
+        ["Wi", "Er", "Ma", "Pr", "Ro", "Fe", "Wa"];
+
+    /// <summary>
+    /// Berechnet den Wochentags-Index (0 = Windstag, …, 6 = Wassertag).
+    /// Referenz: 1. Praios 1065 BF = Rohalstag (Index 4).
+    /// Formel: absoluteDay = (jahr-1)*365 + (monat-1)*30 + tag; weekday = (absoluteDay + 3) % 7.
+    /// </summary>
+    public static int GetWochentagIndex(BoronDatum datum)
+    {
+        long abs = (long)(datum.Jahr - 1) * 365 + (datum.Monat - 1) * 30 + datum.Tag;
+        return (int)((abs + 3) % 7);
+    }
+
+    /// <summary>Gibt den vollständigen Wochentagsnamen für ein Datum zurück.</summary>
+    public static string GetWochentagName(BoronDatum datum) =>
+        Wochentage[GetWochentagIndex(datum)];
 }
 
 /// <summary>

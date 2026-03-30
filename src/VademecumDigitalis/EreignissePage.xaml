@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.EreignissePage"
+             Title="Ereignisse">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14">
+
+            <!-- Datum & Alter -->
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Aktuelles aventurisches Datum" FontSize="16" FontAttributes="Bold" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label x:Name="AktuellesDatumLabel"
+                               Grid.Column="0"
+                               FontSize="15"
+                               TextColor="#0E7490"
+                               VerticalOptions="Center"
+                               Text="Noch kein Datum gesetzt" />
+                        <Button Grid.Column="1"
+                                Text="📅 Ändern"
+                                Clicked="OnDatumAendern"
+                                BackgroundColor="#0E7490"
+                                TextColor="White"
+                                Padding="12,6" />
+                    </Grid>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12" Margin="0,4,0,0">
+                        <Label Grid.Column="0" Text="Geburtstag:" FontSize="13" TextColor="#6B7280" VerticalOptions="Center" />
+                        <Label x:Name="GeburtstagLabel" Grid.Column="1" FontSize="13" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="Berechnetes Alter:" FontSize="13" TextColor="#6B7280" VerticalOptions="Center" />
+                        <Label x:Name="AlterBerechnetLabel" Grid.Column="1" FontSize="15" FontAttributes="Bold" TextColor="#0E7490" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="Ereignis-Altersbonus:" FontSize="13" TextColor="#6B7280" VerticalOptions="Center" />
+                        <Label x:Name="EreignisAlterBonusLabel" Grid.Column="1" FontSize="13" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Schicksalspunkte Schnellzugriff -->
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Schicksalspunkte" FontSize="16" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0"
+                               FontSize="14" VerticalOptions="Center">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="Gesamt (inkl. Ereignisse): " />
+                                    <Span x:Name="SchiPGesamtSpan" FontAttributes="Bold" TextColor="#0E7490" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Button Grid.Column="1" Text="−1 verbrannt"
+                                Clicked="OnSchiPVerbrannt"
+                                BackgroundColor="#DC2626" TextColor="White" FontSize="12" Padding="8,6" />
+                        <Button Grid.Column="2" Text="+1 geschenkt"
+                                Clicked="OnSchiPGeschenkt"
+                                BackgroundColor="#059669" TextColor="White" FontSize="12" Padding="8,6" />
+                        <Button Grid.Column="3" Text="Manuell"
+                                Clicked="OnSchiPManuell"
+                                BackgroundColor="#6B7280" TextColor="White" FontSize="12" Padding="8,6" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Neues Ereignis hinzufügen -->
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="10">
+                    <Label x:Name="FormModusLabel" Text="Neues Ereignis hinzufügen" FontSize="16" FontAttributes="Bold" />
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Entry x:Name="NeuDatumEntry" Grid.Column="0"
+                               Placeholder="Datum (z. B. 13. Boron 1060 BF)"
+                               FontSize="13" />
+                        <Button Grid.Column="1" Text="📅"
+                                Clicked="OnNeuDatumPicker"
+                                BackgroundColor="#E5E7EB"
+                                TextColor="#111827" Padding="10,6" />
+                    </Grid>
+
+                    <Editor x:Name="NeuBeschreibungEditor"
+                            Placeholder="Beschreibung (z. B. Bei Abenteurer X um 20 Jahre gealtert)"
+                            MinimumHeightRequest="60"
+                            AutoSize="TextChanges"
+                            FontSize="13" />
+
+                    <Label Text="Stat-Änderungen (0 = keine Änderung)" FontSize="13" FontAttributes="Bold" TextColor="#6B7280" />
+
+                    <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="0">
+                            <Label Text="Alter (Jahre)" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuAlterEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="1">
+                            <Label Text="SchiP (dauerhaft)" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuSchiPEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="2">
+                            <Label Text="LeP (dauerhaft)" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuLepEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0">
+                            <Label Text="AsP" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuAspEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="1">
+                            <Label Text="KaP" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuKapEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="2">
+                            <Label Text="SK" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuSkEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+
+                        <VerticalStackLayout Grid.Row="2" Grid.Column="0">
+                            <Label Text="ZK" FontSize="11" TextColor="#6B7280" />
+                            <Entry x:Name="NeuZkEntry" Keyboard="Numeric" Text="0" FontSize="13" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Button x:Name="HinzufuegenButton"
+                                Grid.Column="0"
+                                Text="✚ Ereignis hinzufügen"
+                                Clicked="OnEreignisHinzufuegen"
+                                BackgroundColor="#0E7490"
+                                TextColor="White"
+                                Padding="12,10" />
+                        <Button x:Name="AbrechenButton"
+                                Grid.Column="1"
+                                Text="✕ Abbrechen"
+                                Clicked="OnBearbeitenAbbrechen"
+                                BackgroundColor="#6B7280"
+                                TextColor="White"
+                                Padding="12,10"
+                                IsVisible="False" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Ereignisliste -->
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Ereignisprotokoll" FontSize="16" FontAttributes="Bold" />
+                    <Label Text="Noch keine Ereignisse eingetragen."
+                           FontSize="13" TextColor="#6B7280"
+                           IsVisible="{Binding KeinEreignisse}" />
+                    <VerticalStackLayout Spacing="0"
+                                         BindableLayout.ItemsSource="{Binding Ereignisse}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Stroke="#E5E7EB" StrokeShape="RoundRectangle 8" Padding="10" Margin="0,4">
+                                     <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="2">
+                                        <Label Grid.Row="0" Grid.Column="0"
+                                               Text="{Binding DatumStr}"
+                                               FontAttributes="Bold" FontSize="13" TextColor="#0E7490" />
+                                        <Label Grid.Row="1" Grid.Column="0"
+                                               Text="{Binding Beschreibung}"
+                                               FontSize="13" />
+                                        <Label Grid.Row="2" Grid.Column="0"
+                                               Text="{Binding Zusammenfassung}"
+                                               FontSize="11" TextColor="#6B7280" />
+                                        <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                                Text="&#x270F;&#xFE0F;"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#0E7490"
+                                                FontSize="18"
+                                                Padding="4"
+                                                Clicked="OnEreignisBearbeiten"
+                                                CommandParameter="{Binding .}" />
+                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="3"
+                                                Text="&#x1F5D1;"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#DC2626"
+                                                FontSize="18"
+                                                Padding="4"
+                                                Clicked="OnEreignisLoeschen"
+                                                CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

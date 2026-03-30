@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using VademecumDigitalis.Models;
@@ -25,6 +26,101 @@ public class MainPageViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IReadOnlyList<TalentGroup> TalentGruppen { get; }
+
+    // --- Ereignisse ---
+
+    public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
+
+    /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
+    public bool KeinEreignisse => Ereignisse.Count == 0;
+
+    /// <summary>Summe aller Alter-Boni aus Ereignissen (in Jahren).</summary>
+    public int EreignisAlterBonus => Ereignisse.Sum(e => e.AlterBonus);
+
+    /// <summary>Summe aller SchiP-Boni aus Ereignissen.</summary>
+    public int EreignisSchiPBonus => Ereignisse.Sum(e => e.SchicksalspunkteBonus);
+
+    /// <summary>Summe aller LeP-Boni aus Ereignissen.</summary>
+    public int EreignisLepBonus => Ereignisse.Sum(e => e.LepBonus);
+
+    /// <summary>Summe aller AsP-Boni aus Ereignissen.</summary>
+    public int EreignisAspBonus => Ereignisse.Sum(e => e.AspBonus);
+
+    /// <summary>Summe aller KaP-Boni aus Ereignissen.</summary>
+    public int EreignisKapBonus => Ereignisse.Sum(e => e.KapBonus);
+
+    /// <summary>Summe aller SK-Boni aus Ereignissen.</summary>
+    public int EreignisSkBonus => Ereignisse.Sum(e => e.SkBonus);
+
+    /// <summary>Summe aller ZK-Boni aus Ereignissen.</summary>
+    public int EreignisZkBonus => Ereignisse.Sum(e => e.ZkBonus);
+
+    // Anzeigestrings für Ereignis-Boni in der Basiswerte-Tabelle (leer wenn 0)
+    public string EreignisLepBonusAnzeige => EreignisLepBonus != 0 ? $"{EreignisLepBonus:+#;-#;0} Ere." : "";
+    public string EreignisAspBonusAnzeige => EreignisAspBonus != 0 ? $"{EreignisAspBonus:+#;-#;0} Ere." : "";
+    public string EreignisKapBonusAnzeige => EreignisKapBonus != 0 ? $"{EreignisKapBonus:+#;-#;0} Ere." : "";
+    public string EreignisSkBonusAnzeige  => EreignisSkBonus  != 0 ? $"{EreignisSkBonus:+#;-#;0} Ere."  : "";
+    public string EreignisZkBonusAnzeige  => EreignisZkBonus  != 0 ? $"{EreignisZkBonus:+#;-#;0} Ere."  : "";
+
+    // Boni-Spalte: Summe aus Vorteilsboni + Ereignisboni (alle Quellen)
+    public int LebensenergieBoniGesamt   => _sheet.LebensenergieVorteilsBonus + EreignisLepBonus;
+    public int AstralergieBoniGesamt     => _sheet.AstralenergieVorteilsBonus + EreignisAspBonus;
+    public int KarmaenergieBoniGesamt    => _sheet.KarmaenergieVorteilsBonus  + EreignisKapBonus;
+    public int SeelenkraftBoniGesamt     => _sheet.SeelenkraftVorteilsBonus   + EreignisSkBonus;
+    public int ZähigkeitBoniGesamt       => _sheet.ZähigkeitVorteilsBonus     + EreignisZkBonus;
+    public int InitiativeBasisBoniGesamt => _sheet.InitiativeBasisVorteilsBonus;
+    public int GeschwindigkeitBoniGesamt => _sheet.GeschwindigkeitVorteilsBonus;
+
+    private void OnEreignisChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        NotifyEreignisBoni();
+        RequestDelayedSave();
+    }
+
+    private void NotifyEreignisBoni()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeinEreignisse)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisAlterBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisSchiPBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisLepBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisAspBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisKapBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisSkBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisZkBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisLepBonusAnzeige)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisAspBonusAnzeige)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisKapBonusAnzeige)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisSkBonusAnzeige)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EreignisZkBonusAnzeige)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Astralenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Karmaenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchicksalspunkteGesamt)));
+    }
+
+    public void EreignisHinzufuegen(CharakterEreignis ereignis)
+    {
+        ereignis.PropertyChanged += OnEreignisChanged;
+        Ereignisse.Add(ereignis);
+        NotifyEreignisBoni();
+        RequestDelayedSave();
+    }
+
+    public void EreignisEntfernen(CharakterEreignis ereignis)
+    {
+        ereignis.PropertyChanged -= OnEreignisChanged;
+        Ereignisse.Remove(ereignis);
+        NotifyEreignisBoni();
+        RequestDelayedSave();
+    }
 
     // --- Spezies-Auswahl ---
 
@@ -79,6 +175,15 @@ public class MainPageViewModel : INotifyPropertyChanged
         _sheet.SeelenkraftZugekauft = s.SeelenkraftZugekauft;
         _sheet.ZähigkeitZugekauft = s.ZähigkeitZugekauft;
 
+        // Vorteilsboni
+        _sheet.LebensenergieVorteilsBonus = s.LebensenergieVorteilsBonus;
+        _sheet.AstralenergieVorteilsBonus = s.AstralenergieVorteilsBonus;
+        _sheet.KarmaenergieVorteilsBonus = s.KarmaenergieVorteilsBonus;
+        _sheet.SeelenkraftVorteilsBonus = s.SeelenkraftVorteilsBonus;
+        _sheet.ZähigkeitVorteilsBonus = s.ZähigkeitVorteilsBonus;
+        _sheet.InitiativeBasisVorteilsBonus = s.InitiativeBasisVorteilsBonus;
+        _sheet.GeschwindigkeitVorteilsBonus = s.GeschwindigkeitVorteilsBonus;
+
         // AP / SchiP
         _sheet.AbenteuerpunkteGesamt = s.AbenteuerpunkteGesamt;
         _sheet.AbenteuerpunkteVerfuegbar = s.AbenteuerpunkteVerfuegbar;
@@ -91,6 +196,9 @@ public class MainPageViewModel : INotifyPropertyChanged
         _sheet.Nachteile = s.Nachteile;
         _sheet.Talente = s.Talente;
         _sheet.Kampftalente = s.Kampftalente;
+
+        // Aktuelles Datum
+        _sheet.AktuellesDatumStr = s.AktuellesDatumStr;
 
         // Talentwerte (FW + Anmerkung) auf TalentRows mappen
         if (data.TalentValues != null)
@@ -111,6 +219,22 @@ public class MainPageViewModel : INotifyPropertyChanged
 
         // Alle Properties der UI melden
         NotifyAllProperties();
+
+        // Ereignisse laden
+        foreach (var e in Ereignisse.ToList())
+        {
+            e.PropertyChanged -= OnEreignisChanged;
+        }
+        Ereignisse.Clear();
+        if (data.Ereignisse != null)
+        {
+            foreach (var e in data.Ereignisse)
+            {
+                e.PropertyChanged += OnEreignisChanged;
+                Ereignisse.Add(e);
+            }
+        }
+        NotifyEreignisBoni();
     }
 
     /// <summary>
@@ -194,6 +318,14 @@ public class MainPageViewModel : INotifyPropertyChanged
                 KarmaenergieZugekauft = _sheet.KarmaenergieZugekauft,
                 SeelenkraftZugekauft = _sheet.SeelenkraftZugekauft,
                 ZähigkeitZugekauft = _sheet.ZähigkeitZugekauft,
+                // Speichere die Vorteilsboni
+                LebensenergieVorteilsBonus = _sheet.LebensenergieVorteilsBonus,
+                AstralenergieVorteilsBonus = _sheet.AstralenergieVorteilsBonus,
+                KarmaenergieVorteilsBonus = _sheet.KarmaenergieVorteilsBonus,
+                SeelenkraftVorteilsBonus = _sheet.SeelenkraftVorteilsBonus,
+                ZähigkeitVorteilsBonus = _sheet.ZähigkeitVorteilsBonus,
+                InitiativeBasisVorteilsBonus = _sheet.InitiativeBasisVorteilsBonus,
+                GeschwindigkeitVorteilsBonus = _sheet.GeschwindigkeitVorteilsBonus,
                 // Speichere auch die berechneten Gesamtwerte für Abwärtskompatibilität
                 Lebensenergie = Lebensenergie,
                 Astralenergie = Astralenergie,
@@ -210,9 +342,11 @@ public class MainPageViewModel : INotifyPropertyChanged
                 Vorteile = _sheet.Vorteile,
                 Nachteile = _sheet.Nachteile,
                 Talente = _sheet.Talente,
-                Kampftalente = _sheet.Kampftalente
+                Kampftalente = _sheet.Kampftalente,
+                AktuellesDatumStr = _sheet.AktuellesDatumStr
             },
-            TalentValues = talentValues
+            TalentValues = talentValues,
+            Ereignisse = Ereignisse.ToList()
         };
     }
 
@@ -265,13 +399,28 @@ public class MainPageViewModel : INotifyPropertyChanged
     /// </summary>
     private void NotifyDerivedValues()
     {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Astralenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralenergieFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Karmaenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisBerechnet)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasis)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleSpezies)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpeziesInfoText)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
     }
 
     private void NotifyAllProperties()
@@ -302,6 +451,20 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieZugekauft)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftZugekauft)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitZugekauft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralenergieVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitVorteilsBonus)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBoniGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteVerfuegbar)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteAusgegeben)));
@@ -311,6 +474,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Nachteile)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Talente)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Kampftalente)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuellesDatumStr)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
         NotifyDerivedValues();
     }
 
@@ -373,13 +538,48 @@ public class MainPageViewModel : INotifyPropertyChanged
     public string Geburtstag
     {
         get => _sheet.Geburtstag;
-        set => SetProperty(_sheet.Geburtstag, value, v => _sheet.Geburtstag = v);
+        set
+        {
+            SetProperty(_sheet.Geburtstag, value, v => _sheet.Geburtstag = v);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
+        }
     }
 
     public string Alter
     {
         get => _sheet.Alter;
         set => SetProperty(_sheet.Alter, value, v => _sheet.Alter = v);
+    }
+
+    /// <summary>Aktuelles aventurisches In-Game-Datum.</summary>
+    public string AktuellesDatumStr
+    {
+        get => _sheet.AktuellesDatumStr;
+        set
+        {
+            SetProperty(_sheet.AktuellesDatumStr, value, v => _sheet.AktuellesDatumStr = v);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
+        }
+    }
+
+    /// <summary>
+    /// Berechnetes Alter aus Geburtstag + aktuellem Datum + Ereignis-Alters-Boni.
+    /// Gibt einen lesbaren String zurück, z.B. "32 Jahre".
+    /// </summary>
+    public string AlterBerechnet
+    {
+        get
+        {
+            if (!BoronDatum.TryParse(_sheet.Geburtstag, out var geburt)) return "—";
+            if (!BoronDatum.TryParse(_sheet.AktuellesDatumStr, out var heute)) return "—";
+
+            int jahre = heute.Jahr - geburt.Jahr;
+            if (heute.Monat < geburt.Monat || (heute.Monat == geburt.Monat && heute.Tag < geburt.Tag))
+                jahre--;
+
+            int gesamt = Math.Max(0, jahre + EreignisAlterBonus);
+            return $"{gesamt} Jahre";
+        }
     }
 
     public string Größe
@@ -464,47 +664,98 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     // --- Berechnete Basiswerte (DSA 5 Formeln) ---
 
-    /// <summary>LeP = 2×KO + SpeziesLeP + Zugekauft</summary>
-    public int Lebensenergie
+    /// <summary>LeP-Basiswert = 2×KO + SpeziesLeP (ohne Zugekauft/Boni)</summary>
+    public int LebensenergieBasis
     {
         get
         {
             int basis = AktuelleSpezies?.LePBasis ?? 5;
-            return 2 * _sheet.Konstitution + basis + _sheet.LebensenergieZugekauft;
+            return 2 * _sheet.Konstitution + basis;
         }
     }
 
-    /// <summary>AsP = Zugekauft (nur mit Vorteil Zauberer)</summary>
-    public int Astralenergie => _sheet.AstralenergieZugekauft;
+    /// <summary>LeP gesamt = Basis + Zugekauft + Vorteilsboni + EreignisBoni</summary>
+    public int Lebensenergie => LebensenergieBasis + _sheet.LebensenergieZugekauft + _sheet.LebensenergieVorteilsBonus + EreignisLepBonus;
 
-    /// <summary>KaP = Zugekauft (nur mit Vorteil Geweihter)</summary>
-    public int Karmaenergie => _sheet.KarmaenergieZugekauft;
+    public string LebensenergieFormel
+    {
+        get
+        {
+            int basis = AktuelleSpezies?.LePBasis ?? 5;
+            return $"2\u00d7KO({_sheet.Konstitution}) + {basis}";
+        }
+    }
 
-    /// <summary>SK = ceil((MU+KL+IN)/6) + SpeziesMod + Zugekauft</summary>
-    public int Seelenkraft
+    /// <summary>AsP gesamt = Zugekauft + Vorteilsboni + EreignisBoni</summary>
+    public int Astralenergie => _sheet.AstralenergieZugekauft + _sheet.AstralenergieVorteilsBonus + EreignisAspBonus;
+
+    public string AstralenergieFormel => "kein Basiswert \u2013 nur zugekauft";
+
+    /// <summary>KaP gesamt = Zugekauft + Vorteilsboni + EreignisBoni</summary>
+    public int Karmaenergie => _sheet.KarmaenergieZugekauft + _sheet.KarmaenergieVorteilsBonus + EreignisKapBonus;
+
+    public string KarmaenergieFormel => "kein Basiswert \u2013 nur zugekauft";
+
+    /// <summary>SK-Basiswert = ⌈(MU+KL+IN)/6⌉ + SpeziesMod (ohne Zugekauft/Boni)</summary>
+    public int SeelenkraftBasis
     {
         get
         {
             int mod = AktuelleSpezies?.SeelenkraftMod ?? -5;
-            return (int)Math.Ceiling((_sheet.Mut + _sheet.Klugheit + _sheet.Intuition) / 6.0) + mod + _sheet.SeelenkraftZugekauft;
+            return (int)Math.Ceiling((_sheet.Mut + _sheet.Klugheit + _sheet.Intuition) / 6.0) + mod;
         }
     }
 
-    /// <summary>ZK = ceil((KO+KO+KK)/6) + SpeziesMod + Zugekauft</summary>
-    public int Zähigkeit
+    /// <summary>SK gesamt = Basis + Vorteilsboni + EreignisBoni (kein Zukauf möglich)</summary>
+    public int Seelenkraft => SeelenkraftBasis + _sheet.SeelenkraftVorteilsBonus + EreignisSkBonus;
+
+    public string SeelenkraftFormel
+    {
+        get
+        {
+            int mod = AktuelleSpezies?.SeelenkraftMod ?? -5;
+            return $"\u2308(MU+KL+IN)/6\u2309 = \u2308({_sheet.Mut}+{_sheet.Klugheit}+{_sheet.Intuition})/6\u2309 {mod:+#;-#;0}";
+        }
+    }
+
+    /// <summary>ZK-Basiswert = ⌈(KO+KO+KK)/6⌉ + SpeziesMod (ohne Zugekauft/Boni)</summary>
+    public int ZähigkeitBasis
     {
         get
         {
             int mod = AktuelleSpezies?.ZähigkeitMod ?? -5;
-            return (int)Math.Ceiling((_sheet.Konstitution + _sheet.Konstitution + _sheet.Körperkraft) / 6.0) + mod + _sheet.ZähigkeitZugekauft;
+            return (int)Math.Ceiling((_sheet.Konstitution + _sheet.Konstitution + _sheet.Körperkraft) / 6.0) + mod;
         }
     }
 
-    /// <summary>INI = ceil((MU+GE)/2)</summary>
-    public int InitiativeBasis => (int)Math.Ceiling((_sheet.Mut + _sheet.Gewandtheit) / 2.0);
+    /// <summary>ZK gesamt = Basis + Vorteilsboni + EreignisBoni (kein Zukauf möglich)</summary>
+    public int Zähigkeit => ZähigkeitBasis + _sheet.ZähigkeitVorteilsBonus + EreignisZkBonus;
 
-    /// <summary>GS = SpeziesGS (Zwerg 6, sonst 8)</summary>
-    public int Geschwindigkeit => AktuelleSpezies?.Geschwindigkeit ?? 8;
+    public string ZähigkeitFormel
+    {
+        get
+        {
+            int mod = AktuelleSpezies?.ZähigkeitMod ?? -5;
+            return $"\u2308(KO+KO+KK)/6\u2309 = \u2308({_sheet.Konstitution}+{_sheet.Konstitution}+{_sheet.Körperkraft})/6\u2309 {mod:+#;-#;0}";
+        }
+    }
+
+    /// <summary>INI-Basiswert = ⌈(MU+GE)/2⌉ (ohne Vorteilsboni)</summary>
+    public int InitiativeBasisBerechnet => (int)Math.Ceiling((_sheet.Mut + _sheet.Gewandtheit) / 2.0);
+
+    /// <summary>INI gesamt = Berechnet + Vorteilsboni</summary>
+    public int InitiativeBasis => InitiativeBasisBerechnet + _sheet.InitiativeBasisVorteilsBonus;
+
+    public string InitiativeBasisFormel => $"\u2308(MU+GE)/2\u2309 = \u2308({_sheet.Mut}+{_sheet.Gewandtheit})/2\u2309";
+
+    /// <summary>GS-Basiswert = SpeziesGS</summary>
+    public int GeschwindigkeitBasis => AktuelleSpezies?.Geschwindigkeit ?? 8;
+
+    /// <summary>GS gesamt = SpeziesGS + Vorteilsboni</summary>
+    public int Geschwindigkeit => GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus;
+
+    public string GeschwindigkeitFormel => $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})";
+
 
     // --- Zugekaufte Modifikatoren (editierbar) ---
 
@@ -573,6 +824,106 @@ public class MainPageViewModel : INotifyPropertyChanged
         }
     }
 
+    // --- Vorteilsboni (Vorteile / Sonderfertigkeiten etc.) ---
+
+    public int LebensenergieVorteilsBonus
+    {
+        get => _sheet.LebensenergieVorteilsBonus;
+        set
+        {
+            if (_sheet.LebensenergieVorteilsBonus == value) return;
+            _sheet.LebensenergieVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int AstralenergieVorteilsBonus
+    {
+        get => _sheet.AstralenergieVorteilsBonus;
+        set
+        {
+            if (_sheet.AstralenergieVorteilsBonus == value) return;
+            _sheet.AstralenergieVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralenergieVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Astralenergie)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralergieBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int KarmaenergieVorteilsBonus
+    {
+        get => _sheet.KarmaenergieVorteilsBonus;
+        set
+        {
+            if (_sheet.KarmaenergieVorteilsBonus == value) return;
+            _sheet.KarmaenergieVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Karmaenergie)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int SeelenkraftVorteilsBonus
+    {
+        get => _sheet.SeelenkraftVorteilsBonus;
+        set
+        {
+            if (_sheet.SeelenkraftVorteilsBonus == value) return;
+            _sheet.SeelenkraftVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int ZähigkeitVorteilsBonus
+    {
+        get => _sheet.ZähigkeitVorteilsBonus;
+        set
+        {
+            if (_sheet.ZähigkeitVorteilsBonus == value) return;
+            _sheet.ZähigkeitVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int InitiativeBasisVorteilsBonus
+    {
+        get => _sheet.InitiativeBasisVorteilsBonus;
+        set
+        {
+            if (_sheet.InitiativeBasisVorteilsBonus == value) return;
+            _sheet.InitiativeBasisVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasis)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
+    public int GeschwindigkeitVorteilsBonus
+    {
+        get => _sheet.GeschwindigkeitVorteilsBonus;
+        set
+        {
+            if (_sheet.GeschwindigkeitVorteilsBonus == value) return;
+            _sheet.GeschwindigkeitVorteilsBonus = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitVorteilsBonus)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBoniGesamt)));
+            RequestDelayedSave();
+        }
+    }
+
     // --- AP / SchiP ---
 
     public int AbenteuerpunkteGesamt
@@ -595,8 +946,8 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public int SchicksalspunkteGesamt
     {
-        get => _sheet.SchicksalspunkteGesamt;
-        set => SetProperty(_sheet.SchicksalspunkteGesamt, value, v => _sheet.SchicksalspunkteGesamt = v);
+        get => _sheet.SchicksalspunkteGesamt + EreignisSchiPBonus;
+        set => SetProperty(_sheet.SchicksalspunkteGesamt, value - EreignisSchiPBonus, v => _sheet.SchicksalspunkteGesamt = v);
     }
 
     public int SchicksalspunkteVerfuegbar

@@ -28,6 +28,7 @@ public static class MauiProgram
     builder.Services.AddTransient<GlobalItemSearchViewModel>();
 
     builder.Services.AddTransient<BoronKalenderPage>();
+    builder.Services.AddTransient<EreignissePage>();
 
         return builder.Build();
     }

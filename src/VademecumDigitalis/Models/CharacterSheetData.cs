@@ -11,6 +11,9 @@ public class CharacterSheetData
     /// Gespeicherte Talentwerte (FW + Anmerkung) indexiert nach Talent-Name.
     /// </summary>
     public List<TalentSaveEntry> TalentValues { get; set; } = new();
+
+    /// <summary>Charakter-Ereignisse (Altersveränderungen, Stat-Boni usw.).</summary>
+    public List<CharakterEreignis> Ereignisse { get; set; } = [];
 }
 
 /// <summary>

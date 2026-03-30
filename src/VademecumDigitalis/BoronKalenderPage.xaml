@@ -5,15 +5,10 @@
              xmlns:vm="clr-namespace:VademecumDigitalis.ViewModels"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
              x:Class="VademecumDigitalis.BoronKalenderPage"
+             x:Name="KalenderSeite"
              Title="Kalender">
 
     <ContentPage.Resources>
-        <converters:BoolToColorConverter x:Key="HeuteBackground"
-                                         TrueColor="#0E7490"
-                                         FalseColor="#2A2A2A" />
-        <converters:BoolToColorConverter x:Key="HeuteBorder"
-                                         TrueColor="#14B8A6"
-                                         FalseColor="#444444" />
     </ContentPage.Resources>
 
     <ScrollView>
@@ -65,33 +60,151 @@
                                 WidthRequest="50" FontSize="18" Padding="4" />
                     </Grid>
 
-                    <!-- Tagesraster -->
-                    <FlexLayout BindableLayout.ItemsSource="{Binding AngezeigtesTage}"
-                                Wrap="Wrap"
-                                JustifyContent="Start"
-                                AlignItems="Start"
-                                Margin="0,8,0,0">
+                    <!-- Wochentag-Kopfzeile (Pr = Praiostag = Ruhetag, grün hervorgehoben) -->
+                    <Grid ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="4" Margin="0,6,0,2">
+                        <Label Grid.Column="0" Text="Wi" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="1" Text="Er" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="2" Text="Ma" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="3" Text="Pr" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="#4ADE80" />
+                        <Label Grid.Column="4" Text="Ro" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="5" Text="Fe" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="6" Text="Wa" FontSize="11" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </Grid>
+
+                    <!-- Tagesraster (7 Spalten = Wochentage, kein Scroll) -->
+                    <VerticalStackLayout Spacing="4"
+                                         BindableLayout.ItemsSource="{Binding AngezeigteZeilen}">
                         <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="vm:KalenderTag">
-                                <Border WidthRequest="48" HeightRequest="48"
-                                        Margin="3"
-                                        StrokeShape="RoundRectangle 6"
-                                        Stroke="{Binding IstHeute, Converter={StaticResource HeuteBorder}}"
-                                        BackgroundColor="{Binding IstHeute, Converter={StaticResource HeuteBackground}}"
-                                        StrokeThickness="2">
-                                    <Border.GestureRecognizers>
-                                        <TapGestureRecognizer
-                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:BoronKalenderViewModel}}, Path=TagAusw&#xE4;hlenCommand}"
-                                            CommandParameter="{Binding .}" />
-                                    </Border.GestureRecognizers>
-                                    <Label Text="{Binding Tag}"
-                                           FontSize="16" FontAttributes="Bold"
-                                           HorizontalOptions="Center"
-                                           VerticalOptions="Center" />
-                                </Border>
+                            <DataTemplate x:DataType="vm:KalenderZeile">
+                                <Grid ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="4">
+
+                                    <Border Grid.Column="0" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag0.TileBackground}" Stroke="{Binding Tag0.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag0}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag0.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag0.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag0.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="1" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag1.TileBackground}" Stroke="{Binding Tag1.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag1}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag1.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag1.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag1.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="2" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag2.TileBackground}" Stroke="{Binding Tag2.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag2}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag2.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag2.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag2.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="3" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag3.TileBackground}" Stroke="{Binding Tag3.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag3}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag3.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag3.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag3.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="4" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag4.TileBackground}" Stroke="{Binding Tag4.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag4}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag4.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag4.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag4.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="5" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag5.TileBackground}" Stroke="{Binding Tag5.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag5}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag5.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag5.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag5.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border Grid.Column="6" HeightRequest="56" StrokeShape="RoundRectangle 8" StrokeThickness="2"
+                                            BackgroundColor="{Binding Tag6.TileBackground}" Stroke="{Binding Tag6.TileBorder}">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding BindingContext.TagAusw&#xE4;hlenCommand, Source={x:Reference KalenderSeite}}" CommandParameter="{Binding Tag6}" />
+                                        </Border.GestureRecognizers>
+                                        <Grid RowDefinitions="*,10" IsVisible="{Binding Tag6.ShowContent}">
+                                            <Label Grid.Row="0" Text="{Binding Tag6.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag6.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                </Grid>
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
-                    </FlexLayout>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Tagesdetails & Kalender-Einträge -->
+            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Tagesdetails &amp; Einträge" Style="{StaticResource SectionHeaderLabel}" />
+                    <Label Text="{Binding SelectedTagText}"
+                           FontSize="14" FontAttributes="Bold"
+                           TextColor="{StaticResource AccentCyan}" />
+
+                    <!-- Eintrags-Liste für den gewählten Tag -->
+                    <CollectionView ItemsSource="{Binding SelectedTagEintraege}"
+                                    SelectionMode="None"
+                                    EmptyView="Keine Einträge – Tag antippen, dann unten hinzufügen.">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:KalenderEintrag">
+                                <Grid ColumnDefinitions="*,Auto" Padding="0,3">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                        <Label Text="{Binding Titel}" FontSize="14" FontAttributes="Bold" />
+                                        <Label Text="{Binding BeschreibungKurz}" FontSize="11"
+                                               TextColor="{StaticResource TextSecondary}" />
+                                    </VerticalStackLayout>
+                                    <Button Grid.Column="1" Text="🗑"
+                                            BackgroundColor="Transparent" TextColor="#DC2626"
+                                            FontSize="18" Padding="4"
+                                            Clicked="OnEintragLoeschen"
+                                            CommandParameter="{Binding .}" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Neuen Eintrag hinzufügen -->
+                    <Label Text="Neuer Eintrag für gewählten Tag" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" Margin="0,8,0,0" />
+                    <Entry x:Name="NeuEintragTitelEntry"
+                           Placeholder="Titel (z. B. Geburtstag Rohaja, Praiostag-Fest ...)"
+                           FontSize="13" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="Jährlich wiederkehrend" FontSize="13" VerticalOptions="Center" />
+                        <Switch x:Name="NeuEintragJaehrlichSwitch" Grid.Column="1" IsToggled="True" />
+                    </Grid>
+                    <Button Text="✚ Eintrag hinzufügen"
+                            Clicked="OnEintragHinzufuegen"
+                            BackgroundColor="#0E7490" TextColor="White" Padding="12,10" />
                 </VerticalStackLayout>
             </Border>
 
@@ -125,50 +238,7 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- DSA DatePicker im Kalender-Tab -->
-            <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Datum-Picker" Style="{StaticResource SectionHeaderLabel}" />
-                    <Label Text="DSA-Datum zusammenstellen (z.B. als Geburtstag)."
-                           FontSize="12" TextColor="{StaticResource TextSecondary}" />
-
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
-                        <Label Grid.Row="0" Grid.Column="0" Text="Tag" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
-                        <Stepper Grid.Row="0" Grid.Column="1" Minimum="1" Maximum="{Binding PickerMaxTage}"
-                                 Value="{Binding PickerTag}" Increment="1" />
-                        <Label Grid.Row="0" Grid.Column="2" Text="{Binding PickerTag}" FontSize="16" FontAttributes="Bold"
-                               VerticalOptions="Center" WidthRequest="30" HorizontalTextAlignment="Center" />
-
-                        <Label Grid.Row="1" Grid.Column="0" Text="Monat" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
-                        <Picker Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                ItemsSource="{Binding MonatsNamen}"
-                                SelectedItem="{Binding PickerMonatName, Mode=TwoWay}"
-                                TextColor="{StaticResource TextPrimary}"
-                                BackgroundColor="{StaticResource InputBackground}" />
-
-                        <Label Grid.Row="2" Grid.Column="0" Text="Jahr" Style="{StaticResource FieldLabel}" VerticalOptions="Center" />
-                        <Entry Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                               Keyboard="Numeric" Text="{Binding PickerJahr}"
-                               HorizontalTextAlignment="Center" />
-                    </Grid>
-
-                    <Label Text="{Binding PickerDatumText}" FontSize="16" FontAttributes="Bold"
-                           HorizontalOptions="Center" TextColor="{StaticResource AccentCyan}" Margin="0,4,0,0" />
                 </VerticalStackLayout>
-            </Border>
-
-            <!-- Notizen -->
-            <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Notizen zum aktuellen Tag" Style="{StaticResource SectionHeaderLabel}" />
-                    <Editor AutoSize="TextChanges"
-                            MinimumHeightRequest="120"
-                            Placeholder="Reisenotizen, Ereignisse, ..."
-                            Text="{Binding Notizen}" />
-                </VerticalStackLayout>
-            </Border>
-
-        </VerticalStackLayout>
-    </ScrollView>
+            </ScrollView>
 
 </ContentPage>

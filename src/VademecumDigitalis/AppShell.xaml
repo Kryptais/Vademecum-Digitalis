@@ -33,6 +33,11 @@
             Route="BoronKalenderPage" />
 
         <ShellContent
+            Title="Ereignisse"
+            ContentTemplate="{DataTemplate local:EreignissePage}"
+            Route="EreignissePage" />
+
+        <ShellContent
             Title="Inventar"
             ContentTemplate="{DataTemplate local:InventoryDashboardPage}"
             Route="InventoryDashboardPage" />

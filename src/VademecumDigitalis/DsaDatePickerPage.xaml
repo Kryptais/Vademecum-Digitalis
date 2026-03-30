@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.DsaDatePickerPage"
+             Title="Datum wahlen">
+    <VerticalStackLayout Padding="20" Spacing="16">
+        <Label Text="Aventurisches Datum" FontSize="20" FontAttributes="Bold" />
+        <Label Text="Tag" FontAttributes="Bold" FontSize="13" />
+        <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+            <Stepper x:Name="TagStepper" Minimum="1" Maximum="30" Increment="1" ValueChanged="OnTagChanged" />
+            <Label x:Name="TagLabel" Text="1" FontSize="16" VerticalOptions="Center" WidthRequest="30" />
+        </HorizontalStackLayout>
+        <Label Text="Monat" FontAttributes="Bold" FontSize="13" />
+        <Picker x:Name="MonatPicker" Title="Monat wahlen" SelectedIndexChanged="OnMonatChanged" />
+        <Label Text="Jahr (BF)" FontAttributes="Bold" FontSize="13" />
+        <Entry x:Name="JahrEntry" Keyboard="Numeric" Placeholder="z. B. 1040" TextChanged="OnJahrChanged" />
+        <Label Text="Vorschau" FontAttributes="Bold" FontSize="13" />
+        <Label x:Name="VorschauLabel" FontSize="15" TextColor="#0E7490" />
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,8,0,0">
+            <Button Grid.Column="0" Text="Abbrechen" Clicked="OnCancel" BackgroundColor="#9CA3AF" TextColor="White" />
+            <Button Grid.Column="1" Text="Ubernehmen" Clicked="OnConfirm" BackgroundColor="#0E7490" TextColor="White" />
+        </Grid>
+    </VerticalStackLayout>
+</ContentPage>

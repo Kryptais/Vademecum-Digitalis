@@ -7,4 +7,5 @@ public class KalenderData
 {
     public BoronDatum AktuellesDatum { get; set; } = BoronDatum.Default;
     public string Notizen { get; set; } = string.Empty;
+    public List<KalenderEintrag> Eintraege { get; set; } = [];
 }

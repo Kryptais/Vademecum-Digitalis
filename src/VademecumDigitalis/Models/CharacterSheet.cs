@@ -27,13 +27,21 @@ public class CharacterSheet
     public int Konstitution { get; set; } = 8;
     public int Körperkraft { get; set; } = 8;
 
-    // Basiswerte – zugekaufte Modifikatoren (über Vor-/Nachteile, AP-Käufe etc.)
-    // Die Berechnung erfolgt im ViewModel: Basis = Formel(Attribute, Spezies) + Zugekauft
+    // Basiswerte – zugekaufte Modifikatoren (über AP-Käufe)
     public int LebensenergieZugekauft { get; set; } = 0;
     public int AstralenergieZugekauft { get; set; } = 0;
     public int KarmaenergieZugekauft { get; set; } = 0;
     public int SeelenkraftZugekauft { get; set; } = 0;
     public int ZähigkeitZugekauft { get; set; } = 0;
+
+    // Basiswerte – Boni aus Vorteilen / Sonderfertigkeiten etc.
+    public int LebensenergieVorteilsBonus { get; set; } = 0;
+    public int AstralenergieVorteilsBonus { get; set; } = 0;
+    public int KarmaenergieVorteilsBonus { get; set; } = 0;
+    public int SeelenkraftVorteilsBonus { get; set; } = 0;
+    public int ZähigkeitVorteilsBonus { get; set; } = 0;
+    public int InitiativeBasisVorteilsBonus { get; set; } = 0;
+    public int GeschwindigkeitVorteilsBonus { get; set; } = 0;
 
     // Legacy-Felder für Abwärtskompatibilität (werden beim Laden migriert)
     public int Lebensenergie { get; set; } = 0;
@@ -57,4 +65,10 @@ public class CharacterSheet
     public string Nachteile { get; set; } = string.Empty;
     public string Talente { get; set; } = string.Empty;
     public string Kampftalente { get; set; } = string.Empty;
+
+    // Aktuelles aventurisches Datum (für Altersberechnung)
+    public string AktuellesDatumStr { get; set; } = string.Empty;
+
+    // Charakter-Ereignisse
+    public List<CharakterEreignis> Ereignisse { get; set; } = [];
 }

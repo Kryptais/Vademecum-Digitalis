@@ -93,7 +93,8 @@
                     </Grid>
 
                     <Label Text="Alter" Style="{StaticResource FieldLabel}" />
-                    <Entry Placeholder="Alter" Text="{Binding Alter}" />
+                    <Label Text="{Binding AlterBerechnet}"
+                           FontSize="15" FontAttributes="Bold" TextColor="{StaticResource AccentCyan}" />
 
                     <Label Text="Größe" Style="{StaticResource FieldLabel}" />
                     <Entry Placeholder="Größe" Text="{Binding Größe}" />
@@ -112,74 +113,116 @@
                 </VerticalStackLayout>
             </Border>
 
-            <!-- Basiswerte (berechnet + Zugekauft) -->
+            <!-- Basiswerte (berechnet + Zugekauft + Boni) -->
             <Border Style="{StaticResource CardBorder}">
                 <VerticalStackLayout Spacing="10">
                     <Label Text="Basiswerte" Style="{StaticResource SectionHeaderLabel}" />
-                    <Label Text="Berechnet aus Attributen + Spezies. Zugekaufte Punkte (z.B. über Vorteile/AP) separat eingeben."
+                    <Label Text="Basis = Formelwert | Zukauf = über AP | Boni = Vorteile/SF | Gesamt = Summe"
                            FontSize="11" TextColor="{StaticResource TextSecondary}" Margin="0,-4,0,4" />
 
                     <!-- Header -->
-                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12" Padding="0,0,0,4">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="8" Padding="0,0,0,4">
                         <Label Grid.Column="0" Text="" />
-                        <Label Grid.Column="1" Text="Gesamt" FontAttributes="Bold" FontSize="13" WidthRequest="60" HorizontalTextAlignment="Center" />
-                        <Label Grid.Column="2" Text="Zugek." FontAttributes="Bold" FontSize="13" WidthRequest="70" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="1" Text="Basis" FontAttributes="Bold" FontSize="12" WidthRequest="52" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="2" Text="Zukauf" FontAttributes="Bold" FontSize="12" WidthRequest="55" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="3" Text="Boni" FontAttributes="Bold" FontSize="12" WidthRequest="55" HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="4" Text="Gesamt" FontAttributes="Bold" FontSize="13" WidthRequest="55" HorizontalTextAlignment="Center" />
                     </Grid>
 
-                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12" RowSpacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="8">
                         <!-- LeP -->
-                        <Label Grid.Row="0" Grid.Column="0" Text="Lebensenergie (LeP)" VerticalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding Lebensenergie}" WidthRequest="60"
-                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Entry Grid.Row="0" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding LebensenergieZugekauft}" HorizontalTextAlignment="Center">
+                        <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Lebensenergie (LeP)" />
+                            <Label Text="{Binding LebensenergieFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="0" Grid.Column="1" Text="{Binding LebensenergieBasis}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Entry Grid.Row="0" Grid.Column="2" WidthRequest="55" Keyboard="Numeric" Text="{Binding LebensenergieZugekauft}" HorizontalTextAlignment="Center">
                             <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                         </Entry>
+                        <Label Grid.Row="0" Grid.Column="3" Text="{Binding LebensenergieBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="4" Text="{Binding Lebensenergie}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
 
                         <!-- AsP -->
-                        <Label Grid.Row="1" Grid.Column="0" Text="Astralenergie (AsP)" VerticalOptions="Center" />
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Astralenergie}" WidthRequest="60"
-                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Entry Grid.Row="1" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding AstralenergieZugekauft}" HorizontalTextAlignment="Center">
+                        <VerticalStackLayout Grid.Row="1" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Astralenergie (AsP)" />
+                            <Label Text="{Binding AstralenergieFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="1" Grid.Column="1" Text="&#x2014;" WidthRequest="52"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Entry Grid.Row="1" Grid.Column="2" WidthRequest="55" Keyboard="Numeric" Text="{Binding AstralenergieZugekauft}" HorizontalTextAlignment="Center">
                             <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                         </Entry>
+                        <Label Grid.Row="1" Grid.Column="3" Text="{Binding AstralergieBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="4" Text="{Binding Astralenergie}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
 
                         <!-- KaP -->
-                        <Label Grid.Row="2" Grid.Column="0" Text="Karmaenergie (KaP)" VerticalOptions="Center" />
-                        <Label Grid.Row="2" Grid.Column="1" Text="{Binding Karmaenergie}" WidthRequest="60"
-                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Entry Grid.Row="2" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding KarmaenergieZugekauft}" HorizontalTextAlignment="Center">
+                        <VerticalStackLayout Grid.Row="2" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Karmaenergie (KaP)" />
+                            <Label Text="{Binding KarmaenergieFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="2" Grid.Column="1" Text="&#x2014;" WidthRequest="52"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Entry Grid.Row="2" Grid.Column="2" WidthRequest="55" Keyboard="Numeric" Text="{Binding KarmaenergieZugekauft}" HorizontalTextAlignment="Center">
                             <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                         </Entry>
+                        <Label Grid.Row="2" Grid.Column="3" Text="{Binding KarmaenergieBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="2" Grid.Column="4" Text="{Binding Karmaenergie}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
 
                         <!-- SK -->
-                        <Label Grid.Row="3" Grid.Column="0" Text="Seelenkraft (SK)" VerticalOptions="Center" />
-                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding Seelenkraft}" WidthRequest="60"
+                        <VerticalStackLayout Grid.Row="3" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Seelenkraft (SK)" />
+                            <Label Text="{Binding SeelenkraftFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="3" Grid.Column="1" Text="{Binding SeelenkraftBasis}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="3" Grid.Column="2" Text="&#x2014;" WidthRequest="55"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="3" Grid.Column="3" Text="{Binding SeelenkraftBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="3" Grid.Column="4" Text="{Binding Seelenkraft}" WidthRequest="55"
                                FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Entry Grid.Row="3" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding SeelenkraftZugekauft}" HorizontalTextAlignment="Center">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
 
                         <!-- ZK -->
-                        <Label Grid.Row="4" Grid.Column="0" Text="Zähigkeit (ZK)" VerticalOptions="Center" />
-                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Zähigkeit}" WidthRequest="60"
-                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Entry Grid.Row="4" Grid.Column="2" WidthRequest="70" Keyboard="Numeric" Text="{Binding ZähigkeitZugekauft}" HorizontalTextAlignment="Center">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-
-                        <!-- INI (rein berechnet, kein Zugekauft) -->
-                        <Label Grid.Row="5" Grid.Column="0" Text="Initiative-Basis (INI)" VerticalOptions="Center" />
-                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding InitiativeBasis}" WidthRequest="60"
-                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Label Grid.Row="5" Grid.Column="2" Text="—" WidthRequest="70"
+                        <VerticalStackLayout Grid.Row="4" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Z&#xE4;higkeit (ZK)" />
+                            <Label Text="{Binding Z&#xE4;higkeitFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="4" Grid.Column="1" Text="{Binding Z&#xE4;higkeitBasis}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="4" Grid.Column="2" Text="&#x2014;" WidthRequest="55"
                                HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
-
-                        <!-- GS (Spezies-abhängig, kein Zugekauft) -->
-                        <Label Grid.Row="6" Grid.Column="0" Text="Geschwindigkeit (GS)" VerticalOptions="Center" />
-                        <Label Grid.Row="6" Grid.Column="1" Text="{Binding Geschwindigkeit}" WidthRequest="60"
+                        <Label Grid.Row="4" Grid.Column="3" Text="{Binding Z&#xE4;higkeitBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="4" Grid.Column="4" Text="{Binding Z&#xE4;higkeit}" WidthRequest="55"
                                FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
-                        <Label Grid.Row="6" Grid.Column="2" Text="—" WidthRequest="70"
+
+                        <!-- INI (kein Zukauf) -->
+                        <VerticalStackLayout Grid.Row="5" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Initiative-Basis (INI)" />
+                            <Label Text="{Binding InitiativeBasisFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="5" Grid.Column="1" Text="{Binding InitiativeBasisBerechnet}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="5" Grid.Column="2" Text="&#x2014;" WidthRequest="55"
                                HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="5" Grid.Column="3" Text="{Binding InitiativeBasisBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="5" Grid.Column="4" Text="{Binding InitiativeBasis}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+
+                        <!-- GS (Spezies-abh&#xE4;ngig, kein Zukauf) -->
+                        <VerticalStackLayout Grid.Row="6" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Geschwindigkeit (GS)" />
+                            <Label Text="{Binding GeschwindigkeitFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="6" Grid.Column="1" Text="{Binding GeschwindigkeitBasis}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="6" Grid.Column="2" Text="&#x2014;" WidthRequest="55"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="6" Grid.Column="3" Text="{Binding GeschwindigkeitBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                        <Label Grid.Row="6" Grid.Column="4" Text="{Binding Geschwindigkeit}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>
