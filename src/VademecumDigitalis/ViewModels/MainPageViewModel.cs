@@ -31,6 +31,34 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
 
+    // --- Vorteile / Nachteile ---
+
+    public ObservableCollection<CharaktervorteilEintrag> VorteilNachteilEintraege { get; } = [];
+
+    /// <summary>True wenn keine strukturierten Einträge vorhanden.</summary>
+    public bool KeineVorteilNachteilEintraege => VorteilNachteilEintraege.Count == 0;
+
+    public void VorteilNachteilHinzufuegen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    public void VorteilNachteilEntfernen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
     /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
     public bool KeinEreignisse => Ereignisse.Count == 0;
 
@@ -235,6 +263,25 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
         NotifyEreignisBoni();
+
+        // Strukturierte Vorteile/Nachteile laden
+        foreach (var eintrag in VorteilNachteilEintraege.ToList())
+        {
+            eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        }
+        VorteilNachteilEintraege.Clear();
+        if (s.VorteilNachteilListe != null)
+        {
+            foreach (var eintrag in s.VorteilNachteilListe)
+            {
+                // MaxStufe aus dem Katalog nachschlagen
+                var katalog = VorteilNachteilKatalog.FindByName(eintrag.Name);
+                if (katalog != null) eintrag.MaxStufe = katalog.MaxStufe;
+                eintrag.PropertyChanged += OnVorteilNachteilChanged;
+                VorteilNachteilEintraege.Add(eintrag);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
     }
 
     /// <summary>
@@ -343,7 +390,8 @@ public class MainPageViewModel : INotifyPropertyChanged
                 Nachteile = _sheet.Nachteile,
                 Talente = _sheet.Talente,
                 Kampftalente = _sheet.Kampftalente,
-                AktuellesDatumStr = _sheet.AktuellesDatumStr
+                AktuellesDatumStr = _sheet.AktuellesDatumStr,
+                VorteilNachteilListe = VorteilNachteilEintraege.ToList()
             },
             TalentValues = talentValues,
             Ereignisse = Ereignisse.ToList()

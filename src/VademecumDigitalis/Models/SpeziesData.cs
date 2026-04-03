@@ -2,21 +2,21 @@ namespace VademecumDigitalis.Models;
 
 /// <summary>
 /// Statische DSA-5-Spezies-Daten (Grundregelwerk).
-/// Enthält die Basiswerte, die bei der Spezieswahl in die Berechnung einfließen.
+/// EnthÃ¤lt die Basiswerte, die bei der Spezieswahl in die Berechnung einflieÃŸen.
 /// </summary>
 public record SpeziesData
 {
     /// <summary>Anzeigename (z. B. "Mensch")</summary>
     public required string Name { get; init; }
 
-    /// <summary>LeP-Grundwert der Spezies (wird zu 2×KO addiert)</summary>
+    /// <summary>LeP-Grundwert der Spezies (wird zu 2Ã—KO addiert)</summary>
     public int LePBasis { get; init; }
 
     /// <summary>Seelenkraft-Modifikator der Spezies (wird auf (MU+KL+IN)/6 aufaddiert)</summary>
     public int SeelenkraftMod { get; init; }
 
-    /// <summary>Zähigkeit-Modifikator der Spezies (wird auf (KO+KO+KK)/6 aufaddiert)</summary>
-    public int ZähigkeitMod { get; init; }
+    /// <summary>ZÃ¤higkeit-Modifikator der Spezies (wird auf (KO+KO+KK)/6 aufaddiert)</summary>
+    public int ZÃ¤higkeitMod { get; init; }
 
     /// <summary>Grundgeschwindigkeit der Spezies</summary>
     public int Geschwindigkeit { get; init; }
@@ -25,7 +25,7 @@ public record SpeziesData
     public int SchicksalspunkteMax { get; init; }
 
     /// <summary>
-    /// Alle im DSA-5-Grundregelwerk verfügbaren Spezies.
+    /// Alle im DSA-5-Grundregelwerk verfÃ¼gbaren Spezies.
     /// Werte aus dem offiziellen DSA-5-Grundregelwerk (Ulisses Spiele).
     /// </summary>
     public static IReadOnlyList<SpeziesData> Alle { get; } =
@@ -35,7 +35,7 @@ public record SpeziesData
             Name = "Mensch",
             LePBasis = 5,
             SeelenkraftMod = -5,
-            ZähigkeitMod = -5,
+            ZÃ¤higkeitMod = -5,
             Geschwindigkeit = 8,
             SchicksalspunkteMax = 3
         },
@@ -44,7 +44,7 @@ public record SpeziesData
             Name = "Elf",
             LePBasis = 2,
             SeelenkraftMod = -4,
-            ZähigkeitMod = -6,
+            ZÃ¤higkeitMod = -6,
             Geschwindigkeit = 8,
             SchicksalspunkteMax = 2
         },
@@ -53,7 +53,7 @@ public record SpeziesData
             Name = "Halbelf",
             LePBasis = 5,
             SeelenkraftMod = -4,
-            ZähigkeitMod = -6,
+            ZÃ¤higkeitMod = -6,
             Geschwindigkeit = 8,
             SchicksalspunkteMax = 3
         },
@@ -62,7 +62,7 @@ public record SpeziesData
             Name = "Zwerg",
             LePBasis = 8,
             SeelenkraftMod = -4,
-            ZähigkeitMod = -4,
+            ZÃ¤higkeitMod = -4,
             Geschwindigkeit = 6,
             SchicksalspunkteMax = 3
         },
@@ -71,7 +71,7 @@ public record SpeziesData
             Name = "Halbork (Ork)",
             LePBasis = 8,
             SeelenkraftMod = -6,
-            ZähigkeitMod = -4,
+            ZÃ¤higkeitMod = -4,
             Geschwindigkeit = 8,
             SchicksalspunkteMax = 2 // Errata / Regelbuch je nach Ausgabe 2 oder 3
         }

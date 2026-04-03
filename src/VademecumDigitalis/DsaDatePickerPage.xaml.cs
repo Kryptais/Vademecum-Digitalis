@@ -3,26 +3,26 @@ using VademecumDigitalis.Models;
 namespace VademecumDigitalis;
 
 /// <summary>
-/// Modale Seite zum Wählen eines aventurischen Datums (DSA-Kalender).
+/// Modale Seite zum WÃ¤hlen eines aventurischen Datums (DSA-Kalender).
 /// Wird z.B. vom Geburtstags-Picker auf dem Hauptblatt aufgerufen.
 /// </summary>
 public partial class DsaDatePickerPage : ContentPage
 {
     private int _tag = 1;
-    private int _monatIndex = 0; // 0-basiert für Picker
+    private int _monatIndex = 0; // 0-basiert fÃ¼r Picker
     private int _jahr = 1040;
 
-    /// <summary>Ergebnis-String nach Bestätigung, z.B. "12. Rahja 1038 BF".</summary>
+    /// <summary>Ergebnis-String nach BestÃ¤tigung, z.B. "12. Rahja 1038 BF".</summary>
     public string? ResultDatum { get; private set; }
 
-    /// <summary>True wenn der User bestätigt hat.</summary>
+    /// <summary>True wenn der User bestÃ¤tigt hat.</summary>
     public bool Confirmed { get; private set; }
 
     public DsaDatePickerPage()
     {
         InitializeComponent();
 
-        // Monate befüllen
+        // Monate befÃ¼llen
         foreach (var name in BoronKalender.MonatsNamen)
             MonatPicker.Items.Add(name);
 
