@@ -31,6 +31,34 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
 
+    // --- Sonderfertigkeiten ---
+
+    public ObservableCollection<CharakterSonderfertigkeitEintrag> SonderfertigkeitEintraege { get; } = [];
+
+    /// <summary>True wenn keine Sonderfertigkeiten vorhanden.</summary>
+    public bool KeineSonderfertigkeiten => SonderfertigkeitEintraege.Count == 0;
+
+    public void SonderfertigkeitHinzufuegen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    public void SonderfertigkeitEntfernen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    private void OnSonderfertigkeitChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
     // --- Vorteile / Nachteile ---
 
     public ObservableCollection<CharaktervorteilEintrag> VorteilNachteilEintraege { get; } = [];
@@ -282,6 +310,22 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+
+        // Sonderfertigkeiten laden
+        foreach (var eintrag in SonderfertigkeitEintraege.ToList())
+        {
+            eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        }
+        SonderfertigkeitEintraege.Clear();
+        if (s.SonderfertigkeitListe != null)
+        {
+            foreach (var eintrag in s.SonderfertigkeitListe)
+            {
+                eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+                SonderfertigkeitEintraege.Add(eintrag);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
     }
 
     /// <summary>
@@ -391,7 +435,8 @@ public class MainPageViewModel : INotifyPropertyChanged
                 Talente = _sheet.Talente,
                 Kampftalente = _sheet.Kampftalente,
                 AktuellesDatumStr = _sheet.AktuellesDatumStr,
-                VorteilNachteilListe = VorteilNachteilEintraege.ToList()
+                VorteilNachteilListe = VorteilNachteilEintraege.ToList(),
+                SonderfertigkeitListe = SonderfertigkeitEintraege.ToList()
             },
             TalentValues = talentValues,
             Ereignisse = Ereignisse.ToList()
@@ -466,6 +511,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Wundschwelle)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WundschwelleFormel)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleSpezies)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpeziesInfoText)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
@@ -803,6 +850,11 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int Geschwindigkeit => GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus;
 
     public string GeschwindigkeitFormel => $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})";
+
+    /// <summary>Wundschwelle = ⌈KO/2⌉</summary>
+    public int Wundschwelle => (int)Math.Ceiling(_sheet.Konstitution / 2.0);
+
+    public string WundschwelleFormel => $"\u2308KO/2\u2309 = \u2308{_sheet.Konstitution}/2\u2309";
 
 
     // --- Zugekaufte Modifikatoren (editierbar) ---
