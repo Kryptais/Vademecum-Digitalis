@@ -19,6 +19,9 @@ public static class MauiProgram
     builder.Services.AddSingleton<IDialogService, DialogService>();
     builder.Services.AddSingleton<MainPageViewModel>();
     builder.Services.AddSingleton<BoronKalenderViewModel>();
+    builder.Services.AddSingleton<AdvantagesService>();
+    builder.Services.AddSingleton<AdvantagesViewModel>();
+    builder.Services.AddSingleton<AdvantagesPage>();
     
     // Pages + VMs
     builder.Services.AddTransient<InventoryContainerPage>();

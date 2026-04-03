@@ -4,9 +4,18 @@ namespace VademecumDigitalis;
 
 public partial class AdvantagesPage : ContentPage
 {
-    public AdvantagesPage()
+    private readonly AdvantagesViewModel _viewModel;
+
+    public AdvantagesPage(AdvantagesViewModel viewModel)
     {
         InitializeComponent();
-        BindingContext = CharacterSheetSession.Current;
+        _viewModel = viewModel;
+        BindingContext = _viewModel;
+    }
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        await _viewModel.LoadDataAsync();
     }
 }
