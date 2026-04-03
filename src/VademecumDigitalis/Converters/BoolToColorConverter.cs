@@ -3,8 +3,8 @@ using System.Globalization;
 namespace VademecumDigitalis.Converters;
 
 /// <summary>
-/// Gibt den TrueValue zurück wenn der bool-Wert true ist, sonst den FalseValue.
-/// Verwendbar für Farben, Opacity etc.
+/// Gibt den TrueValue zurÃ¼ck wenn der bool-Wert true ist, sonst den FalseValue.
+/// Verwendbar fÃ¼r Farben, Opacity etc.
 /// </summary>
 public class BoolToColorConverter : IValueConverter
 {

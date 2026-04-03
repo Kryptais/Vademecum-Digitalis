@@ -9,8 +9,8 @@ using VademecumDigitalis.Services;
 namespace VademecumDigitalis.ViewModels;
 
 /// <summary>
-/// ViewModel für die aventurische Kalender-Seite.
-/// Zeigt den aktuellen Monat als Tagesraster, unterstützt Navigation und Notizen.
+/// ViewModel fÃ¼r die aventurische Kalender-Seite.
+/// Zeigt den aktuellen Monat als Tagesraster, unterstÃ¼tzt Navigation und Notizen.
 /// </summary>
 public partial class BoronKalenderViewModel : ObservableObject
 {
@@ -21,27 +21,27 @@ public partial class BoronKalenderViewModel : ObservableObject
     [ObservableProperty]
     private BoronDatum _aktuellesDatum = BoronDatum.Default;
 
-    // Der angezeigte Monat/Jahr für die Kalenderansicht
+    // Der angezeigte Monat/Jahr fÃ¼r die Kalenderansicht
     [ObservableProperty]
     private int _angezeigtesJahr = 1040;
 
     [ObservableProperty]
     private int _angezeigterMonatIndex = 1;
 
-    // Tage des aktuell angezeigten Monats (inkl. Leer-Kacheln für Wochenausrichtung)
+    // Tage des aktuell angezeigten Monats (inkl. Leer-Kacheln fÃ¼r Wochenausrichtung)
     public ObservableCollection<KalenderTag> AngezeigtesTage { get; } = [];
 
     // Zeilen des Kalender-Rasters (je 7 Tage pro Zeile)
     public ObservableCollection<KalenderZeile> AngezeigteZeilen { get; } = [];
 
-    // Alle Monatsnamen für den Picker
+    // Alle Monatsnamen fÃ¼r den Picker
     public IReadOnlyList<string> MonatsNamen => BoronKalender.MonatsNamen;
 
     // Angezeigter Monatsname
     public string AngezeigterMonatName =>
         BoronKalender.GetMonat(AngezeigterMonatIndex)?.Name ?? "?";
 
-    /// <summary>Gewählter Monatsname im Picker (für SelectedItem-Binding).</summary>
+    /// <summary>GewÃ¤hlter Monatsname im Picker (fÃ¼r SelectedItem-Binding).</summary>
     public string AngezeigterMonatNamePicker
     {
         get => BoronKalender.GetMonat(AngezeigterMonatIndex)?.Name ?? "Praios";
@@ -56,17 +56,17 @@ public partial class BoronKalenderViewModel : ObservableObject
     // Formatiertes aktuelles Datum + Wochentag
     public string AktuellesDatumText =>
         AktuellesDatum.IsValid
-            ? $"{AktuellesDatum}  ·  {BoronKalender.GetWochentagName(AktuellesDatum)}"
+            ? $"{AktuellesDatum}  Â·  {BoronKalender.GetWochentagName(AktuellesDatum)}"
             : AktuellesDatum.ToString();
 
     // Notizen
     [ObservableProperty]
     private string _notizen = string.Empty;
 
-    // Kalender-Einträge (Geburtstage, Feste, ...)
+    // Kalender-EintrÃ¤ge (Geburtstage, Feste, ...)
     public ObservableCollection<KalenderEintrag> Eintraege { get; } = [];
 
-    // Ausgewählter Tag
+    // AusgewÃ¤hlter Tag
     [ObservableProperty]
     private KalenderTag? _selectedTag;
 
@@ -76,9 +76,9 @@ public partial class BoronKalenderViewModel : ObservableObject
     {
         get
         {
-            if (SelectedTag == null || SelectedTag.IstLeer) return "Kein Tag ausgewählt – Tag antippen";
+            if (SelectedTag == null || SelectedTag.IstLeer) return "Kein Tag ausgewÃ¤hlt Â– Tag antippen";
             var datum = new BoronDatum(SelectedTag.Tag, AngezeigterMonatIndex, AngezeigtesJahr);
-            return $"{datum}  ·  {BoronKalender.GetWochentagName(datum)}";
+            return $"{datum}  Â·  {BoronKalender.GetWochentagName(datum)}";
         }
     }
 
@@ -141,7 +141,7 @@ public partial class BoronKalenderViewModel : ObservableObject
 
     partial void OnNotizenChanged(string value) => RequestDelayedSave();
 
-    /// <summary>Baut die Tages-Liste für den angezeigten Monat/Jahr (7 Spalten = Wochentage).</summary>
+    /// <summary>Baut die Tages-Liste fÃ¼r den angezeigten Monat/Jahr (7 Spalten = Wochentage).</summary>
     private void RebuildTage()
     {
         AngezeigtesTage.Clear();
@@ -163,13 +163,13 @@ public partial class BoronKalenderViewModel : ObservableObject
             AngezeigtesTage.Add(new KalenderTag(t, istHeute, istLeer: false, istPraiostag, hatEintrag));
         }
 
-        // Auffüll-Kacheln am Ende für vollständige letzte Zeile
+        // AuffÃ¼ll-Kacheln am Ende fÃ¼r vollstÃ¤ndige letzte Zeile
         int rest = AngezeigtesTage.Count % 7;
         if (rest != 0)
             for (int i = 0; i < 7 - rest; i++)
                 AngezeigtesTage.Add(new KalenderTag(0, false, istLeer: true));
 
-        // Zeilen-Collection für BindableLayout aufbauen
+        // Zeilen-Collection fÃ¼r BindableLayout aufbauen
         AngezeigteZeilen.Clear();
         for (int i = 0; i < AngezeigtesTage.Count; i += 7)
         {
@@ -201,7 +201,7 @@ public partial class BoronKalenderViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void NächsterMonat()
+    private void NÃ¤chsterMonat()
     {
         if (AngezeigterMonatIndex < 13)
         {
@@ -232,7 +232,7 @@ public partial class BoronKalenderViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void TagZurück()
+    private void TagZurÃ¼ck()
     {
         AktuellesDatum = AktuellesDatum.AddTage(-1);
         AngezeigtesJahr = AktuellesDatum.Jahr;
@@ -248,7 +248,7 @@ public partial class BoronKalenderViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void TagAuswählen(KalenderTag tag)
+    private void TagAuswÃ¤hlen(KalenderTag tag)
     {
         if (tag == null || tag.IstLeer) return;
         AktuellesDatum = new BoronDatum(tag.Tag, AngezeigterMonatIndex, AngezeigtesJahr);
@@ -266,7 +266,7 @@ public partial class BoronKalenderViewModel : ObservableObject
             SelectedTagEintraege.Add(e);
     }
 
-    /// <summary>Fügt einen Kalendereintrag hinzu und aktualisiert die Ansicht.</summary>
+    /// <summary>FÃ¼gt einen Kalendereintrag hinzu und aktualisiert die Ansicht.</summary>
     public void EintragHinzufuegen(KalenderEintrag eintrag)
     {
         Eintraege.Add(eintrag);
@@ -284,21 +284,21 @@ public partial class BoronKalenderViewModel : ObservableObject
         RequestDelayedSave();
     }
 
-    // --- Date Picker Command (für Geburtstag etc.) ---
+    // --- Date Picker Command (fÃ¼r Geburtstag etc.) ---
 
-    /// <summary>Picker-Ergebnis: gewählter Tag</summary>
+    /// <summary>Picker-Ergebnis: gewÃ¤hlter Tag</summary>
     [ObservableProperty]
     private int _pickerTag = 1;
 
-    /// <summary>Picker-Ergebnis: gewählter Monatsindex (1-basiert)</summary>
+    /// <summary>Picker-Ergebnis: gewÃ¤hlter Monatsindex (1-basiert)</summary>
     [ObservableProperty]
     private int _pickerMonatIndex = 1;
 
-    /// <summary>Picker-Ergebnis: gewähltes Jahr</summary>
+    /// <summary>Picker-Ergebnis: gewÃ¤hltes Jahr</summary>
     [ObservableProperty]
     private int _pickerJahr = 1040;
 
-    /// <summary>Gewählter Monat im Datum-Picker (String für SelectedItem-Binding).</summary>
+    /// <summary>GewÃ¤hlter Monat im Datum-Picker (String fÃ¼r SelectedItem-Binding).</summary>
     public string PickerMonatName
     {
         get => BoronKalender.GetMonat(PickerMonatIndex)?.Name ?? "Praios";
@@ -323,7 +323,7 @@ public partial class BoronKalenderViewModel : ObservableObject
             PickerTag = PickerMaxTage;
     }
 
-    /// <summary>Formatiert das aktuell im Picker gewählte Datum.</summary>
+    /// <summary>Formatiert das aktuell im Picker gewÃ¤hlte Datum.</summary>
     public string PickerDatumText =>
         new BoronDatum(PickerTag, PickerMonatIndex, PickerJahr).ToString();
 
