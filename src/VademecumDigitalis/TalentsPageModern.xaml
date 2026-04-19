@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             xmlns:converters="clr-namespace:VademecumDigitalis.Converters"
              x:Class="VademecumDigitalis.TalentsPageModern"
              Title="Talente (Modern)">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" TrueColor="#2E7D32" FalseColor="DarkGray" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12"
                              BindableLayout.ItemsSource="{Binding TalentGruppen}">
             <BindableLayout.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:TalentGroup">
                     <VerticalStackLayout Spacing="8">
                         <!-- Collapsible Header -->
                         <Grid ColumnDefinitions="Auto,*" Padding="12,10" BackgroundColor="#0E7490" 
@@ -28,38 +36,64 @@
 
                         <!-- Content - shown when IsExpanded is true -->
                         <VerticalStackLayout Spacing="0" IsVisible="{Binding IsExpanded}">
-                            <!-- Header Row -->
-                            <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
-                                  ColumnSpacing="6"
-                                  Padding="12,12"
+                            <!-- Two-row Header -->
+                            <Grid RowDefinitions="Auto,Auto"
+                                  ColumnDefinitions="2*,0.8*,0.5*,0.5*,0.5*,0.6*,0.6*,0.6*,0.6*,0.6*,0.7*,0.5*,1.4*"
+                                  ColumnSpacing="4"
+                                  Padding="12,0"
                                   BackgroundColor="#0E7490">
-                                <Label Grid.Column="0" Text="Talent" FontAttributes="Bold" FontSize="13" TextColor="White" />
-                                <Label Grid.Column="1" Text="Steigerungsfaktor" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="2" Text="Probe 1" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="3" Text="Probe 2" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="4" Text="Probe 3" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="5" Text="Belastungseinfluss" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="6" Text="FW" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
-                                <Label Grid.Column="7" Text="Anmerkung" FontAttributes="Bold" FontSize="13" TextColor="White" HorizontalOptions="Center" />
+
+                                <!-- Top row: merged headers -->
+                                <Label Grid.Row="0" Grid.Column="0" Text="Talent" FontAttributes="Bold" FontSize="12" TextColor="White" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="SF" FontAttributes="Bold" FontSize="11" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+
+                                <!-- "Proben" spanning 6 columns (3 Kürzel + 3 Werte) -->
+                                <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="6" Text="Proben" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                                <!-- Sub-headers for Proben -->
+                                <Label Grid.Row="1" Grid.Column="2" Text="P1" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="3" Text="P2" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="4" Text="P3" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="5" Text="W1" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="6" Text="W2" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="7" Text="W3" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+
+                                <Label Grid.Row="0" Grid.Column="8" Text="BE" FontAttributes="Bold" FontSize="11" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="9" Text="FW" FontAttributes="Bold" FontSize="11" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="10" Text="FW ges." FontAttributes="Bold" FontSize="11" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="11" Text="Beg." FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="12" Text="Anmerkung" FontAttributes="Bold" FontSize="11" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
                             </Grid>
 
-                            <!-- Data Rows with Zebra Striping -->
+                            <!-- Data Rows -->
                             <VerticalStackLayout Spacing="0"
                                                  BindableLayout.ItemsSource="{Binding Eintraege}">
                                 <BindableLayout.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
-                                              ColumnSpacing="6"
-                                              Padding="12,14"
-                                              BackgroundColor="DarkGray">
-                                            <Label Grid.Column="0" Text="{Binding Talent}" FontSize="12" VerticalOptions="Center" />
-                                            <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="12" VerticalOptions="Center" TextColor="#0E7490" />
-                                            <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" />
-                                            <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" />
-                                            <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" />
-                                            <Label Grid.Column="5" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" />
-                                            <Entry Grid.Column="6" Keyboard="Numeric" Text="{Binding Fw}" FontSize="11" HorizontalTextAlignment="Center" />
-                                            <Entry Grid.Column="7" Text="{Binding Anmerkung}" FontSize="11" />
+                                    <DataTemplate x:DataType="models:TalentRow">
+                                        <Grid ColumnDefinitions="2*,0.8*,0.5*,0.5*,0.5*,0.6*,0.6*,0.6*,0.6*,0.6*,0.7*,0.5*,1.4*"
+                                              ColumnSpacing="4"
+                                              Padding="12,10"
+                                              BackgroundColor="{Binding HatBegabung, Converter={StaticResource BoolToColorConverter}}">
+                                            <Label Grid.Column="0" Text="{Binding Talent}" FontSize="11" VerticalOptions="Center" />
+                                            <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="11" VerticalOptions="Center" TextColor="#0E7490" />
+                                            <!-- Probe Kürzel (schmal) -->
+                                            <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <!-- Effektive Probenwerte -->
+                                            <Label Grid.Column="5" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Label Grid.Column="6" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Label Grid.Column="7" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <!-- BE -->
+                                            <Label Grid.Column="8" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <!-- FW (editierbar) -->
+                                            <Entry Grid.Column="9" Keyboard="Numeric" Text="{Binding Fw}" FontSize="16" HorizontalTextAlignment="Center" />
+                                            <!-- FW Gesamt (berechnet) -->
+                                            <Label Grid.Column="10" Text="{Binding FwGesamt}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <!-- Begabung Checkbox (read-only) -->
+                                            <CheckBox Grid.Column="11" IsChecked="{Binding HatBegabung, Mode=OneWay}" IsEnabled="False" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <!-- Anmerkung -->
+                                            <Entry Grid.Column="12" Text="{Binding Anmerkung}" FontSize="16" />
                                         </Grid>
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>

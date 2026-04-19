@@ -129,7 +129,7 @@
                         <Label Grid.Column="4" Text="Gesamt" FontAttributes="Bold" FontSize="13" WidthRequest="55" HorizontalTextAlignment="Center" />
                     </Grid>
 
-                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="8">
                         <!-- LeP -->
                         <VerticalStackLayout Grid.Row="0" Grid.Column="0" Spacing="1" VerticalOptions="Center">
                             <Label Text="Lebensenergie (LeP)" />
@@ -222,6 +222,20 @@
                                HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
                         <Label Grid.Row="6" Grid.Column="3" Text="{Binding GeschwindigkeitBoniGesamt, StringFormat='{0:+#;-#;0}'}" WidthRequest="55" FontAttributes="Bold" FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" />
                         <Label Grid.Row="6" Grid.Column="4" Text="{Binding Geschwindigkeit}" WidthRequest="55"
+                               FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+
+                        <!-- WS (Wundschwelle, read-only) -->
+                        <VerticalStackLayout Grid.Row="7" Grid.Column="0" Spacing="1" VerticalOptions="Center">
+                            <Label Text="Wundschwelle (WS)" />
+                            <Label Text="{Binding WundschwelleFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Row="7" Grid.Column="1" Text="{Binding Wundschwelle}" WidthRequest="52"
+                               FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="7" Grid.Column="2" Text="&#x2014;" WidthRequest="55"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="7" Grid.Column="3" Text="&#x2014;" WidthRequest="55"
+                               HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Row="7" Grid.Column="4" Text="{Binding Wundschwelle}" WidthRequest="55"
                                FontAttributes="Bold" FontSize="16" HorizontalTextAlignment="Center" VerticalOptions="Center" />
                     </Grid>
                 </VerticalStackLayout>

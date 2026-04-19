@@ -14,6 +14,12 @@ public class CharacterSheetData
 
     /// <summary>Charakter-Ereignisse (Altersveränderungen, Stat-Boni usw.).</summary>
     public List<CharakterEreignis> Ereignisse { get; set; } = [];
+
+    /// <summary>Sonderfertigkeiten des Charakters.</summary>
+    public List<CharakterSonderfertigkeitEintrag> SonderfertigkeitListe { get; set; } = [];
+
+    /// <summary>Vorteile und Nachteile des Charakters.</summary>
+    public List<CharakterVorteilNachteilEintrag> VorteilNachteilListe { get; set; } = [];
 }
 
 /// <summary>

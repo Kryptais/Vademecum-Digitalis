@@ -1,0 +1,366 @@
+[
+  {
+    "Id": "auf-distanz-halten",
+    "Name": "Auf Distanz halten",
+    "Beschreibung": "Der Held kann mit einer Nahkampfwaffe Gegner auf Distanz halten. Er erhält +1 auf Attacke, wenn der Gegner in seine Angriffsreichweite eindringt.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Kampftechnik", "Name": "Stangenwaffen", "MinValue": 10 }
+      ]
+    ],
+    "ZielKampftechniken": ["Stangenwaffen", "Zweihandschwerter", "Zweihandhiebwaffen"],
+    "Anmerkungen": "Gilt nur für Nahkampfwaffen mit Reichweite lang."
+  },
+  {
+    "Id": "wuchtschlag",
+    "Name": "Wuchtschlag",
+    "Beschreibung": "Der Held kann seine Angriffe mit mehr Kraft ausführen und verursacht mehr Schaden auf Kosten der Treffsicherheit.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [15, 20, 25],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "KK", "MinValue": 13 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "KK", "MinValue": 15 },
+        { "Type": "Sonderfertigkeit", "Name": "Wuchtschlag", "MinValue": 1 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "KK", "MinValue": 17 },
+        { "Type": "Sonderfertigkeit", "Name": "Wuchtschlag", "MinValue": 2 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Stufe I: +2 TP / −1 AT; Stufe II: +4 TP / −2 AT; Stufe III: +6 TP / −3 AT."
+  },
+  {
+    "Id": "finte",
+    "Name": "Finte",
+    "Beschreibung": "Der Held kann seinen Gegner durch geschickte Finten täuschen und dessen Verteidigung erschweren.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [15, 20, 25],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 13 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 15 },
+        { "Type": "Sonderfertigkeit", "Name": "Finte", "MinValue": 1 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 17 },
+        { "Type": "Sonderfertigkeit", "Name": "Finte", "MinValue": 2 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Stufe I: −1 VW Gegner / −1 AT; Stufe II: −2 VW / −2 AT; Stufe III: −3 VW / −3 AT."
+  },
+  {
+    "Id": "beidhändiger-kampf",
+    "Name": "Beidhändiger Kampf",
+    "Beschreibung": "Der Held kann zwei Einhandwaffen gleichzeitig im Kampf einsetzen.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [25, 30],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 15 },
+        { "Type": "Vorteil", "Name": "Beidhändig", "MinValue": 0 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 17 },
+        { "Type": "Sonderfertigkeit", "Name": "Beidhändiger Kampf", "MinValue": 1 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Stufe I: −2/−2 auf AT beider Waffen; Stufe II: keine Abzüge."
+  },
+  {
+    "Id": "schildkampf",
+    "Name": "Schildkampf",
+    "Beschreibung": "Der Held kann Schilde effektiv zur Verteidigung einsetzen.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [15, 20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Kampftechnik", "Name": "Schilde", "MinValue": 8 }
+      ],
+      [
+        { "Type": "Kampftechnik", "Name": "Schilde", "MinValue": 12 },
+        { "Type": "Sonderfertigkeit", "Name": "Schildkampf", "MinValue": 1 }
+      ]
+    ],
+    "ZielKampftechniken": ["Schilde"],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "ausweichen",
+    "Name": "Ausweichen",
+    "Beschreibung": "Der Held kann Angriffen durch geschicktes Ausweichen entgehen.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [10, 15, 20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 13 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 15 },
+        { "Type": "Sonderfertigkeit", "Name": "Ausweichen", "MinValue": 1 }
+      ],
+      [
+        { "Type": "Attribut", "Name": "GE", "MinValue": 17 },
+        { "Type": "Sonderfertigkeit", "Name": "Ausweichen", "MinValue": 2 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Stufe I: +1 AW; Stufe II: +2 AW; Stufe III: +3 AW."
+  },
+  {
+    "Id": "kampfreflexe",
+    "Name": "Kampfreflexe",
+    "Beschreibung": "Der Held verfügt über hervorragende Reflexe im Kampf und kann schneller reagieren.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "IN", "MinValue": 13 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "+1 auf Initiative."
+  },
+  {
+    "Id": "verbessertes-ausweichen",
+    "Name": "Verbessertes Ausweichen",
+    "Beschreibung": "Der Held kann selbst in schwerem Gelände oder eingeengt ausweichen.",
+    "Kategorie": "KampfSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Sonderfertigkeit", "Name": "Ausweichen", "MinValue": 2 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "befehl-angriff",
+    "Name": "Befehl: Angriff!",
+    "Beschreibung": "Der Held kann seinen Gefährten den Befehl zum Angriff geben, wodurch diese einen Bonus auf ihre nächste Attacke erhalten.",
+    "Kategorie": "BefehlsSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Talent", "Name": "Kriegskunst", "MinValue": 8 },
+        { "Type": "Attribut", "Name": "CH", "MinValue": 13 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Erfordert eine freie Aktion."
+  },
+  {
+    "Id": "befehl-formation",
+    "Name": "Befehl: Formation!",
+    "Beschreibung": "Der Held befiehlt seinen Gefährten, eine Formation zu bilden, die ihnen einen defensiven Bonus verschafft.",
+    "Kategorie": "BefehlsSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Talent", "Name": "Kriegskunst", "MinValue": 8 },
+        { "Type": "Attribut", "Name": "CH", "MinValue": 13 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Erfordert eine freie Aktion."
+  },
+  {
+    "Id": "hruruzat",
+    "Name": "Hruruzat",
+    "Beschreibung": "Der Held beherrscht den wilden Kampfstil der Orks, der auf Aggression und überwältigende Kraft setzt.",
+    "Kategorie": "KampfstilSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Kampftechnik", "Name": "Schwerter", "MinValue": 10 }
+      ]
+    ],
+    "ZielKampftechniken": ["Schwerter", "Zweihandschwerter"],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "hammerfaust",
+    "Name": "Hammerfaust",
+    "Beschreibung": "Der Held kann mit der Faust besonders harte Schläge austeilen.",
+    "Kategorie": "PruegelSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Kampftechnik", "Name": "Raufen", "MinValue": 10 },
+        { "Type": "Attribut", "Name": "KK", "MinValue": 13 }
+      ]
+    ],
+    "ZielKampftechniken": ["Raufen"],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "glueckskind",
+    "Name": "Glückskind",
+    "Beschreibung": "Der Held kann einmal pro Spielsitzung einen Schicksalspunkt einsetzen, ohne ihn zu verbrauchen.",
+    "Kategorie": "SchicksalspunkteSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [[]],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "schicksalspunkte-zurueckkaufen",
+    "Name": "Schicksalspunkte zurückkaufen",
+    "Beschreibung": "Der Held kann verbrannte Schicksalspunkte für AP zurückkaufen.",
+    "Kategorie": "SchicksalspunkteSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [[]],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "fachsprache",
+    "Name": "Fachsprache",
+    "Beschreibung": "Der Held beherrscht eine spezialisierte Fachsprache (z.B. Bosparano für Gildenmagier oder Isdira).",
+    "Kategorie": "SprachenSchriften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [2, 4, 6],
+    "VoraussetzungenProStufe": [[], [], []],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Die konkrete Sprache wird beim Erwerb festgelegt."
+  },
+  {
+    "Id": "schrift-lesen",
+    "Name": "Schrift lesen",
+    "Beschreibung": "Der Held kann eine bestimmte Schrift lesen und schreiben.",
+    "Kategorie": "SprachenSchriften",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [4],
+    "VoraussetzungenProStufe": [[]],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Die konkrete Schrift wird beim Erwerb festgelegt."
+  },
+  {
+    "Id": "ortskenntnis",
+    "Name": "Ortskenntnis",
+    "Beschreibung": "Der Held kennt sich in einer bestimmten Stadt oder Region besonders gut aus.",
+    "Kategorie": "AllgemeineSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [10],
+    "VoraussetzungenProStufe": [[]],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Der Ort wird beim Erwerb festgelegt."
+  },
+  {
+    "Id": "gelaendekunde",
+    "Name": "Geländekunde",
+    "Beschreibung": "Der Held kennt sich in einem bestimmten Geländetyp besonders gut aus und erhält dort Erleichterungen auf relevante Proben.",
+    "Kategorie": "AllgemeineSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [10],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Talent", "Name": "Wildnisleben", "MinValue": 4 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": "Der Geländetyp wird beim Erwerb festgelegt (z.B. Wald, Gebirge, Sumpf)."
+  },
+  {
+    "Id": "analytiker",
+    "Name": "Analytiker",
+    "Beschreibung": "Der Held kann komplexe Zusammenhänge besser verstehen und erhält Erleichterungen auf bestimmte Wissensproben.",
+    "Kategorie": "AllgemeineSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "KL", "MinValue": 13 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "meisterschuetze",
+    "Name": "Meisterschütze",
+    "Beschreibung": "Der Held ist ein hervorragender Fernkämpfer und erhält Erleichterungen auf Fernkampf-Proben.",
+    "Kategorie": "AllgemeineSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Attribut", "Name": "FF", "MinValue": 15 },
+        { "Type": "Kampftechnik", "Name": "Bögen", "MinValue": 12 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "erweiterter-kampfstil-hruruzat",
+    "Name": "Erweiterter Kampfstil: Hruruzat",
+    "Beschreibung": "Der Held hat seinen Kampfstil weiter verfeinert und erhält zusätzliche Kampfvorteile.",
+    "Kategorie": "ErweiterteKampfstilSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Sonderfertigkeit", "Name": "Hruruzat", "MinValue": 1 },
+        { "Type": "Kampftechnik", "Name": "Schwerter", "MinValue": 14 }
+      ]
+    ],
+    "ZielKampftechniken": ["Schwerter", "Zweihandschwerter"],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "erweiterte-talent-sf-wildnisleben",
+    "Name": "Erweiterte Talent-SF: Wildnisleben",
+    "Beschreibung": "Der Held hat sein Wissen in Wildnisleben auf ein meisterliches Niveau gebracht.",
+    "Kategorie": "ErweiterteTalentSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Talent", "Name": "Wildnisleben", "MinValue": 12 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "talentstil-jaeger",
+    "Name": "Talentstil: Jäger",
+    "Beschreibung": "Der Held hat sich einen speziellen Talentstil angeeignet, der ihm Vorteile bei jagdrelevanten Proben gibt.",
+    "Kategorie": "TalentstilSf",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [
+        { "Type": "Talent", "Name": "Fährtensuchen", "MinValue": 8 },
+        { "Type": "Talent", "Name": "Wildnisleben", "MinValue": 8 }
+      ]
+    ],
+    "ZielKampftechniken": [],
+    "Anmerkungen": ""
+  }
+]

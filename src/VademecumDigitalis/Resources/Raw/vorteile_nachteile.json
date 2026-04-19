@@ -1,0 +1,340 @@
+[
+  {
+    "Id": "begabung",
+    "Name": "Begabung",
+    "Beschreibung": "Der Held ist in einem bestimmten Talent besonders begabt. Er erhält eine Erleichterung von 1 auf alle Proben mit diesem Talent.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [10],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Muss für ein bestimmtes Talent gewählt werden."
+  },
+  {
+    "Id": "glueck",
+    "Name": "Glück",
+    "Beschreibung": "Der Held hat ein überdurchschnittliches Glück. Er erhält pro Stufe einen zusätzlichen Schicksalspunkt bei Spielbeginn.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [20, 20, 20],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "+1 SchiP pro Stufe."
+  },
+  {
+    "Id": "hohe-lebenskraft",
+    "Name": "Hohe Lebenskraft",
+    "Beschreibung": "Der Held verfügt über eine überdurchschnittliche Lebensenergie. Pro Stufe erhält er +1 LeP.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 7,
+    "ApKostenProStufe": [25, 25, 25, 25, 25, 25, 25],
+    "VoraussetzungenProStufe": [
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 12 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 12 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 13 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 13 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 14 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 14 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 15 }]
+    ],
+    "Anmerkungen": "+1 LeP pro Stufe."
+  },
+  {
+    "Id": "hohe-seelenkraft",
+    "Name": "Hohe Seelenkraft",
+    "Beschreibung": "Der Held hat eine besonders starke Seele. Er erhält +1 auf seinen SK-Grundwert.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "+1 SK."
+  },
+  {
+    "Id": "hohe-zaehigkeit",
+    "Name": "Hohe Zähigkeit",
+    "Beschreibung": "Der Held ist besonders widerstandsfähig gegen körperliche Belastung. Er erhält +1 auf seinen ZK-Grundwert.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "+1 ZK."
+  },
+  {
+    "Id": "flink",
+    "Name": "Flink",
+    "Beschreibung": "Der Held ist besonders schnell auf den Beinen. Seine Geschwindigkeit erhöht sich um 1.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [10],
+    "VoraussetzungenProStufe": [
+      [{ "Type": "Attribut", "Name": "GE", "MinValue": 12 }]
+    ],
+    "Anmerkungen": "+1 GS."
+  },
+  {
+    "Id": "gutaussehend",
+    "Name": "Gutaussehend",
+    "Beschreibung": "Der Held ist besonders attraktiv und kann dies in sozialen Situationen nutzen. Er erhält Erleichterungen bei bestimmten Gesellschaftstalenten.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [20, 40],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe II = Wunderschön."
+  },
+  {
+    "Id": "eisern",
+    "Name": "Eisern",
+    "Beschreibung": "Der Held kann auch mit wenig Lebensenergie weiterkämpfen. Er erleidet erst bei LeP unter KO×(-1) den automatischen Tod (statt bei KO×(-1)+5).",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "richtungssinn",
+    "Name": "Richtungssinn",
+    "Beschreibung": "Der Held hat ein ausgeprägtes Gespür für Himmelsrichtungen und kann sich nur schwer verirren.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [
+      [{ "Type": "Attribut", "Name": "IN", "MinValue": 12 }]
+    ],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "zaeher-hund",
+    "Name": "Zäher Hund",
+    "Beschreibung": "Der Held kann auch unter erschwerten Bedingungen weitermachen. Er ignoriert 1 Stufe Schmerz.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 13 }]
+    ],
+    "Anmerkungen": "Ignoriert 1 Stufe Schmerz."
+  },
+  {
+    "Id": "entfernungssinn",
+    "Name": "Entfernungssinn",
+    "Beschreibung": "Der Held kann Entfernungen gut einschätzen. Fernkampfproben erhalten eine Erleichterung von 1.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [10],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Erleichterung von 1 auf Fernkampfproben."
+  },
+  {
+    "Id": "verbesserte-regeneration",
+    "Name": "Verbesserte Regeneration (Lebensenergie)",
+    "Beschreibung": "Der Held regeneriert schneller Lebensenergie. Er erhält +1 LeP pro Regenerationsphase pro Stufe.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [15, 15, 15],
+    "VoraussetzungenProStufe": [
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 12 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 13 }],
+      [{ "Type": "Attribut", "Name": "KO", "MinValue": 14 }]
+    ],
+    "Anmerkungen": "+1 LeP-Regeneration pro Stufe."
+  },
+  {
+    "Id": "soziale-anpassungsfaehigkeit",
+    "Name": "Soziale Anpassungsfähigkeit",
+    "Beschreibung": "Der Held kann sich hervorragend an verschiedene gesellschaftliche Situationen anpassen. Erleichterung von 1 auf Gesellschaftstalente.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "beidhaendig",
+    "Name": "Beidhändig",
+    "Beschreibung": "Der Held kann seine zweite Hand genauso geschickt einsetzen wie seine Haupthand. Er erleidet keine Abzüge beim Einsatz der schwachen Hand.",
+    "Kategorie": "Kampfvorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "waffenbegabung",
+    "Name": "Waffenbegabung",
+    "Beschreibung": "Der Held ist mit einer bestimmten Kampftechnik besonders begabt und erhält einen Bonus auf Attacke und Parade.",
+    "Kategorie": "Kampfvorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [20],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Muss für eine bestimmte Kampftechnik gewählt werden."
+  },
+  {
+    "Id": "hohe-astralkraft",
+    "Name": "Hohe Astralkraft",
+    "Beschreibung": "Der Held verfügt über eine überdurchschnittliche Astralenergie. Pro Stufe erhält er +1 AsP.",
+    "Kategorie": "MagischeVorteile",
+    "MaxStufe": 7,
+    "ApKostenProStufe": [25, 25, 25, 25, 25, 25, 25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "+1 AsP pro Stufe. Voraussetzung: Vorteil Zauberer."
+  },
+  {
+    "Id": "hohe-karmalkraft",
+    "Name": "Hohe Karmalkraft",
+    "Beschreibung": "Der Held verfügt über eine überdurchschnittliche Karmaenergie. Pro Stufe erhält er +1 KaP.",
+    "Kategorie": "KarmaleVorteile",
+    "MaxStufe": 7,
+    "ApKostenProStufe": [25, 25, 25, 25, 25, 25, 25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "+1 KaP pro Stufe. Voraussetzung: Vorteil Geweihter."
+  },
+  {
+    "Id": "niedrige-lebenskraft",
+    "Name": "Niedrige Lebenskraft",
+    "Beschreibung": "Der Held hat weniger Lebensenergie als üblich. Pro Stufe verliert er -1 LeP.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 7,
+    "ApKostenProStufe": [25, 25, 25, 25, 25, 25, 25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "-1 LeP pro Stufe."
+  },
+  {
+    "Id": "niedrige-seelenkraft",
+    "Name": "Niedrige Seelenkraft",
+    "Beschreibung": "Der Held hat eine schwache Seele. Er erhält -1 auf seinen SK-Grundwert.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "-1 SK."
+  },
+  {
+    "Id": "niedrige-zaehigkeit",
+    "Name": "Niedrige Zähigkeit",
+    "Beschreibung": "Der Held ist besonders anfällig gegen körperliche Belastung. Er erhält -1 auf seinen ZK-Grundwert.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "-1 ZK."
+  },
+  {
+    "Id": "pech",
+    "Name": "Pech",
+    "Beschreibung": "Der Held hat ein chronisches Pech. Er hat pro Stufe einen Schicksalspunkt weniger bei Spielbeginn.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [20, 20, 20],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "-1 SchiP pro Stufe."
+  },
+  {
+    "Id": "krankheitsanfaellig",
+    "Name": "Krankheitsanfällig",
+    "Beschreibung": "Der Held ist anfälliger für Krankheiten. Er erhält Erschwernisse auf Proben zur Abwehr von Krankheiten.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [5, 10],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "kurzsichtig",
+    "Name": "Kurzsichtig",
+    "Beschreibung": "Der Held sieht schlecht in die Ferne. Fernkampfproben und Sinnesschärfe (Sicht) sind erschwert.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [15, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe I: -2 FK, Stufe II: -4 FK."
+  },
+  {
+    "Id": "haesslich",
+    "Name": "Hässlich",
+    "Beschreibung": "Der Held ist unattraktiv und hat Nachteile in sozialen Situationen. Erschwernisse auf Gesellschaftstalente.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 2,
+    "ApKostenProStufe": [10, 20],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe II = Abstoßend."
+  },
+  {
+    "Id": "schlechte-regeneration",
+    "Name": "Schlechte Regeneration (Lebensenergie)",
+    "Beschreibung": "Der Held regeneriert langsamer Lebensenergie. Er erhält -1 LeP pro Regenerationsphase pro Stufe.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [15, 15, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "-1 LeP-Regeneration pro Stufe."
+  },
+  {
+    "Id": "neugier",
+    "Name": "Neugier",
+    "Beschreibung": "Der Held ist übermäßig neugierig und kann Geheimnissen und Rätseln nur schwer widerstehen. Er muss Willenskraft-Proben bestehen, um der Neugier zu widerstehen.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe = Erschwernis auf Willenskraft (Verlockungen/Ablenkungen)."
+  },
+  {
+    "Id": "prinzipientreue",
+    "Name": "Prinzipientreue",
+    "Beschreibung": "Der Held hält streng an seinen moralischen oder religiösen Grundsätzen fest, auch wenn es ihm schadet.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe = Erschwernis auf Willenskraft (Prinzipien brechen)."
+  },
+  {
+    "Id": "goldgier",
+    "Name": "Goldgier",
+    "Beschreibung": "Der Held ist von Reichtum besessen und kann dem Glanz des Goldes nur schwer widerstehen.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe = Erschwernis auf Willenskraft (Reichtum widerstehen)."
+  },
+  {
+    "Id": "angst-vor",
+    "Name": "Angst vor …",
+    "Beschreibung": "Der Held leidet an einer Phobie. In Gegenwart des Auslösers muss er Willenskraft-Proben bestehen oder erleidet Furcht.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Art der Angst angeben (z.B. Dunkelheit, Enge, Höhe, Wasser)."
+  },
+  {
+    "Id": "jähzorn",
+    "Name": "Jähzorn",
+    "Beschreibung": "Der Held neigt zu unkontrollierbaren Wutausbrüchen. Bei Provokation muss er Willenskraft bestehen oder gerät in Rage.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe = Erschwernis auf Willenskraft (Wut widerstehen)."
+  },
+  {
+    "Id": "aberglaube",
+    "Name": "Aberglaube",
+    "Beschreibung": "Der Held glaubt an allerlei Vorzeichen und Omen und richtet sein Verhalten danach aus.",
+    "Kategorie": "SchlechteEigenschaften",
+    "MaxStufe": 3,
+    "ApKostenProStufe": [5, 10, 15],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Stufe = Erschwernis auf Willenskraft (Aberglauben ignorieren)."
+  },
+  {
+    "Id": "unfaehig",
+    "Name": "Unfähig",
+    "Beschreibung": "Der Held ist in einem bestimmten Talent besonders unbegabt. Er erhält eine Erschwernis von 1 auf alle Proben mit diesem Talent.",
+    "Kategorie": "AllgemeineNachteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [3],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Muss für ein bestimmtes Talent gewählt werden."
+  }
+]

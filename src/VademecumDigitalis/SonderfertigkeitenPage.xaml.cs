@@ -3,11 +3,11 @@ using VademecumDigitalis.ViewModels;
 
 namespace VademecumDigitalis;
 
-public partial class AdvantagesPage : ContentPage
+public partial class SonderfertigkeitenPage : ContentPage
 {
-    private readonly VorteilNachteilViewModel _vm;
+    private readonly SonderfertigkeitenViewModel _vm;
 
-    public AdvantagesPage(VorteilNachteilViewModel vm)
+    public SonderfertigkeitenPage(SonderfertigkeitenViewModel vm)
     {
         InitializeComponent();
         _vm = vm;
@@ -27,9 +27,9 @@ public partial class AdvantagesPage : ContentPage
 
     private void OnAddFromCatalogClicked(object? sender, EventArgs e)
     {
-        if (sender is Button btn && btn.CommandParameter is VorteilNachteil vn)
+        if (sender is Button btn && btn.CommandParameter is SpecialAbility sf)
         {
-            _vm.AddFromCatalog(vn);
+            _vm.AddFromCatalog(sf);
         }
     }
 
@@ -40,7 +40,7 @@ public partial class AdvantagesPage : ContentPage
 
     private void OnLevelUpClicked(object? sender, EventArgs e)
     {
-        if (sender is Button btn && btn.CommandParameter is CharakterVorteilNachteilEintrag entry)
+        if (sender is Button btn && btn.CommandParameter is CharakterSonderfertigkeitEintrag entry)
         {
             _vm.LevelUp(entry);
         }
@@ -48,7 +48,7 @@ public partial class AdvantagesPage : ContentPage
 
     private void OnEntfernenClicked(object? sender, EventArgs e)
     {
-        if (sender is Button btn && btn.CommandParameter is CharakterVorteilNachteilEintrag entry)
+        if (sender is Button btn && btn.CommandParameter is CharakterSonderfertigkeitEintrag entry)
         {
             _vm.Remove(entry);
         }

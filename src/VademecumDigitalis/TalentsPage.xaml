@@ -1,58 +1,103 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             xmlns:converters="clr-namespace:VademecumDigitalis.Converters"
              xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
              x:Class="VademecumDigitalis.TalentsPage"
              Title="Talente">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="16" Spacing="12"
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:BoolToColorConverter x:Key="BoolToColorConverter" TrueColor="#2E7D32" FalseColor="Black" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView Orientation="Both">
+        <VerticalStackLayout Padding="16" Spacing="12" MinimumWidthRequest="1200"
                              BindableLayout.ItemsSource="{Binding TalentGruppen}">
             <BindableLayout.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="models:TalentGroup">
                     <VerticalStackLayout Spacing="8">
-                        <!-- Gruppenname -->
-                        <Border Stroke="{StaticResource AccentCyan}" BackgroundColor="{StaticResource AccentCyan}" StrokeShape="RoundRectangle 8" Padding="8,6">
-                            <Label Text="{Binding Gruppe}" TextColor="White" FontAttributes="Bold" FontSize="16" />
-                        </Border>
+                        <!-- Collapsible Header -->
+                        <Grid ColumnDefinitions="Auto,*" Padding="12,10" BackgroundColor="#0E7490"
+                              RowSpacing="0" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleExpandCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Grid.GestureRecognizers>
 
-                        <!-- Tabellen-Header -->
-                        <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
-                              ColumnSpacing="6"
-                              BackgroundColor="{StaticResource InputBackground}"
-                              Padding="8,6">
-                            <Label Grid.Column="0" Text="Talent" FontAttributes="Bold" FontSize="12" />
-                            <Label Grid.Column="1" Text="SF" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="2" Text="P1" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="3" Text="P2" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="4" Text="P3" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="5" Text="BE" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="6" Text="FW" FontAttributes="Bold" FontSize="12" HorizontalTextAlignment="Center" />
-                            <Label Grid.Column="7" Text="Anmerkung" FontAttributes="Bold" FontSize="12" />
+                            <Label Grid.Column="0"
+                                   Text="{Binding IsExpanded, StringFormat='{0:?▼:▶}'}"
+                                   FontSize="14" TextColor="White" FontAttributes="Bold"
+                                   VerticalOptions="Center" IsVisible="Hidden" />
+                            <Label Grid.Column="1" Text="{Binding Gruppe}" TextColor="White" FontAttributes="Bold" FontSize="16" VerticalOptions="Center" />
                         </Grid>
 
-                        <!-- Talent-Zeilen -->
-                        <VerticalStackLayout Spacing="1"
-                                             BindableLayout.ItemsSource="{Binding Eintraege}">
-                            <BindableLayout.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid ColumnDefinitions="2.2*,1*,0.9*,0.9*,0.9*,1.1*,0.8*,1.6*"
-                                          ColumnSpacing="6"
-                                          BackgroundColor="{StaticResource CardBackground}"
-                                          Padding="8,6">
-                                        <Label Grid.Column="0" Text="{Binding Talent}" FontSize="12" />
-                                        <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="12" />
-                                        <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                        <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                        <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                        <Label Grid.Column="5" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="12" TextColor="{StaticResource TextSecondary}" />
-                                        <Entry Grid.Column="6" Keyboard="Numeric" Text="{Binding Fw}" FontSize="12" HorizontalTextAlignment="Center">
-                                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                                        </Entry>
-                                        <Entry Grid.Column="7" Text="{Binding Anmerkung}" FontSize="12" />
-                                    </Grid>
-                                </DataTemplate>
-                            </BindableLayout.ItemTemplate>
+                        <!-- Content - shown when IsExpanded is true -->
+                        <VerticalStackLayout Spacing="0" IsVisible="{Binding IsExpanded}">
+                            <!-- Two-row Header -->
+                            <Grid RowDefinitions="Auto,Auto"
+                                  ColumnDefinitions="*,0.4*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.3*,0.3*,0.3*,1.4*"
+                                  ColumnSpacing="4"
+                                  Padding="12,0"
+                                  BackgroundColor="#0E7490">
+
+                                <Label Grid.Row="0" Grid.Column="0" Text="Talent" FontAttributes="Bold" FontSize="16" TextColor="White" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="1" Text="Steigerungsfaktor" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+
+                                <!-- "Proben" spanning 6 columns -->
+                                <Label Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="6" Text="Proben" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+
+                                <!-- Sub-headers -->
+                                <Label Grid.Row="1" Grid.Column="2" Text="P1" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="3" Text="P2" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="4" Text="P3" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="5" Text="W1" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="6" Text="W2" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="7" Text="W3" FontAttributes="Bold" FontSize="16" TextColor="#B0E0E6" HorizontalOptions="Center" />
+
+                                <Label Grid.Row="0" Grid.Column="8" Text="BE" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="9" Text="FW" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="10" Text="FW ges." FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="11" Text="Begabung" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                                <Label Grid.Row="0" Grid.Column="12" Text="Anmerkung" FontAttributes="Bold" FontSize="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
+                            </Grid>
+
+                            <!-- Data Rows -->
+                            <VerticalStackLayout Spacing="0"
+                                                 BindableLayout.ItemsSource="{Binding Eintraege}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:TalentRow">
+                                        <Grid ColumnDefinitions="*,0.4*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.3*,0.3*,0.3*,1.4*"
+                                              ColumnSpacing="4"
+                                              Padding="12,10"
+                                              BackgroundColor="{Binding HatBegabung, Converter={StaticResource BoolToColorConverter}}">
+                                            <Label Grid.Column="0" Text="{Binding Talent}" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Label Grid.Column="5" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Label Grid.Column="6" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Label Grid.Column="7" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Label Grid.Column="8" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" />
+                                            <Entry Grid.Column="9" Keyboard="Numeric" Text="{Binding Fw}" FontSize="16" HeightRequest="50" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black" >
+                                                <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                                            </Entry>
+                                            <Label Grid.Column="10" Text="{Binding FwGesamt}" HorizontalOptions="Center" FontSize="16" VerticalOptions="Center" FontAttributes="Bold" />
+                                            <Grid Grid.Column="11" HorizontalOptions="Center" VerticalOptions="Center"
+                                                  WidthRequest="30" HeightRequest="30">
+                                                <CheckBox IsChecked="{Binding HatBegabung, Mode=TwoWay}" IsEnabled="True"
+                                                          HorizontalOptions="Center" VerticalOptions="Center"
+                                                          Margin="-6" />
+                                            </Grid>
+                                            <Editor Grid.Column="12" Text="{Binding Anmerkung}" FontSize="16" Background="LightGray" TextColor="Black" AutoSize="TextChanges" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
                         </VerticalStackLayout>
                     </VerticalStackLayout>
                 </DataTemplate>

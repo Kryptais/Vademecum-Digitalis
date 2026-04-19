@@ -66,9 +66,18 @@ public class CharacterSheet
     public string Talente { get; set; } = string.Empty;
     public string Kampftalente { get; set; } = string.Empty;
 
+    /// <summary>Aktuelle Lebensenergie (für Kampf-Tab Schmerzstufen-Tracking).</summary>
+    public int AktuelleLebensenergie { get; set; } = -1;
+
     // Aktuelles aventurisches Datum (für Altersberechnung)
     public string AktuellesDatumStr { get; set; } = string.Empty;
 
     // Charakter-Ereignisse
     public List<CharakterEreignis> Ereignisse { get; set; } = [];
+
+    // Sonderfertigkeiten
+    public List<CharakterSonderfertigkeitEintrag> SonderfertigkeitListe { get; set; } = [];
+
+    // Vorteile / Nachteile
+    public List<CharakterVorteilNachteilEintrag> VorteilNachteilListe { get; set; } = [];
 }

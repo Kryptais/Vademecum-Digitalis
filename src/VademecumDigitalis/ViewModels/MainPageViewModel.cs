@@ -10,22 +10,100 @@ public class MainPageViewModel : INotifyPropertyChanged
 {
     private readonly CharacterSheet _sheet = new();
     private readonly PersistenceService _persistence;
+    private readonly TalentModifierService? _talentModifierService;
     private CancellationTokenSource? _saveCts;
 
-    public MainPageViewModel() : this(new PersistenceService())
+    public MainPageViewModel() : this(new PersistenceService(), null)
     {
     }
 
-    public MainPageViewModel(PersistenceService persistence)
+    public MainPageViewModel(PersistenceService persistence, TalentModifierService? talentModifierService = null)
     {
         _persistence = persistence;
+        _talentModifierService = talentModifierService;
         TalentGruppen = BuildTalentGruppen();
+        Kampftechniken = BuildKampftechniken();
         SubscribeToTalentChanges();
+        ToggleExpandCommand = new Command<TalentGroup>(g => g.IsExpanded = !g.IsExpanded);
     }
+
+    /// <summary>Command zum Auf-/Zuklappen einer Talentgruppe.</summary>
+    public Command<TalentGroup> ToggleExpandCommand { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public IReadOnlyList<TalentGroup> TalentGruppen { get; }
+
+    // --- Kampftechniken ---
+
+    public IReadOnlyList<KampftechnikRow> Kampftechniken { get; }
+
+    /// <summary>Ausweichen = ⌈GE/2⌉</summary>
+    public int Ausweichen => (int)Math.Ceiling(_sheet.Gewandtheit / 2.0);
+
+    /// <summary>Aktuelle Lebensenergie (editierbar im Kampf-Tab).</summary>
+    public int AktuelleLebensenergie
+    {
+        get
+        {
+            if (_sheet.AktuelleLebensenergie < 0)
+                return Lebensenergie;
+            return _sheet.AktuelleLebensenergie;
+        }
+        set
+        {
+            if (_sheet.AktuelleLebensenergie == value) return;
+            _sheet.AktuelleLebensenergie = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleLebensenergie)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebenVerloren)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Schmerzstufen)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchmerzstufenDetails)));
+            RequestDelayedSave();
+        }
+    }
+
+    /// <summary>Verlorene Lebenspunkte.</summary>
+    public int LebenVerloren => Math.Max(0, Lebensenergie - AktuelleLebensenergie);
+
+    /// <summary>Aktuelle Schmerzstufen basierend auf verlorener Lebensenergie.</summary>
+    public int Schmerzstufen
+    {
+        get
+        {
+            int max = Lebensenergie;
+            int verloren = LebenVerloren;
+            if (max <= 0) return 0;
+            int stufen = 0;
+            if (verloren >= (int)Math.Ceiling(max * 0.25)) stufen++;
+            if (verloren >= (int)Math.Ceiling(max * 0.50)) stufen++;
+            if (verloren >= (int)Math.Ceiling(max * 0.75)) stufen++;
+            if (AktuelleLebensenergie <= 5 ){ stufen++; };
+            if (AktuelleLebensenergie <= 0) stufen = -1; // Sterbend
+            return stufen;
+        }
+    }
+
+    /// <summary>Detail-Text für Schmerzschwellen mit konkreten LeP-Werten.</summary>
+    public string SchmerzstufenDetails
+    {
+        get
+        {
+            int max = Lebensenergie;
+            if (max <= 0) return string.Empty;
+            int schwelle1 = max - (int)Math.Ceiling(max * 0.25);
+            int schwelle2 = max - (int)Math.Ceiling(max * 0.50);
+            int schwelle3 = max - (int)Math.Ceiling(max * 0.75);
+            int schwelle4 = 5;
+            int aktuell = AktuelleLebensenergie;
+
+            string Marker(int schwelle) => aktuell <= schwelle ? " ◄" : "";
+
+            return $"1. Schmerz bei ≤{schwelle1} LeP{Marker(schwelle1)}\n" +
+                   $"2. Schmerz bei ≤{schwelle2} LeP{Marker(schwelle2)}\n" +
+                   $"3. Schmerz bei ≤{schwelle3} LeP{Marker(schwelle3)}\n" +
+                   $"Sterbend bei ≤5 LeP{(aktuell <= 5 ? " ◄" : "")}";
+        }
+    }
 
     // --- Ereignisse ---
 
@@ -33,6 +111,64 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
     public bool KeinEreignisse => Ereignisse.Count == 0;
+
+    // --- Vorteile / Nachteile ---
+
+    public ObservableCollection<CharakterVorteilNachteilEintrag> VorteilNachteilEintraege { get; } = [];
+
+    /// <summary>True wenn keine Vorteile/Nachteile vorhanden.</summary>
+    public bool KeineVorteileNachteile => VorteilNachteilEintraege.Count == 0;
+
+    public void VorteilNachteilHinzufuegen(CharakterVorteilNachteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        RequestDelayedSave();
+    }
+
+    public void VorteilNachteilEntfernen(CharakterVorteilNachteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        RequestDelayedSave();
+    }
+
+    private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RecalculateTalentProben();
+        RequestDelayedSave();
+    }
+
+    // --- Sonderfertigkeiten ---
+
+    public ObservableCollection<CharakterSonderfertigkeitEintrag> SonderfertigkeitEintraege { get; } = [];
+
+    /// <summary>True wenn keine Sonderfertigkeiten vorhanden.</summary>
+    public bool KeineSonderfertigkeiten => SonderfertigkeitEintraege.Count == 0;
+
+    public void SonderfertigkeitHinzufuegen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    public void SonderfertigkeitEntfernen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    private void OnSonderfertigkeitChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RecalculateTalentProben();
+        RequestDelayedSave();
+    }
 
     /// <summary>Summe aller Alter-Boni aus Ereignissen (in Jahren).</summary>
     public int EreignisAlterBonus => Ereignisse.Sum(e => e.AlterBonus);
@@ -235,6 +371,40 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
         NotifyEreignisBoni();
+
+        // Vorteile/Nachteile laden
+        foreach (var vn in VorteilNachteilEintraege.ToList())
+        {
+            vn.PropertyChanged -= OnVorteilNachteilChanged;
+        }
+        VorteilNachteilEintraege.Clear();
+        if (data.VorteilNachteilListe != null)
+        {
+            foreach (var vn in data.VorteilNachteilListe)
+            {
+                vn.PropertyChanged += OnVorteilNachteilChanged;
+                VorteilNachteilEintraege.Add(vn);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+
+        // Sonderfertigkeiten laden
+        foreach (var sf in SonderfertigkeitEintraege.ToList())
+        {
+            sf.PropertyChanged -= OnSonderfertigkeitChanged;
+        }
+        SonderfertigkeitEintraege.Clear();
+        if (data.SonderfertigkeitListe != null)
+        {
+            foreach (var sf in data.SonderfertigkeitListe)
+            {
+                sf.PropertyChanged += OnSonderfertigkeitChanged;
+                SonderfertigkeitEintraege.Add(sf);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+
+        RecalculateTalentProben();
     }
 
     /// <summary>
@@ -346,7 +516,9 @@ public class MainPageViewModel : INotifyPropertyChanged
                 AktuellesDatumStr = _sheet.AktuellesDatumStr
             },
             TalentValues = talentValues,
-            Ereignisse = Ereignisse.ToList()
+            Ereignisse = Ereignisse.ToList(),
+            VorteilNachteilListe = VorteilNachteilEintraege.ToList(),
+            SonderfertigkeitListe = SonderfertigkeitEintraege.ToList()
         };
     }
 
@@ -418,6 +590,16 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
+
+        RecalculateTalentProben();
+        RecalculateKampftechniken();
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Ausweichen)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleLebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebenVerloren)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Schmerzstufen)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchmerzstufenDetails)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Wundschwelle)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WundschwelleFormel)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleSpezies)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpeziesInfoText)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
@@ -474,6 +656,11 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Nachteile)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Talente)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Kampftalente)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleLebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebenVerloren)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Schmerzstufen)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchmerzstufenDetails)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Ausweichen)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuellesDatumStr)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
         NotifyDerivedValues();
@@ -756,6 +943,11 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public string GeschwindigkeitFormel => $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})";
 
+    /// <summary>Wundschwelle = ⌈KO/2⌉</summary>
+    public int Wundschwelle => (int)Math.Ceiling(_sheet.Konstitution / 2.0);
+
+    /// <summary>Formeldarstellung der Wundschwelle.</summary>
+    public string WundschwelleFormel => $"⌈KO/2⌉ = ⌈{_sheet.Konstitution}/2⌉";
 
     // --- Zugekaufte Modifikatoren (editierbar) ---
 
@@ -986,7 +1178,7 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private static IReadOnlyList<TalentGroup> BuildTalentGruppen()
     {
-        return new[]
+        var gruppen = new[]
         {
             new TalentGroup("Körpertalente", new[]
             {
@@ -1064,6 +1256,17 @@ public class MainPageViewModel : INotifyPropertyChanged
                 NewTalent("Metallbearbeitung", "C", "FF", "KO", "KK", "JA")
             })
         };
+
+        // Gruppe auf jede TalentRow setzen
+        foreach (var gruppe in gruppen)
+        {
+            foreach (var row in gruppe.Eintraege)
+            {
+                row.Gruppe = gruppe.Gruppe;
+            }
+        }
+
+        return gruppen;
     }
 
     private static TalentRow NewTalent(string talent, string faktor, string probe1, string probe2, string probe3, string belastungseinfluss)
@@ -1078,6 +1281,80 @@ public class MainPageViewModel : INotifyPropertyChanged
             Belastungseinfluss = belastungseinfluss
         };
     }
+
+    /// <summary>Berechnet AT/FK-Basiswerte und Parade für alle Kampftechniken neu.</summary>
+    private void RecalculateKampftechniken()
+    {
+        var attrs = BuildAttributeDictionary();
+        foreach (var kt in Kampftechniken)
+        {
+            // AT/FK-Basis: Für Nahkampf = ⌈(MU-8)/3⌉, Fernkampf = ⌈(FF-8)/3⌉ (vereinfacht: Leiteigenschaft als Bonus)
+            if (kt.IstFernkampf)
+            {
+                kt.AtFkBasis = Math.Max(0, (int)Math.Ceiling((attrs.GetValueOrDefault("FF", 8) - 8) / 3.0));
+            }
+            else
+            {
+                // Nahkampf: höchste Leiteigenschaft
+                int best = 0;
+                foreach (var le in kt.Leiteigenschaft.Split('/'))
+                {
+                    if (attrs.TryGetValue(le.Trim(), out var val))
+                        best = Math.Max(best, val);
+                }
+                kt.AtFkBasis = Math.Max(0, (int)Math.Ceiling((best - 8) / 3.0));
+            }
+
+            // Parade = ⌈KTW/2⌉ (nur Nahkampf)
+            if (!kt.IstFernkampf && int.TryParse(kt.Ktw, out var ktw))
+                kt.Parade = (int)Math.Ceiling(ktw / 2.0);
+            else
+                kt.Parade = 0;
+        }
+    }
+
+    private static IReadOnlyList<KampftechnikRow> BuildKampftechniken()
+    {
+        return new KampftechnikRow[]
+        {
+            new() { Kampftechnik = "Armbrüste", Leiteigenschaft = "FF", Steigerungsfaktor = "B", IstFernkampf = true },
+            new() { Kampftechnik = "Bögen", Leiteigenschaft = "FF", Steigerungsfaktor = "C", IstFernkampf = true },
+            new() { Kampftechnik = "Dolche", Leiteigenschaft = "GE", Steigerungsfaktor = "B" },
+            new() { Kampftechnik = "Fechtwaffen", Leiteigenschaft = "GE", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Hiebwaffen", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Kettenwaffen", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Lanzen", Leiteigenschaft = "KK", Steigerungsfaktor = "B" },
+            new() { Kampftechnik = "Raufen", Leiteigenschaft = "GE/KK", Steigerungsfaktor = "B" },
+            new() { Kampftechnik = "Schilde", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Schwerter", Leiteigenschaft = "GE/KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Stangenwaffen", Leiteigenschaft = "GE/KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Wurfwaffen", Leiteigenschaft = "FF", Steigerungsfaktor = "B", IstFernkampf = true },
+            new() { Kampftechnik = "Zweihandhiebwaffen", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
+            new() { Kampftechnik = "Zweihandschwerter", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
+        };
+    }
+
+    /// <summary>Berechnet alle Talent-Probenwerte neu (nach Attribut-/VN-/SF-Änderung).</summary>
+    private void RecalculateTalentProben()
+    {
+        _talentModifierService?.UpdateTalentProben(
+            TalentGruppen,
+            BuildAttributeDictionary(),
+            VorteilNachteilEintraege.ToList(),
+            SonderfertigkeitEintraege.ToList());
+    }
+
+    private Dictionary<string, int> BuildAttributeDictionary() => new()
+    {
+        ["MU"] = _sheet.Mut,
+        ["KL"] = _sheet.Klugheit,
+        ["IN"] = _sheet.Intuition,
+        ["CH"] = _sheet.Charisma,
+        ["FF"] = _sheet.Fingerfertigkeit,
+        ["GE"] = _sheet.Gewandtheit,
+        ["KO"] = _sheet.Konstitution,
+        ["KK"] = _sheet.Körperkraft
+    };
 
     /// <summary>Setzt eine einfache Property, feuert PropertyChanged und speichert verzögert.</summary>
     private void SetProperty<T>(T oldValue, T newValue, Action<T> setter, [CallerMemberName] string? propertyName = null)

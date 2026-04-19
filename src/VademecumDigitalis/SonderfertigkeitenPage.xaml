@@ -2,17 +2,17 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
-             x:Class="VademecumDigitalis.AdvantagesPage"
-             Title="Vorteile/Nachteile">
+             x:Class="VademecumDigitalis.SonderfertigkeitenPage"
+             Title="Sonderfertigkeiten">
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
-            <Label Text="Vorteile &amp; Nachteile" Style="{StaticResource HeadlineLabel}" />
-            <Label Text="Vorteile und Nachteile nach Kategorie gruppiert."
+            <Label Text="Sonderfertigkeiten" Style="{StaticResource HeadlineLabel}" />
+            <Label Text="Profane Sonderfertigkeiten nach Kategorie gruppiert."
                    TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,-8,0,4" />
 
-            <!-- Button: Neuer Vorteil/Nachteil -->
-            <Button Text="＋ Neuer Vorteil / Nachteil" Clicked="OnToggleSearchClicked"
+            <!-- Button: Neue Sonderfertigkeit -->
+            <Button Text="＋ Neue Sonderfertigkeit" Clicked="OnToggleSearchClicked"
                     BackgroundColor="{StaticResource AccentCyan}" TextColor="White" />
 
             <!-- Such-/Hinzufügen-Bereich (toggle) -->
@@ -27,13 +27,13 @@
 
                     <!-- Katalogsuche -->
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding IsCatalogSearchMode}">
-                        <Entry x:Name="SearchEntry" Placeholder="Vorteil/Nachteil suchen…"
+                        <Entry x:Name="SearchEntry" Placeholder="SF-Name suchen…"
                                Text="{Binding SearchText}" />
                         <CollectionView ItemsSource="{Binding SearchResults}"
                                         MaximumHeightRequest="300"
                                         SelectionMode="None">
                             <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:VorteilNachteil">
+                                <DataTemplate x:DataType="models:SpecialAbility">
                                     <Border Stroke="{StaticResource TextSecondary}" StrokeThickness="0.5"
                                             StrokeShape="RoundRectangle 6" Padding="10,8" Margin="0,2">
                                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
@@ -66,7 +66,7 @@
 
                     <!-- Homebrew-Formular -->
                     <VerticalStackLayout Spacing="8" IsVisible="{Binding IsHomebrewMode}">
-                        <Label Text="Eigenen Vorteil/Nachteil erstellen" Style="{StaticResource SectionHeaderLabel}" />
+                        <Label Text="Eigene Sonderfertigkeit erstellen" Style="{StaticResource SectionHeaderLabel}" />
                         <Entry Placeholder="Name" Text="{Binding HomebrewName}" />
                         <Editor Placeholder="Beschreibung / Regeltext" Text="{Binding HomebrewBeschreibung}"
                                 HeightRequest="80" AutoSize="TextChanges" />
@@ -94,17 +94,17 @@
             </Border>
 
             <!-- Leere-Liste-Hinweis -->
-            <Label Text="Noch keine Vorteile oder Nachteile eingetragen."
-                   IsVisible="{Binding KeineVorteileNachteile}"
+            <Label Text="Noch keine Sonderfertigkeiten eingetragen."
+                   IsVisible="{Binding KeineSonderfertigkeiten}"
                    TextColor="{StaticResource TextSecondary}"
                    FontSize="14" HorizontalOptions="Center" Margin="0,8" />
 
             <!-- Gruppierte Liste -->
-            <CollectionView ItemsSource="{Binding GruppierteVorteileNachteile}"
+            <CollectionView ItemsSource="{Binding GruppierteSonderfertigkeiten}"
                             IsGrouped="True"
                             SelectionMode="None">
                 <CollectionView.GroupHeaderTemplate>
-                    <DataTemplate x:DataType="models:VnGruppe">
+                    <DataTemplate x:DataType="models:SfGruppe">
                         <VerticalStackLayout Padding="0,10,0,4">
                             <Label Text="{Binding Kategorie}" FontSize="16" FontAttributes="Bold"
                                    TextColor="{StaticResource AccentCyan}" />
@@ -113,7 +113,7 @@
                     </DataTemplate>
                 </CollectionView.GroupHeaderTemplate>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:CharakterVorteilNachteilEintrag">
+                    <DataTemplate x:DataType="models:CharakterSonderfertigkeitEintrag">
                         <Border Style="{StaticResource CardBorder}" Margin="0,3">
                             <Grid ColumnDefinitions="*,Auto,Auto" Padding="12,10" ColumnSpacing="6">
                                 <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
@@ -121,7 +121,7 @@
                                     <Label Text="{Binding KategorieAnzeige}" FontSize="12"
                                            TextColor="{StaticResource TextSecondary}" />
                                 </VerticalStackLayout>
-                                <!-- Level-up Button (nur bei stufenbasierten VNs) -->
+                                <!-- Level-up Button (nur bei stufenbasierten SFs) -->
                                 <Button Grid.Column="1" Text="▲" FontSize="14"
                                         Padding="8,4" WidthRequest="40"
                                         BackgroundColor="Transparent" TextColor="{StaticResource AccentCyan}"

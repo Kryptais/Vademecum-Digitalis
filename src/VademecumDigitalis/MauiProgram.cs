@@ -30,6 +30,16 @@ public static class MauiProgram
     builder.Services.AddTransient<BoronKalenderPage>();
     builder.Services.AddTransient<EreignissePage>();
 
+    builder.Services.AddSingleton<SpecialAbilityService>();
+    builder.Services.AddTransient<SonderfertigkeitenViewModel>();
+    builder.Services.AddTransient<SonderfertigkeitenPage>();
+
+    builder.Services.AddSingleton<VorteilNachteilService>();
+    builder.Services.AddTransient<VorteilNachteilViewModel>();
+    builder.Services.AddTransient<AdvantagesPage>();
+
+    builder.Services.AddSingleton<TalentModifierService>();
+
         return builder.Build();
     }
 }
