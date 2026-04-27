@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models"
              x:Class="VademecumDigitalis.AdvantagesPage"
+             x:DataType="viewmodels:AdvantagesViewModel"
              Title="Vorteile/Nachteile">
 
     <ScrollView>
@@ -63,9 +66,104 @@
             <Label Text="Freitext-Notizen" Style="{StaticResource SectionHeaderLabel}" Margin="0,4,0,0" />
             <Label Text="Eintrag pro Zeile (V1 als Freitext)." TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,-8,0,4" />
 
+            <!-- AP-Übersicht -->
             <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <VerticalStackLayout Grid.Column="0" HorizontalOptions="Center" Spacing="2">
+                        <Label Text="AP Vorteile" FontSize="12" TextColor="#AAA" HorizontalOptions="Center" />
+                        <Label Text="{Binding VorteilApKosten}" FontSize="18" FontAttributes="Bold" TextColor="#FF6B6B" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
+                        <Label Text="AP Nachteile" FontSize="12" TextColor="#AAA" HorizontalOptions="Center" />
+                        <Label Text="{Binding NachteilApEinnahmen}" FontSize="18" FontAttributes="Bold" TextColor="#6BCB77" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="2" HorizontalOptions="Center" Spacing="2">
+                        <Label Text="AP Saldo" FontSize="12" TextColor="#AAA" HorizontalOptions="Center" />
+                        <Label Text="{Binding ApSaldo}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- ── Vorteile ────────────────────────────────────────────────── -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="10">
                     <Label Text="Vorteile" Style="{StaticResource SectionHeaderLabel}" />
+
+                    <!-- Liste der vorhandenen Vorteile -->
+                    <CollectionView ItemsSource="{Binding Vorteile}">
+                        <CollectionView.EmptyView>
+                            <Label Text="Noch keine Vorteile eingetragen."
+                                   TextColor="#666" FontSize="14" Margin="0,4" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Vorteil">
+                                <Grid ColumnDefinitions="*,Auto" Padding="4,6" ColumnSpacing="8">
+                                    <Label Text="{Binding Anzeige}" TextColor="#E6E6E6"
+                                           VerticalOptions="Center" Grid.Column="0" />
+                                    <Button Text="✕"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AdvantagesViewModel}}, Path=VorteilEntfernenCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="Transparent" TextColor="#FF6B6B"
+                                            FontSize="16" Padding="4,0" HeightRequest="32"
+                                            Grid.Column="1" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Neuen Vorteil hinzufügen -->
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" RowDefinitions="Auto,Auto" RowSpacing="6">
+                        <Entry Grid.Row="0" Grid.Column="0"
+                               Placeholder="Vorteilsname (z. B. Glück)"
+                               Text="{Binding NeuerVorteilName, Mode=TwoWay}"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                        <Entry Grid.Row="0" Grid.Column="1"
+                               Placeholder="Stufe"
+                               Text="{Binding NeuerVorteilStufe, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="70"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                        <Button Grid.Row="0" Grid.Column="2"
+                                Text="+"
+                                Command="{Binding VorteilHinzufuegenCommand}"
+                                FontSize="18" Padding="12,0" HeightRequest="44" />
+                        <Entry Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                               Placeholder="Anmerkung (optional, z. B. betroffenes Talent)"
+                               Text="{Binding NeuerVorteilAnmerkung, Mode=TwoWay}"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                    </Grid>
+
+                    <!-- Katalog-Vorschläge -->
+                    <Label Text="Katalog (DSA 5 Standardvorteile):" FontSize="12" TextColor="#AAA" />
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start">
+                        <BindableLayout.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>Begabung</x:String>
+                                <x:String>Glück</x:String>
+                                <x:String>Schnelle Heilung</x:String>
+                                <x:String>Hohe Lebensenergie</x:String>
+                                <x:String>Wohlhabend</x:String>
+                                <x:String>Flink</x:String>
+                                <x:String>Eisern</x:String>
+                                <x:String>Zauberer</x:String>
+                            </x:Array>
+                        </BindableLayout.ItemsSource>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Stroke="#444" StrokeThickness="1" StrokeShape="RoundRectangle 4"
+                                        BackgroundColor="#2A2A2A" Padding="8,4" Margin="0,2,6,2">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AdvantagesViewModel}}, Path=VorteilKatalogWaehlenCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="{Binding .}" TextColor="#CCC" FontSize="13" />
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
                     <Editor AutoSize="TextChanges"
                             MinimumHeightRequest="100"
                             Placeholder="z. B. Begabung (Sinnesschärfe), Glück I"
@@ -73,15 +171,93 @@
                 </VerticalStackLayout>
             </Border>
 
+            <!-- ── Nachteile ───────────────────────────────────────────────── -->
             <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="8">
+                <VerticalStackLayout Spacing="10">
                     <Label Text="Nachteile" Style="{StaticResource SectionHeaderLabel}" />
+
+                    <!-- Liste der vorhandenen Nachteile -->
+                    <CollectionView ItemsSource="{Binding Nachteile}">
+                        <CollectionView.EmptyView>
+                            <Label Text="Noch keine Nachteile eingetragen."
+                                   TextColor="#666" FontSize="14" Margin="0,4" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:Vorteil">
+                                <Grid ColumnDefinitions="*,Auto" Padding="4,6" ColumnSpacing="8">
+                                    <Label Text="{Binding Anzeige}" TextColor="#E6E6E6"
+                                           VerticalOptions="Center" Grid.Column="0" />
+                                    <Button Text="✕"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AdvantagesViewModel}}, Path=NachteilEntfernenCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="Transparent" TextColor="#FF6B6B"
+                                            FontSize="16" Padding="4,0" HeightRequest="32"
+                                            Grid.Column="1" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                    <!-- Neuen Nachteil hinzufügen -->
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" RowDefinitions="Auto,Auto" RowSpacing="6">
+                        <Entry Grid.Row="0" Grid.Column="0"
+                               Placeholder="Nachteilsname (z. B. Neugier)"
+                               Text="{Binding NeuerNachteilName, Mode=TwoWay}"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                        <Entry Grid.Row="0" Grid.Column="1"
+                               Placeholder="Stufe"
+                               Text="{Binding NeuerNachteilStufe, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
+                               Keyboard="Numeric" WidthRequest="70"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                        <Button Grid.Row="0" Grid.Column="2"
+                                Text="+"
+                                Command="{Binding NachteilHinzufuegenCommand}"
+                                FontSize="18" Padding="12,0" HeightRequest="44" />
+                        <Entry Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                               Placeholder="Anmerkung (optional)"
+                               Text="{Binding NeuerNachteilAnmerkung, Mode=TwoWay}"
+                               BackgroundColor="#2A2A2A" TextColor="#E6E6E6"
+                               PlaceholderColor="#666" />
+                    </Grid>
+
+                    <!-- Katalog-Vorschläge -->
+                    <Label Text="Katalog (DSA 5 Standardnachteile):" FontSize="12" TextColor="#AAA" />
+                    <FlexLayout Wrap="Wrap" Direction="Row" JustifyContent="Start">
+                        <BindableLayout.ItemsSource>
+                            <x:Array Type="{x:Type x:String}">
+                                <x:String>Neugier</x:String>
+                                <x:String>Jähzorn</x:String>
+                                <x:String>Prinzipientreue</x:String>
+                                <x:String>Feige</x:String>
+                                <x:String>Goldgier</x:String>
+                                <x:String>Arroganz</x:String>
+                                <x:String>Pechvogel</x:String>
+                                <x:String>Nachtblind</x:String>
+                            </x:Array>
+                        </BindableLayout.ItemsSource>
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Stroke="#444" StrokeThickness="1" StrokeShape="RoundRectangle 4"
+                                        BackgroundColor="#2A2A2A" Padding="8,4" Margin="0,2,6,2">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:AdvantagesViewModel}}, Path=NachteilKatalogWaehlenCommand}"
+                                            CommandParameter="{Binding .}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="{Binding .}" TextColor="#CCC" FontSize="13" />
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </FlexLayout>
                     <Editor AutoSize="TextChanges"
                             MinimumHeightRequest="100"
                             Placeholder="z. B. Neugier 6, Prinzipientreue 5"
                             Text="{Binding Nachteile}" />
                 </VerticalStackLayout>
             </Border>
+
         </VerticalStackLayout>
     </ScrollView>
 
