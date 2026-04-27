@@ -16,6 +16,7 @@
             <Color x:Key="AccentCyan">#0E7490</Color>
 
             <converters:IntStringConverter x:Key="IntStringConverter" />
+            <converters:StatusButtonColorConverter x:Key="StatusButtonColorConverter" />
 
             <!-- Default Page Background -->
             <Style TargetType="ContentPage">

@@ -12,6 +12,9 @@ public class CharacterSheetData
     /// </summary>
     public List<TalentSaveEntry> TalentValues { get; set; } = new();
 
+    /// <summary>Gespeicherte Kampftechnik-Werte (KTW + Boni).</summary>
+    public List<KampftechnikSaveEntry> KampftechnikValues { get; set; } = new();
+
     /// <summary>Charakter-Ereignisse (Altersveränderungen, Stat-Boni usw.).</summary>
     public List<CharakterEreignis> Ereignisse { get; set; } = [];
 
@@ -30,4 +33,14 @@ public class TalentSaveEntry
     public string Talent { get; set; } = string.Empty;
     public string Fw { get; set; } = string.Empty;
     public string Anmerkung { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Kompakte Speicherung eines Kampftechnik-Werts (KTW + Boni).
+/// </summary>
+public class KampftechnikSaveEntry
+{
+    public string Kampftechnik { get; set; } = string.Empty;
+    public string Ktw { get; set; } = string.Empty;
+    public int Boni { get; set; } = 0;
 }

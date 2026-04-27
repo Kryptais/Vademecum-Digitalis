@@ -216,3 +216,38 @@ public class KampftechnikRow : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }
+
+/// <summary>Zeile für die Kampf-Status-Tabelle (Betäubung, Verwirrung, etc.).</summary>
+public class StatusRow : INotifyPropertyChanged
+{
+    private int _stufe;
+
+    public StatusRow(string statusName)
+    {
+        StatusName = statusName;
+    }
+
+    public string StatusName { get; }
+
+    /// <summary>Aktuelle Stufe des Status (0 = keine, 1-3 = Modifikator -1 bis -3, 4 = handlungsunfähig).</summary>
+    public int Stufe
+    {
+        get => _stufe;
+        set
+        {
+            value = Math.Clamp(value, 0, 4); // Begrenze auf 0-4
+            if (_stufe != value)
+            {
+                _stufe = value;
+                OnPropertyChanged(nameof(Stufe));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

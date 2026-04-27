@@ -23,7 +23,10 @@ public class MainPageViewModel : INotifyPropertyChanged
         _talentModifierService = talentModifierService;
         TalentGruppen = BuildTalentGruppen();
         Kampftechniken = BuildKampftechniken();
+        KampfStatiRows = BuildKampfStatiRows();
         SubscribeToTalentChanges();
+        SubscribeToKampftechnikenChanges();
+        SubscribeToStatusChanges();
         ToggleExpandCommand = new Command<TalentGroup>(g => g.IsExpanded = !g.IsExpanded);
     }
 
@@ -37,6 +40,10 @@ public class MainPageViewModel : INotifyPropertyChanged
     // --- Kampftechniken ---
 
     public IReadOnlyList<KampftechnikRow> Kampftechniken { get; }
+
+    // --- Kampf-Status ---
+
+    public IReadOnlyList<StatusRow> KampfStatiRows { get; }
 
     /// <summary>Ausweichen = ⌈GE/2⌉</summary>
     public int Ausweichen => (int)Math.Ceiling(_sheet.Gewandtheit / 2.0);
@@ -101,6 +108,7 @@ public class MainPageViewModel : INotifyPropertyChanged
             return $"1. Schmerz bei ≤{schwelle1} LeP{Marker(schwelle1)}\n" +
                    $"2. Schmerz bei ≤{schwelle2} LeP{Marker(schwelle2)}\n" +
                    $"3. Schmerz bei ≤{schwelle3} LeP{Marker(schwelle3)}\n" +
+                   $"4. Schmerz bei ≤{schwelle4} LeP{Marker(schwelle4)}\n" +
                    $"Sterbend bei ≤5 LeP{(aktuell <= 5 ? " ◄" : "")}";
         }
     }
@@ -353,6 +361,20 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
 
+        // Kampftechnik-Werte (KTW + Boni) laden
+        if (data.KampftechnikValues != null)
+        {
+            var ktLookup = data.KampftechnikValues.ToDictionary(kt => kt.Kampftechnik, kt => kt);
+            foreach (var kt in Kampftechniken)
+            {
+                if (ktLookup.TryGetValue(kt.Kampftechnik, out var saved))
+                {
+                    kt.Ktw = saved.Ktw;
+                    kt.Boni = saved.Boni;
+                }
+            }
+        }
+
         // Alle Properties der UI melden
         NotifyAllProperties();
 
@@ -457,6 +479,20 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
 
+        var kampftechnikValues = new List<KampftechnikSaveEntry>();
+        foreach (var kt in Kampftechniken)
+        {
+            if (!string.IsNullOrEmpty(kt.Ktw) || kt.Boni != 0)
+            {
+                kampftechnikValues.Add(new KampftechnikSaveEntry
+                {
+                    Kampftechnik = kt.Kampftechnik,
+                    Ktw = kt.Ktw,
+                    Boni = kt.Boni
+                });
+            }
+        }
+
         return new CharacterSheetData
         {
             Sheet = new CharacterSheet
@@ -513,9 +549,11 @@ public class MainPageViewModel : INotifyPropertyChanged
                 Nachteile = _sheet.Nachteile,
                 Talente = _sheet.Talente,
                 Kampftalente = _sheet.Kampftalente,
-                AktuellesDatumStr = _sheet.AktuellesDatumStr
+                AktuellesDatumStr = _sheet.AktuellesDatumStr,
+                KampfStati = _sheet.KampfStati
             },
             TalentValues = talentValues,
+            KampftechnikValues = kampftechnikValues,
             Ereignisse = Ereignisse.ToList(),
             VorteilNachteilListe = VorteilNachteilEintraege.ToList(),
             SonderfertigkeitListe = SonderfertigkeitEintraege.ToList()
@@ -562,6 +600,52 @@ public class MainPageViewModel : INotifyPropertyChanged
             {
                 row.PropertyChanged += (_, _) => RequestDelayedSave();
             }
+        }
+    }
+
+    /// <summary>Abonniere PropertyChanged für Kampftechniken (KTW, Boni) um Parade neu zu berechnen und zu speichern.</summary>
+    private void SubscribeToKampftechnikenChanges()
+    {
+        foreach (var kt in Kampftechniken)
+        {
+            kt.PropertyChanged += (sender, e) =>
+            {
+                // Bei KTW-Änderung: Parade neuberechnen
+                if (e.PropertyName == nameof(KampftechnikRow.Ktw) && sender is KampftechnikRow row)
+                {
+                    RecalculateKampftechnikenParade(row);
+                }
+                RequestDelayedSave();
+            };
+        }
+    }
+
+    /// <summary>Berechnet Parade für eine einzelne Kampftechnik neu (effizienter als volle Neuberechnung).</summary>
+    private void RecalculateKampftechnikenParade(KampftechnikRow kt)
+    {
+        if (kt.IstFernkampf)
+        {
+            kt.Parade = 0;
+            return;
+        }
+
+        var attrs = BuildAttributeDictionary();
+        int best = 0;
+        foreach (var le in kt.Leiteigenschaft.Split('/'))
+        {
+            if (attrs.TryGetValue(le.Trim(), out var val))
+                best = Math.Max(best, val);
+        }
+
+        // Parade = ⌈KTW/2⌉ + ⌊(Leiteigenschaft-8)/3⌋ - Status-Modifikatoren
+        if (int.TryParse(kt.Ktw, out var ktw))
+        {
+            int statusModifikator = GetStatusModifikatorForPA();
+            kt.Parade = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0) + statusModifikator);
+        }
+        else
+        {
+            kt.Parade = 0;
         }
     }
 
@@ -1286,31 +1370,83 @@ public class MainPageViewModel : INotifyPropertyChanged
     private void RecalculateKampftechniken()
     {
         var attrs = BuildAttributeDictionary();
+        int statusModAT = GetStatusModifikatorForAT();
+        int statusModPA = GetStatusModifikatorForPA();
+
         foreach (var kt in Kampftechniken)
         {
             // AT/FK-Basis: Für Nahkampf = ⌈(MU-8)/3⌉, Fernkampf = ⌈(FF-8)/3⌉ (vereinfacht: Leiteigenschaft als Bonus)
             if (kt.IstFernkampf)
             {
-                kt.AtFkBasis = Math.Max(0, (int)Math.Ceiling((attrs.GetValueOrDefault("FF", 8) - 8) / 3.0));
+                kt.AtFkBasis = Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("FF", 8) - 8) / 3.0) + statusModAT);
             }
             else
             {
                 // Nahkampf: höchste Leiteigenschaft
-                int best = 0;
-                foreach (var le in kt.Leiteigenschaft.Split('/'))
-                {
-                    if (attrs.TryGetValue(le.Trim(), out var val))
-                        best = Math.Max(best, val);
-                }
-                kt.AtFkBasis = Math.Max(0, (int)Math.Ceiling((best - 8) / 3.0));
+                kt.AtFkBasis = Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("MU", 8) - 8) / 3.0) + statusModAT);
             }
-
-            // Parade = ⌈KTW/2⌉ (nur Nahkampf)
+            int best = 0;
+            foreach (var le in kt.Leiteigenschaft.Split('/'))
+            {
+                if (attrs.TryGetValue(le.Trim(), out var val))
+                    best = Math.Max(best, val);
+            }
+            // Parade = ⌈KTW/2⌉ + ⌊(Leiteigenschaft-8)/3⌋ - Status-Modifikatoren
             if (!kt.IstFernkampf && int.TryParse(kt.Ktw, out var ktw))
-                kt.Parade = (int)Math.Ceiling(ktw / 2.0);
+                kt.Parade = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0) + statusModPA);
             else
                 kt.Parade = 0;
         }
+    }
+
+    /// <summary>Berechnet Gesamt-Status-Modifikator für AT/FK (Betäubung, Furcht, Schmerz, Paralyse).</summary>
+    private int GetStatusModifikatorForAT()
+    {
+        int mod = 0;
+        foreach (var status in KampfStatiRows)
+        {
+            if (status.Stufe == 4) continue; // Stufe 4 = handlungsunfähig (kein Malus, da keine Handlung möglich)
+
+            switch (status.StatusName)
+            {
+                case "Betäubung":
+                case "Furcht":
+                case "Schmerz":
+                    // -1/-2/-3 auf alle Proben inkl. AT/FK
+                    mod -= Math.Min(status.Stufe, 3);
+                    break;
+                case "Paralyse":
+                    // -1/-2/-3 auf GE/FF-basierte Proben inkl. AT
+                    mod -= Math.Min(status.Stufe, 3);
+                    break;
+            }
+        }
+        return mod;
+    }
+
+    /// <summary>Berechnet Gesamt-Status-Modifikator für PA (Betäubung, Furcht, Schmerz, Paralyse).</summary>
+    private int GetStatusModifikatorForPA()
+    {
+        int mod = 0;
+        foreach (var status in KampfStatiRows)
+        {
+            if (status.Stufe == 4) continue; // Stufe 4 = handlungsunfähig
+
+            switch (status.StatusName)
+            {
+                case "Betäubung":
+                case "Furcht":
+                case "Schmerz":
+                    // -1/-2/-3 auf alle Proben inkl. PA
+                    mod -= Math.Min(status.Stufe, 3);
+                    break;
+                case "Paralyse":
+                    // -1/-2/-3 auf GE/FF-basierte Proben inkl. PA
+                    mod -= Math.Min(status.Stufe, 3);
+                    break;
+            }
+        }
+        return mod;
     }
 
     private static IReadOnlyList<KampftechnikRow> BuildKampftechniken()
@@ -1332,6 +1468,55 @@ public class MainPageViewModel : INotifyPropertyChanged
             new() { Kampftechnik = "Zweihandhiebwaffen", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
             new() { Kampftechnik = "Zweihandschwerter", Leiteigenschaft = "KK", Steigerungsfaktor = "C" },
         };
+    }
+
+    private IReadOnlyList<StatusRow> BuildKampfStatiRows()
+    {
+        var rows = new StatusRow[]
+        {
+            new("Belastung"),
+            new("Berauschtheit"),
+            new("Betäubung"),
+            new("Entrückt"),
+            new("Furcht"),
+            new("Paralyse"),
+            new("Schmerz"),
+            new("Verwirrung"),
+        };
+
+        // Lade gespeicherte Werte aus CharacterSheet
+        foreach (var row in rows)
+        {
+            if (_sheet.KampfStati.TryGetValue(row.StatusName, out int stufe))
+            {
+                row.Stufe = stufe; // Direkt Stufe (0-4) setzen
+            }
+        }
+
+        return rows;
+    }
+
+    /// <summary>Abonniere PropertyChanged für alle StatusRows, um Änderungen zu speichern.</summary>
+    private void SubscribeToStatusChanges()
+    {
+        foreach (var row in KampfStatiRows)
+        {
+            row.PropertyChanged += OnStatusRowChanged;
+        }
+    }
+
+    private void OnStatusRowChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is StatusRow row)
+        {
+            // Speichere aktuelle Stufe (0-4) im CharacterSheet
+            _sheet.KampfStati[row.StatusName] = row.Stufe;
+
+            // Neuberechnung von AT/PA wegen Status-Modifikatoren
+            RecalculateKampftechniken();
+
+            RequestDelayedSave();
+        }
     }
 
     /// <summary>Berechnet alle Talent-Probenwerte neu (nach Attribut-/VN-/SF-Änderung).</summary>

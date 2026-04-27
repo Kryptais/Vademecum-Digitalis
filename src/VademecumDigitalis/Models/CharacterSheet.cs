@@ -69,6 +69,9 @@ public class CharacterSheet
     /// <summary>Aktuelle Lebensenergie (für Kampf-Tab Schmerzstufen-Tracking).</summary>
     public int AktuelleLebensenergie { get; set; } = -1;
 
+    /// <summary>Kampf-Status (Betäubung, Verwirrung, etc.) - Dictionary: StatusName -> Stufe (0-4).</summary>
+    public Dictionary<string, int> KampfStati { get; set; } = new();
+
     // Aktuelles aventurisches Datum (für Altersberechnung)
     public string AktuellesDatumStr { get; set; } = string.Empty;
 

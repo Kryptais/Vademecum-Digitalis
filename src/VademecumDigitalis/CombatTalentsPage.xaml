@@ -7,82 +7,399 @@
              Title="Kampf">
 
     <ScrollView Orientation="Both">
-        <VerticalStackLayout Padding="16" Spacing="12" MinimumWidthRequest="1000">
+        <VerticalStackLayout>
+            <VerticalStackLayout.Padding>
+                <OnIdiom x:TypeArguments="Thickness" Phone="8" Tablet="12" Desktop="16" />
+            </VerticalStackLayout.Padding>
+            <VerticalStackLayout.Spacing>
+                <OnIdiom x:TypeArguments="x:Double" Phone="6" Tablet="8" Desktop="10" />
+            </VerticalStackLayout.Spacing>
 
             <!-- === Hauptattribute (read-only Anzeige) === -->
-            <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" Padding="12,8" BackgroundColor="#1a1a2e">
-                <VerticalStackLayout Spacing="6">
-                    <Label Text="Hauptattribute" HorizontalOptions="Center" FontAttributes="Bold" FontSize="20" TextColor="#0E7490" />
-                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="4">
-                        <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="2" Text="IN" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="3" Text="CH" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="4" Text="FF" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="5" Text="GE" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                        <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
+            <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e">
+                <Border.Padding>
+                    <OnIdiom x:TypeArguments="Thickness" Phone="8,6" Tablet="10,7" Desktop="12,8" />
+                </Border.Padding>
+                <VerticalStackLayout>
+                    <VerticalStackLayout.Spacing>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="4" Tablet="5" Desktop="6" />
+                    </VerticalStackLayout.Spacing>
+                    <Label Text="Hauptattribute" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#0E7490">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto">
+                        <Grid.ColumnSpacing>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="4" Tablet="6" Desktop="8" />
+                        </Grid.ColumnSpacing>
+                        <Grid.RowSpacing>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
+                        </Grid.RowSpacing>
+                        <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="2" Text="IN" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="3" Text="CH" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="4" Text="FF" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="5" Text="GE" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
 
-                        <Label Grid.Row="1" Grid.Column="0" Text="{Binding Mut}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Klugheit}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding Intuition}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="3" Text="{Binding Charisma}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="4" Text="{Binding Fingerfertigkeit}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="5" Text="{Binding Gewandtheit}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="6" Text="{Binding Konstitution}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
-                        <Label Grid.Row="1" Grid.Column="7" Text="{Binding Körperkraft}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#B0E0E6" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="{Binding Mut}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="1" Text="{Binding Klugheit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="2" Text="{Binding Intuition}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="3" Text="{Binding Charisma}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="4" Text="{Binding Fingerfertigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="5" Text="{Binding Gewandtheit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="6" Text="{Binding Konstitution}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Label Grid.Row="1" Grid.Column="7" Text="{Binding Körperkraft}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#B0E0E6">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
                     </Grid>
                 </VerticalStackLayout>
             </Border>
 
             <!-- === Abgeleitete Kampfwerte === -->
-            <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" Padding="12,8" BackgroundColor="#1a1a2e">
-                <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="12" RowSpacing="4">
-                    <Label Grid.Row="0" Grid.Column="0" Text="Ausweichen" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                    <Label Grid.Row="0" Grid.Column="1" Text="Initiative" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                    <Label Grid.Row="0" Grid.Column="2" Text="Seelenkraft" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                    <Label Grid.Row="0" Grid.Column="3" Text="Zähigkeit" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
-                    <Label Grid.Row="0" Grid.Column="4" Text="GS" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White" FontSize="20" />
+            <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e">
+                <Border.Padding>
+                    <OnIdiom x:TypeArguments="Thickness" Phone="8,6" Tablet="10,7" Desktop="12,8" />
+                </Border.Padding>
+                <Grid ColumnDefinitions="*,*,*,*,*" RowDefinitions="Auto,Auto">
+                    <Grid.ColumnSpacing>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="6" Tablet="9" Desktop="12" />
+                    </Grid.ColumnSpacing>
+                    <Grid.RowSpacing>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
+                    </Grid.RowSpacing>
+                    <Label Grid.Row="0" Grid.Column="0" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                        <Label.Text>
+                            <OnIdiom x:TypeArguments="x:String" Phone="AW" Tablet="Ausw." Desktop="Ausweichen" />
+                        </Label.Text>
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="0" Grid.Column="1" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                        <Label.Text>
+                            <OnIdiom x:TypeArguments="x:String" Phone="INI" Tablet="Init." Desktop="Initiative" />
+                        </Label.Text>
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="0" Grid.Column="2" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                        <Label.Text>
+                            <OnIdiom x:TypeArguments="x:String" Phone="SK" Tablet="Seelenk." Desktop="Seelenkraft" />
+                        </Label.Text>
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="0" Grid.Column="3" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                        <Label.Text>
+                            <OnIdiom x:TypeArguments="x:String" Phone="ZK" Tablet="Zäh." Desktop="Zähigkeit" />
+                        </Label.Text>
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="0" Grid.Column="4" Text="GS" FontAttributes="Bold" HorizontalOptions="Center" TextColor="White">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding Ausweichen}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#4DD0E1" />
-                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding InitiativeBasis}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#4DD0E1" />
-                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding Seelenkraft}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#4DD0E1" />
-                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding Zähigkeit}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#4DD0E1" />
-                    <Label Grid.Row="1" Grid.Column="4" Text="{Binding Geschwindigkeit}" HorizontalOptions="Center" FontSize="20" FontAttributes="Bold" TextColor="#4DD0E1" />
+                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding Ausweichen}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding InitiativeBasis}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding Seelenkraft}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding Zähigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
+                    <Label Grid.Row="1" Grid.Column="4" Text="{Binding Geschwindigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                        <Label.FontSize>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                        </Label.FontSize>
+                    </Label>
                 </Grid>
             </Border>
 
-            <!-- === Lebensenergie === -->
-            <Border Stroke="#B71C1C" StrokeShape="RoundRectangle 8" Padding="12,8" BackgroundColor="#1a1a2e">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Lebensenergie" FontAttributes="Bold" FontSize="20" TextColor="#EF5350"  />
-                    <Grid ColumnDefinitions="Auto,Auto,60,Auto,Auto,60" ColumnSpacing="8" RowSpacing="4">
-                        <Label Grid.Column="0" Text="Max:" FontAttributes="Bold" TextColor="White" VerticalOptions="Center" FontSize="20"/>
-                        <Label Grid.Column="1" Text="{Binding Lebensenergie}" FontSize="20" FontAttributes="Bold" TextColor="#EF5350" VerticalOptions="Center" />
-                        <BoxView Grid.Column="2" Color="Transparent" />
-                        <Label Grid.Column="3" Text="Aktuell:" FontAttributes="Bold" FontSize="20" TextColor="White" VerticalOptions="Center" />
-                        <Entry Grid.Column="4" Keyboard="Numeric" Text="{Binding AktuelleLebensenergie}" FontSize="20"
-                               HorizontalTextAlignment="Center" WidthRequest="80" Background="LightGray" TextColor="Black">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                    </Grid>
+            <!-- === Lebensenergie + Status-Tracking (nebeneinander bei genug Platz) === -->
+            <Grid x:Name="LebeStatusGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto">
+                <Grid.ColumnSpacing>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="0" Tablet="10" Desktop="10" />
+                </Grid.ColumnSpacing>
+                <Grid.RowSpacing>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="10" Tablet="0" Desktop="0" />
+                </Grid.RowSpacing>
 
-                    <!-- Schmerzstufen -->
-                    <Label Text="{Binding SchmerzstufenDetails}" FontSize="13" TextColor="#FFAB91" LineBreakMode="WordWrap" />
-                </VerticalStackLayout>
-            </Border>
+                <!-- Lebensenergie -->
+                <Border Stroke="#B71C1C" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e" HorizontalOptions="Fill">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Grid.Column">
+                                <Setter.Value>
+                                    <OnIdiom x:TypeArguments="x:Int32" Phone="0" Tablet="0" Desktop="0" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Grid.Row">
+                                <Setter.Value>
+                                    <OnIdiom x:TypeArguments="x:Int32" Phone="0" Tablet="0" Desktop="0" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Border.Style>
+                    <Border.Padding>
+                        <OnIdiom x:TypeArguments="Thickness" Phone="8,6" Tablet="10,7" Desktop="12,8" />
+                    </Border.Padding>
+                    <VerticalStackLayout>
+                        <VerticalStackLayout.Spacing>
+                            <OnIdiom x:TypeArguments="x:Double" Phone="5" Tablet="6" Desktop="8" />
+                        </VerticalStackLayout.Spacing>
+                        <Label Text="Lebensenergie" FontAttributes="Bold" TextColor="#EF5350">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+                        <Grid ColumnDefinitions="Auto,Auto,20,Auto,Auto">
+                            <Grid.ColumnSpacing>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="6" Tablet="8" Desktop="10" />
+                            </Grid.ColumnSpacing>
+                            <Label Grid.Column="0" Text="Max:" FontAttributes="Bold" TextColor="White" VerticalOptions="Center">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="1" Text="{Binding Lebensenergie}" FontAttributes="Bold" TextColor="#EF5350" VerticalOptions="Center">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="3" Text="Aktuell:" FontAttributes="Bold" TextColor="White" VerticalOptions="Center">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                                </Label.FontSize>
+                            </Label>
+                            <Entry Grid.Column="4" Keyboard="Numeric" Text="{Binding AktuelleLebensenergie}"
+                                   HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black" WidthRequest="70">
+                                <Entry.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
+                                </Entry.FontSize>
+                                <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                            </Entry>
+                        </Grid>
+
+                        <!-- Schmerzstufen -->
+                        <Label Text="{Binding SchmerzstufenDetails}" TextColor="#FFAB91" LineBreakMode="WordWrap">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="11" Tablet="14" Desktop="16" />
+                            </Label.FontSize>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Status-Tracking -->
+                <Border Stroke="#FF6F00" StrokeShape="RoundRectangle 8" Padding="0" BackgroundColor="#1a1a2e" HorizontalOptions="Fill">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Grid.Column">
+                                <Setter.Value>
+                                    <OnIdiom x:TypeArguments="x:Int32" Phone="0" Tablet="1" Desktop="1" />
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Grid.Row">
+                                <Setter.Value>
+                                    <OnIdiom x:TypeArguments="x:Int32" Phone="1" Tablet="0" Desktop="0" />
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Border.Style>
+                    <VerticalStackLayout Spacing="0">
+                        <Label Text="Kampf-Status" FontAttributes="Bold" TextColor="#FFA726" HorizontalOptions="Center" Padding="10,7">
+                            <Label.FontSize>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" Desktop="20" />
+                            </Label.FontSize>
+                        </Label>
+
+                        <!-- Status-Zeilen -->
+                        <VerticalStackLayout Spacing="2" BindableLayout.ItemsSource="{Binding KampfStatiRows}" Padding="8,4">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <VerticalStackLayout Spacing="4">
+                                        <Label Text="{Binding StatusName}" TextColor="White" FontSize="13" FontAttributes="Bold" />
+                                        <HorizontalStackLayout Spacing="4" HorizontalOptions="Start">
+                                            <!-- Segmented Control: 5 Buttons für Stufen 0-4 -->
+                                            <Border Stroke="#4DD0E1" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1a1a2e">
+                                                <HorizontalStackLayout Spacing="0">
+                                                    <Button Text="0" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
+                                                            BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=0}"
+                                                            TextColor="White" Clicked="OnStatusButton0Clicked" />
+                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <Button Text="1" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
+                                                            BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=1}"
+                                                            TextColor="White" Clicked="OnStatusButton1Clicked" />
+                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <Button Text="2" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
+                                                            BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=2}"
+                                                            TextColor="White" Clicked="OnStatusButton2Clicked" />
+                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <Button Text="3" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
+                                                            BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=3}"
+                                                            TextColor="White" Clicked="OnStatusButton3Clicked" />
+                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <Button Text="4" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
+                                                            BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=4}"
+                                                            TextColor="White" Clicked="OnStatusButton4Clicked" />
+                                                </HorizontalStackLayout>
+                                            </Border>
+                                            <Label Text="{Binding Stufe, StringFormat='Stufe {0}'}" TextColor="#4DD0E1" FontSize="12" VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
+
+                        <!-- Berauschtheit-Hinweis -->
+                        <Label Text="Hinweis: 4 Berauschtheitsstufen = 1 Betäubungsstufe" TextColor="#FFD54F" HorizontalOptions="Center" FontAttributes="Italic" Padding="8,6" FontSize="11" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
 
             <!-- === Kampftechniken Header === -->
-            <Grid ColumnDefinitions="2*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*"
-                  ColumnSpacing="4" Padding="12,8" BackgroundColor="#0E7490">
-                <Label Grid.Column="0" Text="Kampftechnik" FontAttributes="Bold" FontSize="14" TextColor="White" VerticalOptions="Center" />
-                <Label Grid.Column="1" Text="Leiteigenschaft" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="2" Text="SF" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="3" Text="KTW" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="4" Text="AT/FK" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="5" Text="Boni" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="6" Text="Gesamt" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
-                <Label Grid.Column="7" Text="PA" FontAttributes="Bold" FontSize="12" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
+            <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*" BackgroundColor="#0E7490">
+                <Grid.ColumnSpacing>
+                    <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
+                </Grid.ColumnSpacing>
+                <Grid.Padding>
+                    <OnIdiom x:TypeArguments="Thickness" Phone="8,6" Tablet="10,7" Desktop="12,8" />
+                </Grid.Padding>
+                <Label Grid.Column="0" FontAttributes="Bold" TextColor="White" VerticalOptions="Center">
+                    <Label.Text>
+                        <OnIdiom x:TypeArguments="x:String" Phone="KT" Tablet="Kampftechnik" Desktop="Kampftechnik" />
+                    </Label.Text>
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="1" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.Text>
+                        <OnIdiom x:TypeArguments="x:String" Phone="LE" Tablet="Leitei." Desktop="Leiteigenschaft" />
+                    </Label.Text>
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="2" Text="SF" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="3" Text="KTW" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="4" Text="AT/FK" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="5" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.Text>
+                        <OnIdiom x:TypeArguments="x:String" Phone="Bo" Tablet="Bon" Desktop="Boni" />
+                    </Label.Text>
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="6" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.Text>
+                        <OnIdiom x:TypeArguments="x:String" Phone="Ges" Tablet="Ges." Desktop="Gesamt" />
+                    </Label.Text>
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="7" Text="PA" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
             </Grid>
 
             <!-- === Kampftechniken Zeilen === -->
@@ -90,20 +407,55 @@
                                  BindableLayout.ItemsSource="{Binding Kampftechniken}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="models:KampftechnikRow">
-                        <Grid ColumnDefinitions="2*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*"
-                              ColumnSpacing="4" Padding="12,10" BackgroundColor="#222222">
-                            <Label Grid.Column="0" Text="{Binding Kampftechnik}" FontSize="14" VerticalOptions="Center" TextColor="White" />
-                            <Label Grid.Column="1" Text="{Binding Leiteigenschaft}" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#B0E0E6" />
-                            <Label Grid.Column="2" Text="{Binding Steigerungsfaktor}" FontSize="13" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#0E7490" />
-                            <Entry Grid.Column="3" Keyboard="Numeric" Text="{Binding Ktw}" FontSize="14" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black">
+                        <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*" BackgroundColor="#222222">
+                            <Grid.ColumnSpacing>
+                                <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
+                            </Grid.ColumnSpacing>
+                            <Grid.Padding>
+                                <OnIdiom x:TypeArguments="Thickness" Phone="8,7" Tablet="10,8.5" Desktop="12,10" />
+                            </Grid.Padding>
+                            <Label Grid.Column="0" Text="{Binding Kampftechnik}" VerticalOptions="Center" TextColor="White">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="1" Text="{Binding Leiteigenschaft}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#B0E0E6">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="2" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#0E7490">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Entry Grid.Column="3" Keyboard="Numeric" Text="{Binding Ktw}" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black">
+                                <Entry.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Entry.FontSize>
                                 <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                             </Entry>
-                            <Label Grid.Column="4" Text="{Binding AtFkBasis}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1" />
-                            <Entry Grid.Column="5" Keyboard="Numeric" Text="{Binding Boni}" FontSize="14" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black">
+                            <Label Grid.Column="4" Text="{Binding AtFkBasis}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Entry Grid.Column="5" Keyboard="Numeric" Text="{Binding Boni}" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black">
+                                <Entry.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Entry.FontSize>
                                 <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                             </Entry>
-                            <Label Grid.Column="6" Text="{Binding Gesamt}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1" />
-                            <Label Grid.Column="7" Text="{Binding Parade}" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="White" />
+                            <Label Grid.Column="6" Text="{Binding Gesamt}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="7" Text="{Binding Parade}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="White">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
                         </Grid>
                     </DataTemplate>
                 </BindableLayout.ItemTemplate>
