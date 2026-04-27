@@ -7,13 +7,13 @@ using VademecumDigitalis.Models;
 
 namespace VademecumDigitalis.ViewModels
 {
-    // Wir nutzen QueryProperty, in Zukunft könnten wir das Item über Shell-Navigation übergeben.
-    // Für die Modal-Navigation nutzen wir aktuell eine SetEditingItem Methode oder Property Injection.
+    // Wir nutzen QueryProperty, in Zukunft kÃ¶nnten wir das Item Ã¼ber Shell-Navigation Ã¼bergeben.
+    // FÃ¼r die Modal-Navigation nutzen wir aktuell eine SetEditingItem Methode oder Property Injection.
     public partial class InventoryAddItemViewModel : ObservableObject
     {
         private InventoryItem? _editingItem;
         
-        // Properties für die View
+        // Properties fÃ¼r die View
         [ObservableProperty]
         private string _name = string.Empty;
         
@@ -32,7 +32,7 @@ namespace VademecumDigitalis.ViewModels
         [ObservableProperty]
         private string _details = string.Empty;
 
-        // Das Ergebnis, auf das der Aufrufer (z.B. ContainerPage) warten/prüfen kann
+        // Das Ergebnis, auf das der Aufrufer (z.B. ContainerPage) warten/prÃ¼fen kann
         public InventoryItem? ResultItem { get; private set; }
 
         // Event (oder Action), um dem View mitzuteilen, dass geschlossen werden soll
@@ -85,7 +85,7 @@ namespace VademecumDigitalis.ViewModels
 
                 if (changed)
                 {
-                    var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
+                    var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar fÃ¼r Log:", "OK", "Abbrechen", "");
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
                         _editingItem.AddLog(comment);
@@ -106,7 +106,7 @@ namespace VademecumDigitalis.ViewModels
                     Details = Details ?? string.Empty,
                     AcquiredDate = DateTime.UtcNow
                 };
-                var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
+                var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar fÃ¼r Log:", "OK", "Abbrechen", "");
                 if (!string.IsNullOrWhiteSpace(comment))
                 {
                     ResultItem.AddLog(comment);

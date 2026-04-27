@@ -11,6 +11,61 @@
         <VerticalStackLayout Padding="16" Spacing="12">
             <Label Text="Vorteile &amp; Nachteile" Style="{StaticResource HeadlineLabel}" />
 
+            <!-- Strukturierte Einträge -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Einträge" Style="{StaticResource SectionHeaderLabel}" />
+                        <Button Grid.Column="1"
+                                Text="✚ Hinzufügen"
+                                Clicked="OnEintragHinzufuegen"
+                                BackgroundColor="#0E7490"
+                                TextColor="White"
+                                FontSize="13"
+                                Padding="10,6" />
+                    </Grid>
+
+                    <Label Text="Noch keine strukturierten Einträge."
+                           FontSize="13" TextColor="{StaticResource TextSecondary}"
+                           IsVisible="{Binding KeineVorteilNachteilEintraege}" />
+
+                    <VerticalStackLayout Spacing="0"
+                                         BindableLayout.ItemsSource="{Binding VorteilNachteilEintraege}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Stroke="#E5E7EB" StrokeShape="RoundRectangle 8" Padding="10" Margin="0,4">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="{Binding AnzeigeText}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="14" />
+                                            <Label Text="{Binding Typ}"
+                                                   FontSize="11"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                            <Label Text="{Binding Notiz}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1"
+                                                Text="&#x1F5D1;"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#DC2626"
+                                                FontSize="18"
+                                                Padding="4"
+                                                Clicked="OnEintragLoeschen"
+                                                CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Freitext-Notizen (V1) -->
+            <Label Text="Freitext-Notizen" Style="{StaticResource SectionHeaderLabel}" Margin="0,4,0,0" />
+            <Label Text="Eintrag pro Zeile (V1 als Freitext)." TextColor="{StaticResource TextSecondary}" FontSize="14" Margin="0,-8,0,4" />
+
             <!-- AP-Übersicht -->
             <Border Style="{StaticResource CardBorder}">
                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
@@ -109,6 +164,10 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
+                    <Editor AutoSize="TextChanges"
+                            MinimumHeightRequest="100"
+                            Placeholder="z. B. Begabung (Sinnesschärfe), Glück I"
+                            Text="{Binding Vorteile}" />
                 </VerticalStackLayout>
             </Border>
 
@@ -192,6 +251,10 @@
                             </DataTemplate>
                         </BindableLayout.ItemTemplate>
                     </FlexLayout>
+                    <Editor AutoSize="TextChanges"
+                            MinimumHeightRequest="100"
+                            Placeholder="z. B. Neugier 6, Prinzipientreue 5"
+                            Text="{Binding Nachteile}" />
                 </VerticalStackLayout>
             </Border>
 

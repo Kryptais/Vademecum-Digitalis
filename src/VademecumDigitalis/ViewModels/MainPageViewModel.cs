@@ -31,6 +31,62 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
 
+    // --- Sonderfertigkeiten ---
+
+    public ObservableCollection<CharakterSonderfertigkeitEintrag> SonderfertigkeitEintraege { get; } = [];
+
+    /// <summary>True wenn keine Sonderfertigkeiten vorhanden.</summary>
+    public bool KeineSonderfertigkeiten => SonderfertigkeitEintraege.Count == 0;
+
+    public void SonderfertigkeitHinzufuegen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    public void SonderfertigkeitEntfernen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    private void OnSonderfertigkeitChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
+    // --- Vorteile / Nachteile ---
+
+    public ObservableCollection<CharaktervorteilEintrag> VorteilNachteilEintraege { get; } = [];
+
+    /// <summary>True wenn keine strukturierten Einträge vorhanden.</summary>
+    public bool KeineVorteilNachteilEintraege => VorteilNachteilEintraege.Count == 0;
+
+    public void VorteilNachteilHinzufuegen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    public void VorteilNachteilEntfernen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
     /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
     public bool KeinEreignisse => Ereignisse.Count == 0;
 
@@ -235,6 +291,41 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
         NotifyEreignisBoni();
+
+        // Strukturierte Vorteile/Nachteile laden
+        foreach (var eintrag in VorteilNachteilEintraege.ToList())
+        {
+            eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        }
+        VorteilNachteilEintraege.Clear();
+        if (s.VorteilNachteilListe != null)
+        {
+            foreach (var eintrag in s.VorteilNachteilListe)
+            {
+                // MaxStufe aus dem Katalog nachschlagen
+                var katalog = VorteilNachteilKatalog.FindByName(eintrag.Name);
+                if (katalog != null) eintrag.MaxStufe = katalog.MaxStufe;
+                eintrag.PropertyChanged += OnVorteilNachteilChanged;
+                VorteilNachteilEintraege.Add(eintrag);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+
+        // Sonderfertigkeiten laden
+        foreach (var eintrag in SonderfertigkeitEintraege.ToList())
+        {
+            eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        }
+        SonderfertigkeitEintraege.Clear();
+        if (s.SonderfertigkeitListe != null)
+        {
+            foreach (var eintrag in s.SonderfertigkeitListe)
+            {
+                eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+                SonderfertigkeitEintraege.Add(eintrag);
+            }
+        }
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
     }
 
     /// <summary>
@@ -343,7 +434,9 @@ public class MainPageViewModel : INotifyPropertyChanged
                 Nachteile = _sheet.Nachteile,
                 Talente = _sheet.Talente,
                 Kampftalente = _sheet.Kampftalente,
-                AktuellesDatumStr = _sheet.AktuellesDatumStr
+                AktuellesDatumStr = _sheet.AktuellesDatumStr,
+                VorteilNachteilListe = VorteilNachteilEintraege.ToList(),
+                SonderfertigkeitListe = SonderfertigkeitEintraege.ToList()
             },
             TalentValues = talentValues,
             Ereignisse = Ereignisse.ToList()
@@ -418,6 +511,8 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Wundschwelle)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WundschwelleFormel)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AktuelleSpezies)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SpeziesInfoText)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AlterBerechnet)));
@@ -755,6 +850,11 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int Geschwindigkeit => GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus;
 
     public string GeschwindigkeitFormel => $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})";
+
+    /// <summary>Wundschwelle = ⌈KO/2⌉</summary>
+    public int Wundschwelle => (int)Math.Ceiling(_sheet.Konstitution / 2.0);
+
+    public string WundschwelleFormel => $"\u2308KO/2\u2309 = \u2308{_sheet.Konstitution}/2\u2309";
 
 
     // --- Zugekaufte Modifikatoren (editierbar) ---
