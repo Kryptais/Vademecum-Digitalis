@@ -34,7 +34,7 @@ public partial class SonderfertigkeitenPage : ContentPage
     }
 
     private void OnAddHomebrewClicked(object? sender, EventArgs e)
-    {
+        {
         _vm.AddHomebrew();
     }
 

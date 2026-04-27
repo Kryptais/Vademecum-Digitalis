@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
              x:Class="VademecumDigitalis.AdvantagesPage"
+             x:DataType="viewmodels:AdvantagesViewModel"
              Title="Vorteile/Nachteile">
 
     <ScrollView>

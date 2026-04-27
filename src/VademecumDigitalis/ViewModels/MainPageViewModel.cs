@@ -117,6 +117,62 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
 
+    // --- Sonderfertigkeiten ---
+
+    public ObservableCollection<CharakterSonderfertigkeitEintrag> SonderfertigkeitEintraege { get; } = [];
+
+    /// <summary>True wenn keine Sonderfertigkeiten vorhanden.</summary>
+    public bool KeineSonderfertigkeiten => SonderfertigkeitEintraege.Count == 0;
+
+    public void SonderfertigkeitHinzufuegen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    public void SonderfertigkeitEntfernen(CharakterSonderfertigkeitEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        RequestDelayedSave();
+    }
+
+    private void OnSonderfertigkeitChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
+    // --- Vorteile / Nachteile ---
+
+    public ObservableCollection<CharaktervorteilEintrag> VorteilNachteilEintraege { get; } = [];
+
+    /// <summary>True wenn keine strukturierten Einträge vorhanden.</summary>
+    public bool KeineVorteilNachteilEintraege => VorteilNachteilEintraege.Count == 0;
+
+    public void VorteilNachteilHinzufuegen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged += OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Add(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    public void VorteilNachteilEntfernen(CharaktervorteilEintrag eintrag)
+    {
+        eintrag.PropertyChanged -= OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Remove(eintrag);
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
+        RequestDelayedSave();
+    }
+
+    private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RequestDelayedSave();
+    }
+
     /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
     public bool KeinEreignisse => Ereignisse.Count == 0;
 

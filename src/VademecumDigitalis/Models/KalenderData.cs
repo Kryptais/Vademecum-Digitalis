@@ -1,7 +1,7 @@
 namespace VademecumDigitalis.Models;
 
 /// <summary>
-/// DTO für die Persistierung der aventurischen Kalender-Daten.
+/// DTO fÃ¼r die Persistierung der aventurischen Kalender-Daten.
 /// </summary>
 public class KalenderData
 {

@@ -1,7 +1,7 @@
 namespace VademecumDigitalis.Models;
 
 /// <summary>
-/// DTO für die Persistierung aller Charakterbogen-Daten (Hauptblatt, Vorteile, Talente, Kampftalente).
+/// DTO fÃ¼r die Persistierung aller Charakterbogen-Daten (Hauptblatt, Vorteile, Talente, Kampftalente).
 /// </summary>
 public class CharacterSheetData
 {
@@ -15,7 +15,7 @@ public class CharacterSheetData
     /// <summary>Gespeicherte Kampftechnik-Werte (KTW + Boni).</summary>
     public List<KampftechnikSaveEntry> KampftechnikValues { get; set; } = new();
 
-    /// <summary>Charakter-Ereignisse (Altersveränderungen, Stat-Boni usw.).</summary>
+    /// <summary>Charakter-Ereignisse (AltersverÃ¤nderungen, Stat-Boni usw.).</summary>
     public List<CharakterEreignis> Ereignisse { get; set; } = [];
 
     /// <summary>Sonderfertigkeiten des Charakters.</summary>

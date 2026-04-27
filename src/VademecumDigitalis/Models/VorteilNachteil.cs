@@ -50,10 +50,10 @@ public static class VorteilNachteilKategorieExtensions
     };
 }
 
-/// <summary>
+    /// <summary>
 /// Ein Vorteil-/Nachteil-Katalogeintrag aus vorteile_nachteile.json.
 /// Definiert Regeldaten, Stufensystem und AP-Kosten.
-/// </summary>
+    /// </summary>
 public record VorteilNachteil
 {
     /// <summary>Eindeutige ID (slug), z.B. "glueck".</summary>
@@ -96,6 +96,7 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     private string _name = string.Empty;
     private VorteilNachteilKategorie _kategorie;
     private int _stufe = 1;
+    private int _apKosten = 0;
     private string _notiz = string.Empty;
     private bool _forceAdded;
 
@@ -115,7 +116,7 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
 
     /// <summary>Kategorie (denormalisiert für Gruppierung).</summary>
     public VorteilNachteilKategorie Kategorie
-    {
+            {
         get => _kategorie;
         set { if (_kategorie != value) { _kategorie = value; OnPropertyChanged(); OnPropertyChanged(nameof(KategorieAnzeige)); } }
     }
@@ -129,14 +130,14 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
 
     /// <summary>Optionale Notiz / Anmerkung des Spielers.</summary>
     public string Notiz
-    {
+            {
         get => _notiz;
         set { if (_notiz != value) { _notiz = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); } }
     }
 
     /// <summary>True wenn der VN ohne Voraussetzungsprüfung hinzugefügt wurde (Homebrew).</summary>
     public bool ForceAdded
-    {
+            {
         get => _forceAdded;
         set { if (_forceAdded != value) { _forceAdded = value; OnPropertyChanged(); } }
     }
@@ -160,17 +161,17 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     /// <summary>Zusammenfassung für Listendarstellung.</summary>
     [JsonIgnore]
     public string Anzeige
-    {
-        get
         {
+        get
+            {
             var text = Name;
             if (MaxStufe > 1)
                 text += $" {ToRoman(Stufe)}";
             if (!string.IsNullOrWhiteSpace(Notiz))
                 text += $" ({Notiz})";
             return text;
+            }
         }
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
