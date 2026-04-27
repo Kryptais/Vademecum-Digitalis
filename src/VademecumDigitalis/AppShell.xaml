@@ -18,6 +18,11 @@
             Route="AdvantagesPage" />
 
         <ShellContent
+            Title="Sonderfertigkeiten"
+            ContentTemplate="{DataTemplate local:SonderfertigkeitenPage}"
+            Route="SonderfertigkeitenPage" />
+
+        <ShellContent
             Title="Talente"
             ContentTemplate="{DataTemplate local:TalentsPage}"
             Route="TalentsPage" />

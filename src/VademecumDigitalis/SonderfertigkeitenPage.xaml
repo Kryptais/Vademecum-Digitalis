@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="VademecumDigitalis.SonderfertigkeitenPage"
+             Title="Sonderfertigkeiten">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+            <Label Text="Sonderfertigkeiten" Style="{StaticResource HeadlineLabel}" />
+
+            <!-- Strukturierte Eintr&#xE4;ge -->
+            <Border Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Grid.Column="0" Text="Eintr&#xE4;ge" Style="{StaticResource SectionHeaderLabel}" />
+                        <Button Grid.Column="1"
+                                Text="&#x2714; Hinzuf&#xFC;gen"
+                                Clicked="OnEintragHinzufuegen"
+                                BackgroundColor="#0E7490"
+                                TextColor="White"
+                                FontSize="13"
+                                Padding="10,6" />
+                    </Grid>
+
+                    <Label Text="Noch keine Sonderfertigkeiten eingetragen."
+                           FontSize="13" TextColor="{StaticResource TextSecondary}"
+                           IsVisible="{Binding KeineSonderfertigkeiten}" />
+
+                    <VerticalStackLayout Spacing="0"
+                                         BindableLayout.ItemsSource="{Binding SonderfertigkeitEintraege}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Border Stroke="#E5E7EB" StrokeShape="RoundRectangle 8" Padding="10" Margin="0,4">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="{Binding Name}"
+                                                   FontAttributes="Bold"
+                                                   FontSize="14" />
+                                            <Label Text="{Binding KategorieAnzeige}"
+                                                   FontSize="11"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                            <Label Text="{Binding Notiz}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource TextSecondary}" />
+                                        </VerticalStackLayout>
+                                        <Button Grid.Column="1"
+                                                Text="&#x1F5D1;"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#DC2626"
+                                                FontSize="18"
+                                                Padding="4"
+                                                Clicked="OnEintragLoeschen"
+                                                CommandParameter="{Binding .}" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

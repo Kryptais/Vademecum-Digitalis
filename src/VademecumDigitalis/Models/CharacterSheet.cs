@@ -69,6 +69,9 @@ public class CharacterSheet
     // Strukturierte Vorteile/Nachteile (V2)
     public List<CharaktervorteilEintrag> VorteilNachteilListe { get; set; } = [];
 
+    // Sonderfertigkeiten
+    public List<CharakterSonderfertigkeitEintrag> SonderfertigkeitListe { get; set; } = [];
+
     // Aktuelles aventurisches Datum (für Altersberechnung)
     public string AktuellesDatumStr { get; set; } = string.Empty;
 
