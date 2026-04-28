@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1360" height="900" viewBox="0 0 1360 900">
+  <defs>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill:#0f172a; }
+      .subtitle { font: 400 15px Arial, sans-serif; fill:#334155; }
+      .box { fill:#f8fafc; stroke:#1e293b; stroke-width:2; rx:10; ry:10; }
+      .head { font:700 16px Arial, sans-serif; fill:#0f172a; }
+      .txt { font: 13px Arial, sans-serif; fill:#0f172a; }
+      .small { font: 12px Arial, sans-serif; fill:#334155; }
+      .line { stroke:#475569; stroke-width:2; fill:none; marker-end:url(#arrow); }
+      .agg { stroke:#64748b; stroke-width:2; fill:none; marker-end:url(#arrow); stroke-dasharray:6 4; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569" />
+    </marker>
+  </defs>
+
+  <text x="28" y="44" class="title">Vorteil/Nachteil-Klassenübersicht (Ist-Stand Repository)</text>
+  <text x="28" y="70" class="subtitle">Schwerpunkt: Datenmodell + ViewModel + Service + Persistenzfluss</text>
+
+  <rect class="box" x="40" y="110" width="340" height="210"/>
+  <text class="head" x="56" y="138">Models.VorteilNachteil (record)</text>
+  <text class="txt" x="56" y="162">+ Id: string</text>
+  <text class="txt" x="56" y="182">+ Name: string</text>
+  <text class="txt" x="56" y="202">+ Kategorie: VorteilNachteilKategorie</text>
+  <text class="txt" x="56" y="222">+ MaxStufe: int</text>
+  <text class="txt" x="56" y="242">+ ApKostenProStufe: List&lt;int&gt;</text>
+  <text class="txt" x="56" y="262">+ VoraussetzungenProStufe: List&lt;List&lt;Requirement&gt;&gt;</text>
+  <text class="txt" x="56" y="282">+ ProbenModifikatoren: List&lt;ProbenModifikator&gt;</text>
+  <text class="txt" x="56" y="302">+ IsHomebrew: bool</text>
+
+  <rect class="box" x="40" y="360" width="340" height="220"/>
+  <text class="head" x="56" y="388">Models.CharakterVorteilNachteilEintrag</text>
+  <text class="txt" x="56" y="412">+ VnId: string</text>
+  <text class="txt" x="56" y="432">+ Name: string</text>
+  <text class="txt" x="56" y="452">+ Kategorie: VorteilNachteilKategorie</text>
+  <text class="txt" x="56" y="472">+ Stufe: int</text>
+  <text class="txt" x="56" y="492">+ MaxStufe: int</text>
+  <text class="txt" x="56" y="512">+ ForceAdded: bool</text>
+  <text class="txt" x="56" y="532">+ Anzeige / StufeAnzeige / KannAufsteigen</text>
+  <text class="small" x="56" y="560">denormalisierte Laufzeit-Sicht pro Charakter</text>
+
+  <rect class="box" x="40" y="630" width="340" height="110"/>
+  <text class="head" x="56" y="658">Models.VnGruppe : List&lt;Eintrag&gt;</text>
+  <text class="txt" x="56" y="682">+ Kategorie: string</text>
+  <text class="small" x="56" y="708">CollectionView-Gruppierung in der UI</text>
+
+  <rect class="box" x="490" y="150" width="390" height="300"/>
+  <text class="head" x="506" y="178">Services.VorteilNachteilService</text>
+  <text class="txt" x="506" y="202">- _catalog: List&lt;VorteilNachteil&gt;</text>
+  <text class="txt" x="506" y="222">+ LoadCatalogAsync()</text>
+  <text class="txt" x="506" y="242">+ Search(query), SearchByCategory(kategorie)</text>
+  <text class="txt" x="506" y="262">+ FindById(id)</text>
+  <text class="txt" x="506" y="282">+ CanAcquire(vn, targetLevel, attributes)</text>
+  <text class="txt" x="506" y="302">+ GetNextLevelCost(vn, currentLevel)</text>
+  <text class="txt" x="506" y="322">+ GetTotalCost(vn, upToLevel)</text>
+  <text class="txt" x="506" y="342">+ CalculateTotalApCost(entries)</text>
+  <text class="txt" x="506" y="362">+ CreateEntry(vn, stufe, forceAdd)</text>
+  <text class="txt" x="506" y="382">+ AddHomebrewEntry(homebrew)</text>
+  <text class="small" x="506" y="412">Katalogverwaltung + AP-/Voraussetzungslogik</text>
+
+  <rect class="box" x="490" y="500" width="390" height="250"/>
+  <text class="head" x="506" y="528">ViewModels.VorteilNachteilViewModel</text>
+  <text class="txt" x="506" y="552">- _vnService: VorteilNachteilService</text>
+  <text class="txt" x="506" y="572">- Vm =&gt; CharacterSheetSession.Current</text>
+  <text class="txt" x="506" y="592">+ SearchResults, GruppierteVorteileNachteile</text>
+  <text class="txt" x="506" y="612">+ ToggleSearch(), AddFromCatalog(vn)</text>
+  <text class="txt" x="506" y="632">+ AddHomebrew(), LevelUp(entry), Remove(entry)</text>
+  <text class="txt" x="506" y="652">+ RefreshGroupedList(), InitializeAsync()</text>
+  <text class="small" x="506" y="680">orchestriert UI-Aktionen und Charakterzustand</text>
+
+  <rect class="box" x="980" y="170" width="330" height="160"/>
+  <text class="head" x="996" y="198">ViewModels.MainPageViewModel</text>
+  <text class="txt" x="996" y="222">+ VorteilNachteilEintraege: Collection&lt;Eintrag&gt;</text>
+  <text class="txt" x="996" y="242">+ VorteilNachteilHinzufuegen(entry)</text>
+  <text class="txt" x="996" y="262">+ VorteilNachteilEntfernen(entry)</text>
+  <text class="small" x="996" y="290">zentrale Charaktersession-Daten</text>
+
+  <rect class="box" x="980" y="380" width="330" height="160"/>
+  <text class="head" x="996" y="408">Services.CharacterSaveService</text>
+  <text class="txt" x="996" y="432">+ SaveCharacterAsync(sheet)</text>
+  <text class="txt" x="996" y="452">+ LoadCharacterAsync()</text>
+  <text class="small" x="996" y="480">persistiert CharacterSheetData inkl. VN-Einträgen</text>
+
+  <rect class="box" x="980" y="590" width="330" height="180"/>
+  <text class="head" x="996" y="618">UI: AdvantagesPage.xaml/.cs</text>
+  <text class="txt" x="996" y="642">+ Toggle Suchbereich / Homebrew-Switch</text>
+  <text class="txt" x="996" y="662">+ Katalogsuche + Add-Button</text>
+  <text class="txt" x="996" y="682">+ Homebrew-Formular (Name, Kategorie, AP, ...)</text>
+  <text class="txt" x="996" y="702">+ Gruppierte Liste, LevelUp, Entfernen</text>
+
+  <path class="line" d="M380 210 L490 210" />
+  <text class="small" x="395" y="198">Catalog enthält</text>
+
+  <path class="line" d="M380 470 L490 600" />
+  <text class="small" x="386" y="548">Einträge gebunden an VM</text>
+
+  <path class="line" d="M880 585 L980 680" />
+  <text class="small" x="890" y="652">Binding + Events</text>
+
+  <path class="line" d="M880 560 L980 250" />
+  <text class="small" x="888" y="420">nutzt Session</text>
+
+  <path class="line" d="M880 260 L980 250" />
+  <text class="small" x="886" y="244">liefert/prüft Daten</text>
+
+  <path class="agg" d="M880 640 L980 460" />
+  <text class="small" x="886" y="545">persistierter Zustand</text>
+
+  <path class="line" d="M380 685 L490 650" />
+  <text class="small" x="392" y="672">Gruppierung</text>
+</svg>

@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="920" viewBox="0 0 1200 920">
+  <defs>
+    <style>
+      .bg { fill:#f1f5f9; }
+      .phone { fill:#ffffff; stroke:#0f172a; stroke-width:3; rx:24; ry:24; }
+      .header { fill:#0891b2; }
+      .card { fill:#ffffff; stroke:#cbd5e1; stroke-width:1.5; rx:12; ry:12; }
+      .field { fill:#f8fafc; stroke:#94a3b8; stroke-width:1.2; rx:8; ry:8; }
+      .btnPrimary { fill:#0891b2; }
+      .btnSecondary { fill:#e2e8f0; }
+      .title { font:700 28px Arial, sans-serif; fill:#0f172a; }
+      .h1 { font:700 22px Arial, sans-serif; fill:#ffffff; }
+      .h2 { font:700 16px Arial, sans-serif; fill:#0f172a; }
+      .label { font:600 13px Arial, sans-serif; fill:#334155; }
+      .txt { font: 13px Arial, sans-serif; fill:#0f172a; }
+      .hint { font: 12px Arial, sans-serif; fill:#64748b; }
+      .btnTxtW { font:700 14px Arial, sans-serif; fill:#ffffff; }
+      .btnTxtD { font:700 14px Arial, sans-serif; fill:#334155; }
+      .callout { fill:#ecfeff; stroke:#06b6d4; stroke-width:1.5; rx:10; ry:10; }
+      .line { stroke:#0ea5e9; stroke-width:2; fill:none; marker-end:url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0ea5e9" />
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="920"/>
+  <text class="title" x="40" y="52">Mock UI – „Neuen Vorteil anlegen“ (Homebrew)</text>
+
+  <rect class="phone" x="70" y="90" width="620" height="790"/>
+  <rect class="header" x="70" y="90" width="620" height="92" rx="24" ry="24"/>
+  <text class="h1" x="110" y="145">Vorteile / Nachteile</text>
+  <text class="txt" x="110" y="168" fill="#cffafe">Neuen Vorteil/Nachteil erstellen</text>
+
+  <rect class="card" x="105" y="210" width="550" height="640"/>
+  <text class="h2" x="130" y="245">Modus</text>
+  <rect class="field" x="130" y="260" width="250" height="40"/>
+  <text class="txt" x="145" y="286">◉ Homebrew erstellen</text>
+  <rect class="field" x="395" y="260" width="240" height="40"/>
+  <text class="txt" x="410" y="286">○ Aus Katalog hinzufügen</text>
+
+  <text class="h2" x="130" y="330">Stammdaten</text>
+  <text class="label" x="130" y="355">Name *</text>
+  <rect class="field" x="130" y="362" width="505" height="40"/>
+  <text class="hint" x="145" y="387">z. B. Kampfinstinkt</text>
+
+  <text class="label" x="130" y="425">Kategorie *</text>
+  <rect class="field" x="130" y="432" width="505" height="40"/>
+  <text class="txt" x="145" y="457">Allgemeine Vorteile ▼</text>
+
+  <text class="label" x="130" y="495">Beschreibung / Regeltext</text>
+  <rect class="field" x="130" y="502" width="505" height="95"/>
+  <text class="hint" x="145" y="526">Freitext mit Regelwirkung und Einschränkungen …</text>
+
+  <text class="h2" x="130" y="635">Stufen &amp; AP-Kosten</text>
+  <text class="label" x="130" y="660">Max. Stufe</text>
+  <rect class="field" x="130" y="667" width="150" height="40"/>
+  <text class="txt" x="145" y="692">1</text>
+
+  <text class="label" x="300" y="660">AP-Kosten pro Stufe *</text>
+  <rect class="field" x="300" y="667" width="335" height="40"/>
+  <text class="hint" x="315" y="692">z. B. 15 oder 10,20,30</text>
+
+  <text class="label" x="130" y="730">Anmerkungen (optional)</text>
+  <rect class="field" x="130" y="737" width="505" height="40"/>
+  <text class="hint" x="145" y="762">Publikation, Hausregel-Kommentar, SL-Hinweis …</text>
+
+  <rect class="btnSecondary" x="130" y="795" width="180" height="40" rx="8" ry="8"/>
+  <text class="btnTxtD" x="170" y="821">Abbrechen</text>
+  <rect class="btnPrimary" x="325" y="795" width="310" height="40" rx="8" ry="8"/>
+  <text class="btnTxtW" x="400" y="821">Homebrew hinzufügen</text>
+
+  <rect class="callout" x="760" y="190" width="390" height="150"/>
+  <text class="h2" x="780" y="220">1) Pflichtfelder früh validieren</text>
+  <text class="txt" x="780" y="246">• Name, Kategorie, AP-Kosten als Minimum.</text>
+  <text class="txt" x="780" y="268">• Button erst aktivieren, wenn valide.</text>
+  <text class="txt" x="780" y="290">• Fehlertext direkt unter Feld anzeigen.</text>
+
+  <rect class="callout" x="760" y="370" width="390" height="160"/>
+  <text class="h2" x="780" y="400">2) AP-Kosten-Parser transparent</text>
+  <text class="txt" x="780" y="426">• Eingabe „10,20,30" => 3 Stufen.</text>
+  <text class="txt" x="780" y="448">• Bei MaxStufe=1 reicht ein Wert.</text>
+  <text class="txt" x="780" y="470">• Bei Fehlern: Vorschlag mit korrektem Format.</text>
+
+  <rect class="callout" x="760" y="560" width="390" height="170"/>
+  <text class="h2" x="780" y="590">3) Zukunft: Effekt-Builder</text>
+  <text class="txt" x="780" y="616">• Optionales Panel für Modifikatoren</text>
+  <text class="txt" x="780" y="638">  (Talent, AT/PA, Probe, Zustand …).</text>
+  <text class="txt" x="780" y="660">• Anmerkung + Quelle pro Effekt.</text>
+  <text class="txt" x="780" y="682">• Grundlage für generisches Regelmodell.</text>
+
+  <path class="line" d="M650 454 L760 430"/>
+  <path class="line" d="M520 689 L760 446"/>
+  <path class="line" d="M430 524 L760 620"/>
+</svg>
