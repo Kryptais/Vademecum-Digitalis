@@ -46,6 +46,16 @@
             Title="Inventar"
             ContentTemplate="{DataTemplate local:InventoryDashboardPage}"
             Route="InventoryDashboardPage" />
+
+        <ShellContent
+            Title="Regeln"
+            ContentTemplate="{DataTemplate local:RegelnPage}"
+            Route="RegelnPage" />
+
+        <ShellContent
+            Title="Einstellungen"
+            ContentTemplate="{DataTemplate local:EinstellungenPage}"
+            Route="EinstellungenPage" />
     </TabBar>
 
 </Shell>

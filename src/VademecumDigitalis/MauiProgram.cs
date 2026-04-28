@@ -8,40 +8,45 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
-        builder
-            .UseMauiApp<App>();
+        builder.UseMauiApp<App>();
 
-    // register services and viewmodels
-    builder.Services.AddSingleton<PersistenceService>();
-    builder.Services.AddSingleton<InventoryService>();
-    builder.Services.AddSingleton<InventoryViewModel>();
-    builder.Services.AddSingleton<InventoryLogService>();
-    builder.Services.AddSingleton<IDialogService, DialogService>();
-    builder.Services.AddSingleton<MainPageViewModel>();
-    builder.Services.AddSingleton<BoronKalenderViewModel>();
-    builder.Services.AddSingleton<AdvantagesService>();
-    builder.Services.AddSingleton<AdvantagesViewModel>();
-    builder.Services.AddSingleton<AdvantagesPage>();
-    
-    // Pages + VMs
-    builder.Services.AddTransient<InventoryContainerPage>();
-    builder.Services.AddTransient<InventoryContainerViewModel>();
-    
-    builder.Services.AddTransient<GlobalItemSearchPage>();
-    builder.Services.AddTransient<GlobalItemSearchViewModel>();
+        // --- Services ---
+        builder.Services.AddSingleton<PersistenceService>();
+        builder.Services.AddSingleton<InventoryService>();
+        builder.Services.AddSingleton<InventoryLogService>();
+        builder.Services.AddSingleton<IDialogService, DialogService>();
+        builder.Services.AddSingleton<AdvantagesService>();
+        builder.Services.AddSingleton<SpecialAbilityService>();
+        builder.Services.AddSingleton<VorteilNachteilService>();
+        builder.Services.AddSingleton<TalentModifierService>();
+        builder.Services.AddSingleton<CharacterSaveService>();
 
-    builder.Services.AddTransient<BoronKalenderPage>();
-    builder.Services.AddTransient<EreignissePage>();
+        // --- ViewModels (Singleton = geteilt pro Session) ---
+        builder.Services.AddSingleton<MainPageViewModel>();
+        builder.Services.AddSingleton<BoronKalenderViewModel>();
+        builder.Services.AddSingleton<AdvantagesViewModel>();
+        builder.Services.AddSingleton<InventoryViewModel>();
+        builder.Services.AddSingleton<DashboardViewModel>();
 
-    builder.Services.AddSingleton<SpecialAbilityService>();
-    builder.Services.AddTransient<SonderfertigkeitenViewModel>();
-    builder.Services.AddTransient<SonderfertigkeitenPage>();
+        // --- ViewModels (Transient = frische Instanz pro Page) ---
+        builder.Services.AddTransient<InventoryContainerViewModel>();
+        builder.Services.AddTransient<GlobalItemSearchViewModel>();
+        builder.Services.AddTransient<SonderfertigkeitenViewModel>();
+        builder.Services.AddTransient<VorteilNachteilViewModel>();
+        builder.Services.AddTransient<RegelnViewModel>();
+        builder.Services.AddTransient<MoneyTransferViewModel>();
 
-    builder.Services.AddSingleton<VorteilNachteilService>();
-    builder.Services.AddTransient<VorteilNachteilViewModel>();
-    builder.Services.AddTransient<AdvantagesPage>();
-
-    builder.Services.AddSingleton<TalentModifierService>();
+        // --- Pages ---
+        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddTransient<DashboardPage>();
+        builder.Services.AddTransient<EinstellungenPage>();
+        builder.Services.AddTransient<RegelnPage>();
+        builder.Services.AddSingleton<AdvantagesPage>();
+        builder.Services.AddTransient<SonderfertigkeitenPage>();
+        builder.Services.AddTransient<BoronKalenderPage>();
+        builder.Services.AddTransient<EreignissePage>();
+        builder.Services.AddTransient<InventoryContainerPage>();
+        builder.Services.AddTransient<GlobalItemSearchPage>();
 
         return builder.Build();
     }

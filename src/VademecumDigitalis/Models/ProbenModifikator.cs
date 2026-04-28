@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using VademecumDigitalis.Models.RuleEngine;
 
 namespace VademecumDigitalis.Models;
 
@@ -22,6 +23,29 @@ public enum ModifikatorTyp
 /// </summary>
 public record ProbenModifikator
 {
+    /// <summary>Konvertiert diesen Legacy-Modifikator in einen <see cref="RuleEffect"/> der neuen Engine.</summary>
+    public RuleEffect ToRuleEffect()
+    {
+        var target = Typ switch
+        {
+            ModifikatorTyp.Attribut => $"attribute.{Ziel}",
+            ModifikatorTyp.Talent => $"skill.{Ziel}",
+            ModifikatorTyp.TalentGruppe => $"skillGroup.{Ziel}",
+            _ => Ziel
+        };
+
+        return new RuleEffect
+        {
+            Id = $"legacy_{Typ}_{Ziel}".ToLowerInvariant().Replace(' ', '_'),
+            Kind = EffectKind.Modifier,
+            Target = target,
+            Operation = ModifierOp.Add,
+            Value = Wert,
+            PerLevel = true,
+            Phase = ModifierPhase.Checks,
+            Stacking = StackingRule.Stack
+        };
+    }
     /// <summary>Art des Modifikators.</summary>
     public ModifikatorTyp Typ { get; init; }
 

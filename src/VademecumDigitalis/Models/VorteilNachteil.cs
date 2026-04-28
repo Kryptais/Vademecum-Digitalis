@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using VademecumDigitalis.Models.RuleEngine;
 
 namespace VademecumDigitalis.Models;
 
@@ -72,8 +73,25 @@ public record VorteilNachteil
     /// <summary>Voraussetzungen pro Stufe. Index 0 = Stufe I etc.</summary>
     public List<List<Requirement>> VoraussetzungenProStufe { get; init; } = [];
 
-    /// <summary>Proben-Modifikatoren, die dieser Vorteil/Nachteil gewährt (pro Stufe multipliziert).</summary>
+    /// <summary>
+    /// Legacy-Proben-Modifikatoren (alte JSON-Struktur), werden automatisch in
+    /// <see cref="Effects"/> einbezogen.
+    /// </summary>
     public List<ProbenModifikator> ProbenModifikatoren { get; init; } = [];
+
+    /// <summary>
+    /// Explizite Effekte im neuen Format, direkt aus JSON oder Homebrew-Erstellung.
+    /// </summary>
+    public List<RuleEffect> ExplicitEffects { get; init; } = [];
+
+    /// <summary>
+    /// Alle aktiven Effekte: Legacy-Modifikatoren (migriert) + explizite Effekte.
+    /// </summary>
+    [JsonIgnore]
+    public IReadOnlyList<RuleEffect> Effects =>
+        ProbenModifikatoren.Select(pm => pm.ToRuleEffect())
+            .Concat(ExplicitEffects)
+            .ToList();
 
     /// <summary>Redaktionelle Hinweise / spezifische Modifikatoren.</summary>
     public string Anmerkungen { get; init; } = string.Empty;
