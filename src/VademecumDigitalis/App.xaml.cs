@@ -4,18 +4,26 @@ namespace VademecumDigitalis;
 
 public partial class App : Application
 {
+    private IServiceProvider? _services;
+
     public App(MainPageViewModel mainVm, IServiceProvider services)
     {
         InitializeComponent();
 
+        _services = services;
         CharacterSheetSession.Initialize(mainVm);
 
-        // App startet mit dem Dashboard
-        MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>())
+        // Dashboard als Startseite setzen
+        try
         {
-            BarBackgroundColor = Color.FromArgb("#2C1A0E"),
-            BarTextColor = Color.FromArgb("#C8A96E")
-        };
+            MainPage = services.GetRequiredService<DashboardPage>();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] Dashboard konnte nicht geladen werden: {ex}");
+            // Fallback: direkt zur Charakteransicht
+            MainPage = services.GetRequiredService<AppShell>();
+        }
     }
 
     /// <summary>Wechselt zur Charakteransicht (TabBar-Shell).</summary>
@@ -27,10 +35,6 @@ public partial class App : Application
     /// <summary>Wechselt zurück zum Dashboard (z. B. aus Einstellungen).</summary>
     public void SwitchToDashboard(IServiceProvider services)
     {
-        MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>())
-        {
-            BarBackgroundColor = Color.FromArgb("#2C1A0E"),
-            BarTextColor = Color.FromArgb("#C8A96E")
-        };
+        MainPage = services.GetRequiredService<DashboardPage>();
     }
 }
