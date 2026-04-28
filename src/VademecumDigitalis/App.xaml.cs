@@ -4,16 +4,37 @@ namespace VademecumDigitalis;
 
 public partial class App : Application
 {
-    public App(MainPageViewModel mainVm)
+    private IServiceProvider? _services;
+
+    public App(MainPageViewModel mainVm, IServiceProvider services)
     {
         InitializeComponent();
 
-        // Initialisiere die zentrale Session, damit alle Pages dasselbe ViewModel nutzen
+        _services = services;
         CharacterSheetSession.Initialize(mainVm);
 
-        // Lade gespeicherte Daten beim App-Start
-        MainThread.BeginInvokeOnMainThread(async () => await mainVm.LoadDataAsync());
+        // Dashboard als Startseite setzen
+        try
+        {
+            MainPage = services.GetRequiredService<DashboardPage>();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[App] Dashboard konnte nicht geladen werden: {ex}");
+            // Fallback: direkt zur Charakteransicht
+            MainPage = services.GetRequiredService<AppShell>();
+        }
+    }
 
-        MainPage = new AppShell();
+    /// <summary>Wechselt zur Charakteransicht (TabBar-Shell).</summary>
+    public void SwitchToCharacterShell(IServiceProvider services)
+    {
+        MainPage = services.GetRequiredService<AppShell>();
+    }
+
+    /// <summary>Wechselt zurück zum Dashboard (z. B. aus Einstellungen).</summary>
+    public void SwitchToDashboard(IServiceProvider services)
+    {
+        MainPage = services.GetRequiredService<DashboardPage>();
     }
 }

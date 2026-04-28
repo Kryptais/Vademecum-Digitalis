@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="VademecumDigitalis.RegelnPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:VademecumDigitalis.ViewModels"
+    Title="Regeln">
+
+    <Grid RowDefinitions="Auto,Auto,*">
+
+        <!-- Suche -->
+        <SearchBar
+            Grid.Row="0"
+            Placeholder="Vor-/Nachteil suchen..."
+            Text="{Binding SearchText}"
+            Margin="12,8"/>
+
+        <!-- Ladeindikator -->
+        <ActivityIndicator
+            Grid.Row="1"
+            IsRunning="{Binding IsLoading}"
+            IsVisible="{Binding IsLoading}"
+            HorizontalOptions="Center"
+            Margin="0,8"/>
+
+        <!-- Katalogliste (gruppiert) -->
+        <CollectionView
+            Grid.Row="2"
+            ItemsSource="{Binding Gruppen}"
+            IsGrouped="True">
+
+            <!-- Gruppenheader -->
+            <CollectionView.GroupHeaderTemplate>
+                <DataTemplate x:DataType="vm:RegelnKategorie">
+                    <Border
+                        Padding="16,10"
+                        BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
+                        Margin="0,4,0,0">
+                        <Label
+                            Text="{Binding Titel}"
+                            FontAttributes="Bold"
+                            FontSize="14"
+                            TextColor="#C8A96E"/>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.GroupHeaderTemplate>
+
+            <!-- Eintrag -->
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
+                    <Border
+                        Margin="8,2"
+                        Padding="14,12"
+                        StrokeShape="RoundRectangle 8"
+                        BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                        Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+
+                            <!-- Name + Homebrew-Badge -->
+                            <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
+                                <Label
+                                    Text="{Binding Name}"
+                                    FontAttributes="Bold"
+                                    FontSize="15"
+                                    TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}"/>
+                                <Border
+                                    IsVisible="{Binding IsHomebrew}"
+                                    Padding="4,2"
+                                    BackgroundColor="#7A5C38"
+                                    StrokeShape="RoundRectangle 4">
+                                    <Label Text="HB" FontSize="10" TextColor="White"/>
+                                </Border>
+                            </HorizontalStackLayout>
+
+                            <!-- AP-Kosten -->
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                Text="{Binding ApInfo}"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                VerticalOptions="Center"/>
+
+                            <!-- Beschreibung -->
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Text="{Binding Beschreibung}"
+                                FontSize="13"
+                                TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
+                                Margin="0,4,0,0"
+                                IsVisible="{Binding HasBeschreibung}"/>
+
+                            <!-- Effekte -->
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Text="{Binding Effekte}"
+                                FontSize="12"
+                                TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                FontFamily="Monospace"
+                                Margin="0,4,0,0"
+                                IsVisible="{Binding HasEffekte}"/>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

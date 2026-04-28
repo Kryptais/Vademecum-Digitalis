@@ -73,14 +73,25 @@ public record VorteilNachteil
     /// <summary>Voraussetzungen pro Stufe. Index 0 = Stufe I etc.</summary>
     public List<List<Requirement>> VoraussetzungenProStufe { get; init; } = [];
 
-    /// <summary>Proben-Modifikatoren, die dieser Vorteil/Nachteil gewährt (pro Stufe multipliziert).</summary>
+    /// <summary>
+    /// Legacy-Proben-Modifikatoren (alte JSON-Struktur), werden automatisch in
+    /// <see cref="Effects"/> einbezogen.
+    /// </summary>
     public List<ProbenModifikator> ProbenModifikatoren { get; init; } = [];
 
     /// <summary>
-    /// Neue generische Effekte. Narrative Effekte beschreiben nur, Modifier-Effekte
-    /// können über die RuleEngine konkrete Werte verändern.
+    /// Explizite Effekte im neuen Format, direkt aus JSON oder Homebrew-Erstellung.
     /// </summary>
-    public List<RuleEffect> Effects { get; init; } = [];
+    public List<RuleEffect> ExplicitEffects { get; init; } = [];
+
+    /// <summary>
+    /// Alle aktiven Effekte: Legacy-Modifikatoren (migriert) + explizite Effekte.
+    /// </summary>
+    [JsonIgnore]
+    public IReadOnlyList<RuleEffect> Effects =>
+        ProbenModifikatoren.Select(pm => pm.ToRuleEffect())
+            .Concat(ExplicitEffects)
+            .ToList();
 
     /// <summary>Redaktionelle Hinweise / spezifische Modifikatoren.</summary>
     public string Anmerkungen { get; init; } = string.Empty;
@@ -91,38 +102,6 @@ public record VorteilNachteil
     /// <summary>True wenn der VN mehr als eine Stufe hat.</summary>
     [JsonIgnore]
     public bool IstStufenbasiert => MaxStufe > 1;
-
-    [JsonIgnore]
-    public string KategorieAnzeige => Kategorie.ToDisplayString();
-
-    [JsonIgnore]
-    public string ApKostenAnzeige
-    {
-        get
-        {
-            if (ApKostenProStufe.Count == 0)
-                return "AP n/a";
-
-            return MaxStufe > 1
-                ? $"{string.Join("/", ApKostenProStufe)} AP"
-                : $"{ApKostenProStufe[0]} AP";
-        }
-    }
-
-    [JsonIgnore]
-    public string EffektKurztext
-    {
-        get
-        {
-            var mechanical = Effects.Count(e => e.IsMechanical);
-            if (mechanical > 0)
-                return $"{mechanical} mechanische Effekte";
-
-            return ProbenModifikatoren.Count > 0
-                ? $"{ProbenModifikatoren.Count} Probenmodifikatoren"
-                : "Narrativ / manuell";
-        }
-    }
 }
 
 /// <summary>
@@ -211,12 +190,6 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
             return text;
             }
         }
-
-    [JsonIgnore]
-    public bool IstNachteil => Kategorie.IstNachteil();
-
-    [JsonIgnore]
-    public string TypAnzeige => IstNachteil ? "Nachteil" : "Vorteil";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

@@ -3,11 +3,21 @@ using VademecumDigitalis.Models;
 
 namespace VademecumDigitalis.Services;
 
+public sealed record CharacterSummary(
+    string FileName,
+    string CharacterName,
+    string Spieler,
+    string Spezies,
+    DateTime LastModified,
+    string FilePath);
+
 public interface ICharacterSaveService
 {
-    Task SaveCharacterAsync(CharacterSheet character, string filename);
-    Task<CharacterSheet?> LoadCharacterAsync(string filePath);
+    Task SaveCharacterAsync(CharacterSheetData data, string filename);
+    Task<CharacterSheetData?> LoadCharacterAsync(string filePath);
     Task<IEnumerable<string>> GetSavedCharactersAsync();
+    Task<IEnumerable<CharacterSummary>> GetCharacterSummariesAsync();
+    Task DeleteCharacterAsync(string filename);
     string GetCharacterPath(string filename);
 }
 
@@ -29,55 +39,37 @@ public class CharacterSaveService : ICharacterSaveService
         }
     }
 
-    public async Task SaveCharacterAsync(CharacterSheet character, string filename)
+    public async Task SaveCharacterAsync(CharacterSheetData data, string filename)
     {
-        try
-        {
-            if (string.IsNullOrWhiteSpace(filename))
-            {
-                throw new ArgumentException("Filename cannot be empty", nameof(filename));
-            }
+        if (string.IsNullOrWhiteSpace(filename))
+            throw new ArgumentException("Filename cannot be empty", nameof(filename));
 
-            var fileName = Path.GetFileNameWithoutExtension(filename) + ".json";
-            var filePath = Path.Combine(_savePath, fileName);
-
-            var options = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var json = JsonSerializer.Serialize(character, options);
-            await File.WriteAllTextAsync(filePath, json);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to save character: {ex.Message}", ex);
-        }
+        var filePath = Path.Combine(_savePath, Path.GetFileNameWithoutExtension(filename) + ".json");
+        var options = new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        var json = JsonSerializer.Serialize(data, options);
+        await File.WriteAllTextAsync(filePath, json);
     }
 
-    public async Task<CharacterSheet?> LoadCharacterAsync(string filePath)
+    public async Task<CharacterSheetData?> LoadCharacterAsync(string filePath)
     {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"Charakterdatei nicht gefunden: {filePath}");
+
+        var json = await File.ReadAllTextAsync(filePath);
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        // Versuche zunächst das aktuelle Format (CharacterSheetData)
         try
         {
-            if (!File.Exists(filePath))
-            {
-                throw new FileNotFoundException($"Character file not found: {filePath}");
-            }
-
-            var json = await File.ReadAllTextAsync(filePath);
-
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            return JsonSerializer.Deserialize<CharacterSheet>(json, options);
+            var data = JsonSerializer.Deserialize<CharacterSheetData>(json, options);
+            if (data?.Sheet is not null && !string.IsNullOrEmpty(data.Sheet.Name))
+                return data;
         }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to load character: {ex.Message}", ex);
-        }
+        catch { }
+
+        // Fallback: altes Format (nur CharacterSheet)
+        var sheet = JsonSerializer.Deserialize<CharacterSheet>(json, options);
+        return sheet is null ? null : new CharacterSheetData { Sheet = sheet };
     }
 
     public async Task<IEnumerable<string>> GetSavedCharactersAsync()
@@ -105,6 +97,58 @@ public class CharacterSaveService : ICharacterSaveService
     {
         var fileName = Path.GetFileNameWithoutExtension(filename) + ".json";
         return Path.Combine(_savePath, fileName);
+    }
+
+    public async Task<IEnumerable<CharacterSummary>> GetCharacterSummariesAsync()
+    {
+        if (!Directory.Exists(_savePath))
+            return [];
+
+        var files = Directory.GetFiles(_savePath, "*.json")
+            .OrderByDescending(File.GetLastWriteTime)
+            .ToList();
+
+        var summaries = new List<CharacterSummary>();
+        var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
+        foreach (var filePath in files)
+        {
+            try
+            {
+                var json = await File.ReadAllTextAsync(filePath);
+                CharacterSheet? sheet = null;
+                try { sheet = (JsonSerializer.Deserialize<CharacterSheetData>(json, options))?.Sheet; } catch { }
+                sheet ??= JsonSerializer.Deserialize<CharacterSheet>(json, options);
+                var name = sheet?.Name ?? Path.GetFileNameWithoutExtension(filePath);
+                summaries.Add(new CharacterSummary(
+                    FileName: Path.GetFileNameWithoutExtension(filePath),
+                    CharacterName: string.IsNullOrWhiteSpace(name) ? Path.GetFileNameWithoutExtension(filePath) : name,
+                    Spieler: sheet?.Spieler ?? string.Empty,
+                    Spezies: sheet?.Spezies ?? string.Empty,
+                    LastModified: File.GetLastWriteTime(filePath),
+                    FilePath: filePath));
+            }
+            catch
+            {
+                summaries.Add(new CharacterSummary(
+                    FileName: Path.GetFileNameWithoutExtension(filePath),
+                    CharacterName: Path.GetFileNameWithoutExtension(filePath),
+                    Spieler: string.Empty,
+                    Spezies: string.Empty,
+                    LastModified: File.GetLastWriteTime(filePath),
+                    FilePath: filePath));
+            }
+        }
+
+        return summaries;
+    }
+
+    public Task DeleteCharacterAsync(string filename)
+    {
+        var filePath = GetCharacterPath(filename);
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+        return Task.CompletedTask;
     }
 
     public string SavePath => _savePath;
