@@ -4,16 +4,33 @@ namespace VademecumDigitalis;
 
 public partial class App : Application
 {
-    public App(MainPageViewModel mainVm)
+    public App(MainPageViewModel mainVm, IServiceProvider services)
     {
         InitializeComponent();
 
-        // Initialisiere die zentrale Session, damit alle Pages dasselbe ViewModel nutzen
         CharacterSheetSession.Initialize(mainVm);
 
-        // Lade gespeicherte Daten beim App-Start
-        MainThread.BeginInvokeOnMainThread(async () => await mainVm.LoadDataAsync());
+        // App startet mit dem Dashboard
+        MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>())
+        {
+            BarBackgroundColor = Color.FromArgb("#2C1A0E"),
+            BarTextColor = Color.FromArgb("#C8A96E")
+        };
+    }
 
-        MainPage = new AppShell();
+    /// <summary>Wechselt zur Charakteransicht (TabBar-Shell).</summary>
+    public void SwitchToCharacterShell(IServiceProvider services)
+    {
+        MainPage = services.GetRequiredService<AppShell>();
+    }
+
+    /// <summary>Wechselt zurück zum Dashboard (z. B. aus Einstellungen).</summary>
+    public void SwitchToDashboard(IServiceProvider services)
+    {
+        MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>())
+        {
+            BarBackgroundColor = Color.FromArgb("#2C1A0E"),
+            BarTextColor = Color.FromArgb("#C8A96E")
+        };
     }
 }

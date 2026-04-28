@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="VademecumDigitalis.EinstellungenPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="Einstellungen">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label
+                Text="Einstellungen"
+                FontSize="22"
+                FontAttributes="Bold"
+                Margin="0,8,0,4"/>
+
+            <!-- Zurück zum Dashboard -->
+            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Charakter" FontAttributes="Bold" FontSize="15"/>
+                    <Button
+                        Text="Zur Charakterauswahl (Dashboard)"
+                        BackgroundColor="#7A5C38"
+                        TextColor="White"
+                        CornerRadius="8"
+                        Clicked="OnDashboardClicked"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Platzhalter für zukünftige Einstellungen -->
+            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Darstellung" FontAttributes="Bold" FontSize="15"/>
+                    <Label Text="Farbschema, Schriftgröße und weitere Optionen folgen in einer späteren Version." FontSize="13" TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Daten" FontAttributes="Bold" FontSize="15"/>
+                    <Label Text="Automatisches Speichern, Sicherungskopien und Synchronisierung folgen in einer späteren Version." FontSize="13" TextColor="Gray"/>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

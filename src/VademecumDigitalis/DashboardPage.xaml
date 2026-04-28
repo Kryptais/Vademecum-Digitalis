@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ContentPage
+    x:Class="VademecumDigitalis.DashboardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:services="clr-namespace:VademecumDigitalis.Services"
+    Title="Vademecum Digitalis"
+    BackgroundColor="{AppThemeBinding Light=#F5F0E8, Dark=#1A1A2E}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+        <!-- Header -->
+        <VerticalStackLayout
+            Grid.Row="0"
+            Padding="24,40,24,24"
+            Spacing="4"
+            BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#0D0D1A}">
+            <Label
+                Text="Vademecum"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="#C8A96E"
+                HorizontalOptions="Center"/>
+            <Label
+                Text="Digitalis"
+                FontSize="16"
+                TextColor="#8B7355"
+                HorizontalOptions="Center"
+                Margin="0,0,0,8"/>
+            <Label
+                Text="DSA 5 Charakterverwaltung"
+                FontSize="12"
+                TextColor="#6B5B45"
+                HorizontalOptions="Center"/>
+        </VerticalStackLayout>
+
+        <!-- Charakterliste -->
+        <ScrollView Grid.Row="1" Padding="16,8">
+            <VerticalStackLayout Spacing="8">
+
+                <!-- Ladeindikator -->
+                <ActivityIndicator
+                    IsRunning="{Binding IsLoading}"
+                    IsVisible="{Binding IsLoading}"
+                    HorizontalOptions="Center"
+                    Margin="0,24"/>
+
+                <!-- Leer-Zustand -->
+                <VerticalStackLayout
+                    IsVisible="{Binding HasNoCharacters}"
+                    Spacing="8"
+                    Padding="0,32">
+                    <Label
+                        Text="⚔"
+                        FontSize="48"
+                        HorizontalOptions="Center"
+                        TextColor="#8B7355"/>
+                    <Label
+                        Text="Noch kein Charakter gespeichert."
+                        HorizontalOptions="Center"
+                        TextColor="{AppThemeBinding Light=#5C4A32, Dark=#8B7355}"
+                        FontSize="15"/>
+                    <Label
+                        Text="Lege einen neuen Helden an oder importiere eine Charakterdatei."
+                        HorizontalOptions="Center"
+                        HorizontalTextAlignment="Center"
+                        TextColor="{AppThemeBinding Light=#8B7355, Dark=#6B5B45}"
+                        FontSize="13"
+                        Margin="16,0"/>
+                </VerticalStackLayout>
+
+                <!-- Charakterkarten -->
+                <CollectionView ItemsSource="{Binding Characters}" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="services:CharacterSummary">
+                            <Border
+                                Margin="0,4"
+                                Padding="16,14"
+                                BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                                StrokeShape="RoundRectangle 10"
+                                Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+                                    <!-- Charaktername + Info -->
+                                    <VerticalStackLayout Grid.Column="0" Grid.RowSpan="2" Spacing="2">
+                                        <Label
+                                            Text="{Binding CharacterName}"
+                                            FontSize="17"
+                                            FontAttributes="Bold"
+                                            TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}"/>
+                                        <Label
+                                            FontSize="12"
+                                            TextColor="{AppThemeBinding Light=#8B7355, Dark=#6B8FA3}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="{Binding Spezies}"/>
+                                                    <Span Text=" · "/>
+                                                    <Span Text="{Binding Spieler}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                        <Label
+                                            FontSize="11"
+                                            TextColor="{AppThemeBinding Light=#B09070, Dark=#5A5A7A}">
+                                            <Label.FormattedText>
+                                                <FormattedString>
+                                                    <Span Text="Zuletzt geändert: "/>
+                                                    <Span Text="{Binding LastModified, StringFormat='{0:dd.MM.yyyy HH:mm}'}"/>
+                                                </FormattedString>
+                                            </Label.FormattedText>
+                                        </Label>
+                                    </VerticalStackLayout>
+
+                                    <!-- Aktionen -->
+                                    <HorizontalStackLayout
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2"
+                                        Spacing="8"
+                                        VerticalOptions="Center">
+                                        <Button
+                                            Text="Laden"
+                                            FontSize="13"
+                                            Padding="12,8"
+                                            BackgroundColor="#6B8FA3"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnCharacterLoadClicked"/>
+                                        <Button
+                                            Text="✕"
+                                            FontSize="13"
+                                            Padding="8,8"
+                                            BackgroundColor="#8B4444"
+                                            TextColor="White"
+                                            CornerRadius="8"
+                                            CommandParameter="{Binding .}"
+                                            Clicked="OnCharacterDeleteClicked"/>
+                                    </HorizontalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Statusmeldung -->
+                <Label
+                    Text="{Binding StatusMessage}"
+                    IsVisible="{Binding HasStatus}"
+                    TextColor="#C85050"
+                    FontSize="13"
+                    HorizontalOptions="Center"
+                    Margin="0,4"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Aktionsleiste -->
+        <VerticalStackLayout
+            Grid.Row="2"
+            Padding="16,12"
+            Spacing="8"
+            BackgroundColor="{AppThemeBinding Light=#EDE5D8, Dark=#12121E}">
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button
+                    Grid.Column="0"
+                    Text="✦ Neuer Charakter"
+                    FontSize="14"
+                    Padding="0,12"
+                    BackgroundColor="#7A5C38"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Clicked="OnNewCharacterClicked"/>
+                <Button
+                    Grid.Column="1"
+                    Text="⬇ Importieren"
+                    FontSize="14"
+                    Padding="0,12"
+                    BackgroundColor="#4A6B5C"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Clicked="OnImportClicked"/>
+            </Grid>
+
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentPage>

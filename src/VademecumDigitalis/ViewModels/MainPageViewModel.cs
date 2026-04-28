@@ -281,7 +281,11 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         var data = await _persistence.LoadCharacterSheetAsync();
         if (data == null) return;
+        ApplyCharacterSheetData(data);
+    }
 
+    private void ApplyCharacterSheetData(CharacterSheetData data)
+    {
         var s = data.Sheet;
         // Charakterinfos
         _sheet.Name = s.Name;
@@ -571,6 +575,81 @@ public class MainPageViewModel : INotifyPropertyChanged
         {
             System.Diagnostics.Debug.WriteLine($"Error saving character sheet: {ex.Message}");
         }
+    }
+
+    // --- Dashboard-Schnittstelle ---
+
+    /// <summary>Dateiname des aktuell geladenen Charakters (ohne Extension). Leer = unbenannter Charakter.</summary>
+    public string ActiveCharacterFileName { get; private set; } = string.Empty;
+
+    /// <summary>Gibt den vollständigen Savestand zurück (für Export / Dashboard-Speicherung).</summary>
+    public CharacterSheetData ToCharacterSheetData() => BuildSaveData();
+
+    /// <summary>Lädt einen Charakter aus einem <see cref="CharacterSheetData"/>-Objekt in die aktive Session.</summary>
+    public async Task LoadFromCharacterSheetDataAsync(CharacterSheetData data, string fileName)
+    {
+        ActiveCharacterFileName = fileName;
+        await Task.Run(() => ApplyCharacterSheetData(data));
+    }
+
+    /// <summary>Setzt alle Felder auf Standardwerte zurück (neuer Charakter).</summary>
+    public void ResetToNewCharacter()
+    {
+        ActiveCharacterFileName = string.Empty;
+
+        _sheet.Name = string.Empty;
+        _sheet.Spieler = string.Empty;
+        _sheet.Spezies = string.Empty;
+        _sheet.Kultur = string.Empty;
+        _sheet.Profession = string.Empty;
+        _sheet.Geschlecht = string.Empty;
+        _sheet.Geburtstag = string.Empty;
+        _sheet.Alter = string.Empty;
+        _sheet.Größe = string.Empty;
+        _sheet.Gewicht = string.Empty;
+        _sheet.Haarfarbe = string.Empty;
+        _sheet.Augenfarbe = string.Empty;
+        _sheet.Sozialstatus = string.Empty;
+        _sheet.Mut = 8; _sheet.Klugheit = 8; _sheet.Intuition = 8; _sheet.Charisma = 8;
+        _sheet.Fingerfertigkeit = 8; _sheet.Gewandtheit = 8; _sheet.Konstitution = 8; _sheet.Körperkraft = 8;
+        _sheet.LebensenergieZugekauft = 0; _sheet.AstralenergieZugekauft = 0;
+        _sheet.KarmaenergieZugekauft = 0; _sheet.SeelenkraftZugekauft = 0; _sheet.ZähigkeitZugekauft = 0;
+        _sheet.LebensenergieVorteilsBonus = 0; _sheet.AstralenergieVorteilsBonus = 0;
+        _sheet.KarmaenergieVorteilsBonus = 0; _sheet.SeelenkraftVorteilsBonus = 0;
+        _sheet.ZähigkeitVorteilsBonus = 0; _sheet.InitiativeBasisVorteilsBonus = 0; _sheet.GeschwindigkeitVorteilsBonus = 0;
+        _sheet.AbenteuerpunkteGesamt = 1100; _sheet.AbenteuerpunkteVerfuegbar = 0; _sheet.AbenteuerpunkteAusgegeben = 1100;
+        _sheet.SchicksalspunkteGesamt = 3; _sheet.SchicksalspunkteVerfuegbar = 3;
+        _sheet.Vorteile = string.Empty; _sheet.Nachteile = string.Empty;
+        _sheet.Talente = string.Empty; _sheet.Kampftalente = string.Empty;
+        _sheet.AktuellesDatumStr = string.Empty;
+        _sheet.AktuelleLebensenergie = -1;
+        _sheet.KampfStati.Clear();
+
+        foreach (var group in TalentGruppen)
+            foreach (var row in group.Eintraege)
+            { row.Fw = string.Empty; row.Anmerkung = string.Empty; }
+
+        foreach (var kt in Kampftechniken)
+        { kt.Ktw = string.Empty; kt.Boni = 0; }
+
+        foreach (var vn in VorteilNachteilEintraege.ToList())
+            vn.PropertyChanged -= OnVorteilNachteilChanged;
+        VorteilNachteilEintraege.Clear();
+
+        foreach (var sf in SonderfertigkeitEintraege.ToList())
+            sf.PropertyChanged -= OnSonderfertigkeitChanged;
+        SonderfertigkeitEintraege.Clear();
+
+        foreach (var e in Ereignisse.ToList())
+            e.PropertyChanged -= OnEreignisChanged;
+        Ereignisse.Clear();
+
+        NotifyAllProperties();
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeinEreignisse)));
+        NotifyEreignisBoni();
+        RecalculateTalentProben();
     }
 
     private void RequestDelayedSave()
