@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:models="clr-namespace:VademecumDigitalis.Models.RuleEngine"
+             x:Class="VademecumDigitalis.Controls.RuleContextSelectorView"
+             x:Name="Root">
+
+    <Border Style="{StaticResource CardBorder}" Padding="12">
+        <VerticalStackLayout Spacing="10">
+            <Label Text="Regel-Kontext" Style="{StaticResource SectionHeaderLabel}" />
+
+            <Label Text="Manuell wählbare Zustände"
+                   FontAttributes="Bold"
+                   FontSize="13"
+                   IsVisible="{Binding ShowManualHeader, Source={x:Reference Root}}" />
+
+            <CollectionView ItemsSource="{Binding ManualStates, Source={x:Reference Root}}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:RuleContextState">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="0,4">
+                            <CheckBox IsChecked="{Binding IsActive}" IsEnabled="{Binding IsSelectable}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding Anzeige}" VerticalOptions="Center" />
+                            <Border Grid.Column="2" Padding="6,2" Stroke="{StaticResource TextSecondary}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                                <Label Text="{Binding Group}" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Label Text="Berechnete Zustände (nur Anzeige)"
+                   FontAttributes="Bold"
+                   FontSize="13"
+                   IsVisible="{Binding ShowDerivedHeader, Source={x:Reference Root}}" />
+
+            <CollectionView ItemsSource="{Binding DerivedStates, Source={x:Reference Root}}"
+                            SelectionMode="None">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:RuleContextState">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Padding="0,4">
+                            <Label Text="🔒" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="{Binding Anzeige}" VerticalOptions="Center" />
+                            <Border Grid.Column="2" Padding="6,2" Stroke="{StaticResource TextSecondary}" StrokeThickness="1" StrokeShape="RoundRectangle 6">
+                                <Label Text="{Binding Group}" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </Border>
+
+</ContentView>
