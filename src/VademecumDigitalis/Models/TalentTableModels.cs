@@ -123,6 +123,17 @@ public class TalentRow : INotifyPropertyChanged
         set { if (_hatBegabung != value) { _hatBegabung = value; OnPropertyChanged(nameof(HatBegabung)); } }
     }
 
+    private string _bonusInfo = string.Empty;
+
+    /// <summary>Lesbare Zusammenfassung aktiver Boni durch VN/SF, z. B. "Flink +1, Behände +1".</summary>
+    public string BonusInfo
+    {
+        get => _bonusInfo;
+        set { if (_bonusInfo != value) { _bonusInfo = value; OnPropertyChanged(nameof(BonusInfo)); OnPropertyChanged(nameof(HatBonusInfo)); } }
+    }
+
+    public bool HatBonusInfo => !string.IsNullOrEmpty(_bonusInfo);
+
     public string Anmerkung
     {
         get => _anmerkung;

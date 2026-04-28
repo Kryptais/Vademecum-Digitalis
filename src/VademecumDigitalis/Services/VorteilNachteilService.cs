@@ -198,7 +198,7 @@ public class VorteilNachteilService
         return new RuleEffect
         {
             Id = $"probe_{modifikator.Typ}_{NormalizeTarget(modifikator.Ziel)}",
-            Kind = RuleEffectKind.Modifier,
+            Kind = EffectKind.Modifier,
             Title = $"Probe: {modifikator.Ziel}",
             Target = modifikator.Typ switch
             {
@@ -207,11 +207,11 @@ public class VorteilNachteilService
                 ModifikatorTyp.TalentGruppe => $"check.talentGroup.{modifikator.Ziel}",
                 _ => modifikator.Ziel
             },
-            Operation = RuleModifierOperation.Add,
+            Operation = ModifierOp.Add,
             Value = modifikator.Wert,
             PerLevel = true,
-            Phase = "checks",
-            Stacking = RuleEffectStacking.Stack
+            Phase = ModifierPhase.Checks,
+            Stacking = StackingRule.Stack
         };
     }
 

@@ -51,15 +51,45 @@ public class TalentModifierService
             string.Equals(vn.VnId, "begabung", StringComparison.OrdinalIgnoreCase) &&
             string.Equals(vn.Notiz?.Trim(), row.Talent, StringComparison.OrdinalIgnoreCase));
 
-        // Begabung gibt +1 auf alle drei Proben des Talents
         int begabungBonus = row.HatBegabung ? 1 : 0;
 
         row.ProbeWert1 = GetEffectiveValue(row.Talent, gruppenName, row.Probe1, attribute, modifiers) + begabungBonus;
         row.ProbeWert2 = GetEffectiveValue(row.Talent, gruppenName, row.Probe2, attribute, modifiers) + begabungBonus;
         row.ProbeWert3 = GetEffectiveValue(row.Talent, gruppenName, row.Probe3, attribute, modifiers) + begabungBonus;
-
-        // FW-Bonus: aktuell keine Standard-FW-Boni
         row.FwBonus = 0;
+
+        // BonusInfo: zeige welche VN/SF dieses Talent beeinflussen
+        row.BonusInfo = BuildBonusInfo(row.Talent, gruppenName, modifiers, row.HatBegabung);
+    }
+
+    private static string BuildBonusInfo(
+        string talentName,
+        string gruppenName,
+        List<ActiveModifier> modifiers,
+        bool hatBegabung)
+    {
+        var parts = new List<string>();
+
+        if (hatBegabung)
+            parts.Add("Begabung +1");
+
+        foreach (var mod in modifiers)
+        {
+            bool betrifftTalent = mod.Mod.Typ switch
+            {
+                ModifikatorTyp.Talent      => string.Equals(mod.Mod.Ziel, talentName,  StringComparison.OrdinalIgnoreCase),
+                ModifikatorTyp.TalentGruppe => string.Equals(mod.Mod.Ziel, gruppenName, StringComparison.OrdinalIgnoreCase),
+                _ => false
+            };
+            if (betrifftTalent)
+            {
+                var wert = mod.Mod.Wert * mod.Stufe;
+                var prefix = wert >= 0 ? "+" : string.Empty;
+                parts.Add($"{mod.Mod.Ziel} {prefix}{wert}");
+            }
+        }
+
+        return string.Join(", ", parts);
     }
 
     private static int GetEffectiveValue(

@@ -19,6 +19,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<SpecialAbilityService>();
         builder.Services.AddSingleton<VorteilNachteilService>();
         builder.Services.AddSingleton<TalentModifierService>();
+        builder.Services.AddSingleton<TalentCatalogService>();
         builder.Services.AddSingleton<CharacterSaveService>();
 
         // --- ViewModels (Singleton = geteilt pro Session) ---

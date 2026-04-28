@@ -74,31 +74,40 @@
                                                  BindableLayout.ItemsSource="{Binding Eintraege}">
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="models:TalentRow">
-                                        <Grid ColumnDefinitions="*,0.4*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.3*,0.3*,0.3*,1.4*"
-                                              ColumnSpacing="{OnIdiom Phone=2, Default=4}"
-                                              Padding="{OnIdiom Phone='8,6', Default='12,10'}"
-                                              BackgroundColor="{Binding HatBegabung, Converter={StaticResource BoolToColorConverter}}">
-                                            <Label Grid.Column="0" Text="{Binding Talent}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
-                                            <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
-                                            <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                            <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                            <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                            <Label Grid.Column="5" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                            <Label Grid.Column="6" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                            <Label Grid.Column="7" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                            <Label Grid.Column="8" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                            <Entry Grid.Column="9" Keyboard="Numeric" Text="{Binding Fw}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" HeightRequest="50" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black" >
-                                                <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                                            </Entry>
-                                            <Label Grid.Column="10" Text="{Binding FwGesamt}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                            <Grid Grid.Column="11" HorizontalOptions="Center" VerticalOptions="Center"
-                                                  WidthRequest="{OnIdiom Phone=24, Default=30}" HeightRequest="{OnIdiom Phone=24, Default=30}">
-                                                <CheckBox IsChecked="{Binding HatBegabung, Mode=TwoWay}" IsEnabled="True"
-                                                          HorizontalOptions="Center" VerticalOptions="Center"
-                                                          Margin="{OnIdiom Phone=-4, Default=-6}" />
+                                        <VerticalStackLayout Spacing="0"
+                                                             BackgroundColor="{Binding HatBegabung, Converter={StaticResource BoolToColorConverter}}">
+                                            <Grid ColumnDefinitions="*,0.4*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.3*,0.3*,0.3*,1.4*"
+                                                  ColumnSpacing="{OnIdiom Phone=2, Default=4}"
+                                                  Padding="{OnIdiom Phone='8,6', Default='12,10'}">
+                                                <Label Grid.Column="0" Text="{Binding Talent}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
+                                                <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
+                                                <Label Grid.Column="2" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
+                                                <Label Grid.Column="3" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
+                                                <Label Grid.Column="4" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
+                                                <Label Grid.Column="5" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
+                                                <Label Grid.Column="6" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
+                                                <Label Grid.Column="7" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
+                                                <Label Grid.Column="8" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
+                                                <Entry Grid.Column="9" Keyboard="Numeric" Text="{Binding Fw}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" HeightRequest="50" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black" >
+                                                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                                                </Entry>
+                                                <Label Grid.Column="10" Text="{Binding FwGesamt}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
+                                                <Grid Grid.Column="11" HorizontalOptions="Center" VerticalOptions="Center"
+                                                      WidthRequest="{OnIdiom Phone=24, Default=30}" HeightRequest="{OnIdiom Phone=24, Default=30}">
+                                                    <CheckBox IsChecked="{Binding HatBegabung, Mode=TwoWay}" IsEnabled="True"
+                                                              HorizontalOptions="Center" VerticalOptions="Center"
+                                                              Margin="{OnIdiom Phone=-4, Default=-6}" />
+                                                </Grid>
+                                                <Editor Grid.Column="12" Text="{Binding Anmerkung}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" Background="LightGray" TextColor="Black" AutoSize="TextChanges" />
                                             </Grid>
-                                            <Editor Grid.Column="12" Text="{Binding Anmerkung}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" Background="LightGray" TextColor="Black" AutoSize="TextChanges" />
-                                        </Grid>
+                                            <!-- Bonus-Info: zeigt aktive VN/SF-Boni -->
+                                            <Label Text="{Binding BonusInfo}"
+                                                   IsVisible="{Binding HatBonusInfo}"
+                                                   FontSize="10"
+                                                   TextColor="#0E7490"
+                                                   FontAttributes="Italic"
+                                                   Padding="12,0,12,4" />
+                                        </VerticalStackLayout>
                                     </DataTemplate>
                                 </BindableLayout.ItemTemplate>
                             </VerticalStackLayout>

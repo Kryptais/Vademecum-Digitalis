@@ -24,6 +24,10 @@ public enum ModifierOp
     MaxCap
 }
 
+/// <summary>Alias für ModifierOp – für Kompatibilität mit dem RuleEngine-Namespace.</summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum RuleModifierOperation { Add, Multiply, Override, MinCap, MaxCap }
+
 /// <summary>
 /// Wie sich gleichartige Effekte auf denselben Zielwert verhalten.
 /// </summary>

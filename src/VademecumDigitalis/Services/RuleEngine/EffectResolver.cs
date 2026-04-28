@@ -12,7 +12,7 @@ public sealed class EffectResolver
         string target,
         decimal baseValue,
         IEnumerable<RuleEffectSource> sources,
-        string phase = "derived_values",
+        ModifierPhase phase = ModifierPhase.DerivedValues,
         IEnumerable<string>? activeConditions = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(target);
@@ -29,7 +29,6 @@ public sealed class EffectResolver
 
         var ordered = ApplyStacking(candidates)
             .OrderBy(candidate => OperationOrder(candidate.Effect.Operation!.Value))
-            .ThenBy(candidate => candidate.Effect.Priority)
             .ThenBy(candidate => candidate.Source.SourceId, StringComparer.Ordinal)
             .ThenBy(candidate => candidate.Effect.Id, StringComparer.Ordinal)
             .ToList();
@@ -57,7 +56,7 @@ public sealed class EffectResolver
                 After = current,
                 Reason = effect.PerLevel
                     ? $"{effect.Value} x Stufe {Math.Max(1, candidate.Source.Level)}"
-                    : effect.Title
+                    : (effect.Title ?? effect.Id)
             });
         }
 
@@ -73,19 +72,20 @@ public sealed class EffectResolver
     private static bool IsApplicable(
         RuleEffect effect,
         string target,
-        string phase,
+        ModifierPhase phase,
         IReadOnlySet<string> activeConditions)
     {
-        if (!effect.IsMechanical ||
+        if (effect.Kind != EffectKind.Modifier ||
             effect.Operation is null ||
             effect.Value is null ||
             !string.Equals(effect.Target, target, StringComparison.OrdinalIgnoreCase) ||
-            !string.Equals(effect.Phase, phase, StringComparison.OrdinalIgnoreCase))
+            effect.Phase != phase)
         {
             return false;
         }
 
-        return effect.RequiredConditions.All(activeConditions.Contains);
+        var required = effect.Condition?.All.Select(c => c.Fact) ?? [];
+        return required.All(activeConditions.Contains);
     }
 
     private static IEnumerable<EffectCandidate> ApplyStacking(IEnumerable<EffectCandidate> candidates)
@@ -97,7 +97,7 @@ public sealed class EffectResolver
                      candidate.Effect.Stacking
                  }))
         {
-            if (group.Key.Stacking == RuleEffectStacking.Highest)
+            if (group.Key.Stacking == StackingRule.Highest)
             {
                 yield return group
                     .OrderByDescending(candidate => Math.Abs(GetAppliedValue(candidate.Effect, candidate.Source.Level)))
@@ -107,11 +107,10 @@ public sealed class EffectResolver
                 continue;
             }
 
-            if (group.Key.Stacking == RuleEffectStacking.Replace)
+            if (group.Key.Stacking == StackingRule.Replace)
             {
                 yield return group
-                    .OrderByDescending(candidate => candidate.Effect.Priority)
-                    .ThenByDescending(candidate => candidate.Source.SourceId, StringComparer.Ordinal)
+                    .OrderByDescending(candidate => candidate.Source.SourceId, StringComparer.Ordinal)
                     .ThenByDescending(candidate => candidate.Effect.Id, StringComparer.Ordinal)
                     .First();
                 continue;
@@ -128,29 +127,28 @@ public sealed class EffectResolver
         return effect.PerLevel ? value * Math.Max(1, sourceLevel) : value;
     }
 
-    private static decimal ApplyOperation(decimal current, RuleModifierOperation operation, decimal value)
+    private static decimal ApplyOperation(decimal current, ModifierOp operation, decimal value)
     {
         return operation switch
         {
-            RuleModifierOperation.Add => current + value,
-            RuleModifierOperation.Multiply => current * value,
-            RuleModifierOperation.MinCap => Math.Max(current, value),
-            RuleModifierOperation.MaxCap => Math.Min(current, value),
-            RuleModifierOperation.Override => value,
+            ModifierOp.Add => current + value,
+            ModifierOp.Multiply => current * value,
+            ModifierOp.MinCap => Math.Max(current, value),
+            ModifierOp.MaxCap => Math.Min(current, value),
+            ModifierOp.Override => value,
             _ => current
         };
     }
 
-    private static int OperationOrder(RuleModifierOperation operation) => operation switch
+    private static int OperationOrder(ModifierOp operation) => operation switch
     {
-        RuleModifierOperation.Add => 0,
-        RuleModifierOperation.Multiply => 1,
-        RuleModifierOperation.MinCap => 2,
-        RuleModifierOperation.MaxCap => 2,
-        RuleModifierOperation.Override => 3,
+        ModifierOp.Add => 0,
+        ModifierOp.Multiply => 1,
+        ModifierOp.MinCap => 2,
+        ModifierOp.MaxCap => 2,
+        ModifierOp.Override => 3,
         _ => 99
     };
 
     private sealed record EffectCandidate(RuleEffectSource Source, RuleEffect Effect);
 }
-

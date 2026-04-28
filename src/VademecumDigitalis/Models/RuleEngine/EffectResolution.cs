@@ -16,7 +16,7 @@ public sealed record RuleEffectAuditEntry
     public string SourceId { get; init; } = string.Empty;
     public string SourceName { get; init; } = string.Empty;
     public string EffectId { get; init; } = string.Empty;
-    public RuleModifierOperation Operation { get; init; }
+    public ModifierOp Operation { get; init; }
     public decimal AppliedValue { get; init; }
     public decimal Before { get; init; }
     public decimal After { get; init; }

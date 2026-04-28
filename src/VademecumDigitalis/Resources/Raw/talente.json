@@ -1,0 +1,89 @@
+{
+  "gruppen": [
+    {
+      "gruppe": "Körpertalente",
+      "talente": [
+        { "name": "Fliegen",            "sf": "B", "probe": ["MU","IN","GE"], "be": "JA" },
+        { "name": "Gaukeleien",         "sf": "A", "probe": ["MU","CH","FF"], "be": "JA" },
+        { "name": "Klettern",           "sf": "B", "probe": ["MU","GE","KK"], "be": "JA" },
+        { "name": "Körperbeherrschung", "sf": "D", "probe": ["GE","GE","KO"], "be": "JA" },
+        { "name": "Kraftakt",           "sf": "B", "probe": ["KO","KK","KK"], "be": "JA" },
+        { "name": "Reiten",             "sf": "B", "probe": ["CH","GE","KK"], "be": "JA" },
+        { "name": "Schwimmen",          "sf": "B", "probe": ["GE","KO","KK"], "be": "JA" },
+        { "name": "Selbstbeherrschung", "sf": "D", "probe": ["MU","MU","KO"], "be": "NEIN" },
+        { "name": "Singen",             "sf": "A", "probe": ["KL","CH","KO"], "be": "EVTL" },
+        { "name": "Sinnesschärfe",      "sf": "D", "probe": ["KL","IN","IN"], "be": "EVTL" },
+        { "name": "Tanzen",             "sf": "A", "probe": ["KL","CH","GE"], "be": "JA" },
+        { "name": "Taschendiebstahl",   "sf": "B", "probe": ["MU","FF","GE"], "be": "JA" },
+        { "name": "Verbergen",          "sf": "C", "probe": ["MU","IN","GE"], "be": "JA" },
+        { "name": "Zechen",             "sf": "A", "probe": ["KL","KO","KK"], "be": "NEIN" }
+      ]
+    },
+    {
+      "gruppe": "Gesellschaftstalente",
+      "talente": [
+        { "name": "Bekehren & Überzeugen", "sf": "B", "probe": ["MU","KL","CH"], "be": "NEIN" },
+        { "name": "Betören",               "sf": "B", "probe": ["MU","CH","CH"], "be": "EVTL" },
+        { "name": "Einschüchtern",         "sf": "B", "probe": ["MU","IN","CH"], "be": "NEIN" },
+        { "name": "Etikette",              "sf": "B", "probe": ["KL","IN","CH"], "be": "EVTL" },
+        { "name": "Gassenwissen",          "sf": "C", "probe": ["KL","IN","CH"], "be": "EVTL" },
+        { "name": "Menschenkenntnis",      "sf": "C", "probe": ["KL","IN","CH"], "be": "NEIN" },
+        { "name": "Überreden",             "sf": "C", "probe": ["MU","IN","CH"], "be": "NEIN" },
+        { "name": "Verkleiden",            "sf": "B", "probe": ["IN","CH","GE"], "be": "EVTL" },
+        { "name": "Willenskraft",          "sf": "D", "probe": ["MU","IN","CH"], "be": "NEIN" }
+      ]
+    },
+    {
+      "gruppe": "Naturtalente",
+      "talente": [
+        { "name": "Fährtensuchen",    "sf": "C", "probe": ["MU","IN","GE"], "be": "JA" },
+        { "name": "Fesseln",          "sf": "A", "probe": ["KL","FF","KK"], "be": "EVTL" },
+        { "name": "Fischen & Angeln", "sf": "A", "probe": ["FF","GE","KO"], "be": "EVTL" },
+        { "name": "Orientierung",     "sf": "B", "probe": ["KL","IN","IN"], "be": "NEIN" },
+        { "name": "Pflanzenkunde",    "sf": "C", "probe": ["KL","FF","KO"], "be": "EVTL" },
+        { "name": "Tierkunde",        "sf": "C", "probe": ["MU","MU","CH"], "be": "JA" },
+        { "name": "Wildnisleben",     "sf": "C", "probe": ["MU","GE","KO"], "be": "JA" }
+      ]
+    },
+    {
+      "gruppe": "Wissenstalente",
+      "talente": [
+        { "name": "Brett- & Glücksspiel", "sf": "A", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Geographie",           "sf": "B", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Geschichtswissen",     "sf": "B", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Götter & Kulte",       "sf": "B", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Kriegskunst",          "sf": "B", "probe": ["MU","KL","IN"], "be": "NEIN" },
+        { "name": "Magiekunde",           "sf": "C", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Mechanik",             "sf": "B", "probe": ["KL","KL","FF"], "be": "NEIN" },
+        { "name": "Rechnen",              "sf": "A", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Rechtskunde",          "sf": "A", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Sagen & Legenden",     "sf": "B", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Sphärenkunde",         "sf": "B", "probe": ["KL","KL","IN"], "be": "NEIN" },
+        { "name": "Sternkunde",           "sf": "A", "probe": ["KL","KL","IN"], "be": "NEIN" }
+      ]
+    },
+    {
+      "gruppe": "Handwerkstalente",
+      "talente": [
+        { "name": "Alchemie",                "sf": "C", "probe": ["MU","KL","FF"], "be": "JA" },
+        { "name": "Boote & Schiffe",         "sf": "B", "probe": ["FF","GE","KK"], "be": "JA" },
+        { "name": "Fahrzeuge",               "sf": "A", "probe": ["CH","FF","KO"], "be": "JA" },
+        { "name": "Handel",                  "sf": "B", "probe": ["KL","IN","CH"], "be": "NEIN" },
+        { "name": "Heilkunde Gift",          "sf": "B", "probe": ["MU","KL","IN"], "be": "JA" },
+        { "name": "Heilkunde Krankheiten",   "sf": "B", "probe": ["MU","IN","KO"], "be": "JA" },
+        { "name": "Heilkunde Seele",         "sf": "B", "probe": ["IN","CH","KO"], "be": "NEIN" },
+        { "name": "Heilkunde Wunden",        "sf": "D", "probe": ["KL","FF","FF"], "be": "JA" },
+        { "name": "Holzbearbeitung",         "sf": "B", "probe": ["FF","GE","KK"], "be": "JA" },
+        { "name": "Lebensmittelbearbeitung", "sf": "A", "probe": ["IN","FF","FF"], "be": "JA" },
+        { "name": "Lederbearbeitung",        "sf": "B", "probe": ["FF","GE","KO"], "be": "JA" },
+        { "name": "Malen & Zeichnen",        "sf": "A", "probe": ["IN","FF","FF"], "be": "JA" },
+        { "name": "Musizieren",              "sf": "A", "probe": ["CH","FF","KO"], "be": "JA" },
+        { "name": "Schlösserknacken",        "sf": "C", "probe": ["IN","FF","FF"], "be": "JA" },
+        { "name": "Steinbearbeitung",        "sf": "A", "probe": ["FF","FF","KK"], "be": "JA" },
+        { "name": "Stoffbearbeitung",        "sf": "A", "probe": ["KL","FF","FF"], "be": "JA" },
+        { "name": "Erdbearbeitung",          "sf": "A", "probe": ["FF","KO","KK"], "be": "JA" },
+        { "name": "Metallbearbeitung",       "sf": "C", "probe": ["FF","KO","KK"], "be": "JA" }
+      ]
+    }
+  ]
+}
