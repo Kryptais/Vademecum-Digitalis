@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
+             xmlns:controls="clr-namespace:VademecumDigitalis.Controls"
              x:Class="VademecumDigitalis.InventoryDashboardPage"
              x:DataType="viewmodels:InventoryViewModel"
              Title="Inventar">
@@ -10,6 +11,8 @@
     <Grid>
         <ScrollView Margin="10">
             <VerticalStackLayout Spacing="12">
+                <controls:CalendarDateWidget />
+
                 <Label Text="Globale Bank" Style="{StaticResource HeadlineLabel}" />
                 <Border BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
                     <Grid  ColumnSpacing="10" Margin="10" RowSpacing="20">

@@ -7,7 +7,7 @@ namespace VademecumDigitalis.ViewModels
 {
     public partial class MoneyTransferViewModel : ObservableObject
     {
-        private readonly InventoryContainer _sourceContainer;
+        private InventoryContainer? _sourceContainer;
 
         // Eingabefelder
         [ObservableProperty]
@@ -40,9 +40,14 @@ namespace VademecumDigitalis.ViewModels
 
         public event EventHandler? RequestClose;
 
-        public MoneyTransferViewModel(InventoryContainer source)
+        public void SetSource(InventoryContainer source)
         {
             _sourceContainer = source;
+            OnPropertyChanged(nameof(SourceName));
+            OnPropertyChanged(nameof(AvailableDukaten));
+            OnPropertyChanged(nameof(AvailableSilbertaler));
+            OnPropertyChanged(nameof(AvailableHeller));
+            OnPropertyChanged(nameof(AvailableKreuzer));
         }
 
         [RelayCommand]

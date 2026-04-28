@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFrameworks>net9.0-android</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">net9.0-windows10.0.19041.0;net9.0-android</TargetFrameworks>
     <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('macos'))">$(TargetFrameworks);net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
 
     <OutputType>Exe</OutputType>
     <RootNamespace>VademecumDigitalis</RootNamespace>
@@ -46,25 +46,28 @@
   </ItemGroup>
 
   <ItemGroup>
-    <MauiXaml Update="BoronKalenderPage.xaml">
+    <MauiXaml Update="Views\BoronKalenderPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="CoinDisplayView.xaml">
+    <MauiXaml Update="Controls\CoinDisplayView.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="DsaDatePickerPage.xaml">
+    <MauiXaml Update="Controls\CalendarDateWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="EreignissePage.xaml">
+    <MauiXaml Update="Views\DsaDatePickerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="GlobalItemSearchPage.xaml">
+    <MauiXaml Update="Views\EreignissePage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="MoneyTransferPage.xaml">
+    <MauiXaml Update="Views\GlobalItemSearchPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
-    <MauiXaml Update="SonderfertigkeitenPage.xaml">
+    <MauiXaml Update="Views\MoneyTransferPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
+    <MauiXaml Update="Views\SonderfertigkeitenPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
   </ItemGroup>

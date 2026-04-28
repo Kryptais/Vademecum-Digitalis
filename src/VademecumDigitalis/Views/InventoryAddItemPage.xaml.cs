@@ -10,13 +10,11 @@ namespace VademecumDigitalis
         // Public property to access the result after modal close
         public InventoryItem? ResultItem => (BindingContext as InventoryAddItemViewModel)?.ResultItem;
 
-        public InventoryAddItemPage()
+        public InventoryAddItemPage(InventoryAddItemViewModel vm)
         {
             InitializeComponent();
-            var vm = new InventoryAddItemViewModel();
             BindingContext = vm;
 
-            // Simple event handling for closing logic triggered by VM
             vm.RequestClose += (s, e) => 
             {
                 Navigation.PopModalAsync();

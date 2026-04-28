@@ -3,23 +3,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Services;
 
 namespace VademecumDigitalis.ViewModels
 {
     public partial class GlobalItemSearchViewModel : ObservableObject
     {
         private readonly InventoryViewModel _mainVm;
+        private readonly IInventoryNavigationService _navigationService;
 
         public ObservableCollection<GlobalSearchResult> SearchResults { get; } = new();
 
         [ObservableProperty]
         private string _searchText = string.Empty;
 
-        public GlobalItemSearchViewModel(InventoryViewModel mainVm)
+        public GlobalItemSearchViewModel(
+            InventoryViewModel mainVm,
+            IInventoryNavigationService navigationService)
         {
             _mainVm = mainVm;
+            _navigationService = navigationService;
         }
 
         partial void OnSearchTextChanged(string value)
@@ -49,20 +53,13 @@ namespace VademecumDigitalis.ViewModels
         {
             if (result == null) return;
 
-             var page = Application.Current.Handler.MauiContext.Services.GetService<InventoryContainerPage>();
-            var vm = page.BindingContext as InventoryContainerViewModel;
-            
-            if (page != null && vm != null)
-            {
-                    vm.Container = result.Container;
-                    await Application.Current.MainPage.Navigation.PushAsync(page);
-            }
+            await _navigationService.NavigateToContainerAsync(result.Container);
         }
 
         [RelayCommand]
         private async Task NavigateBack()
         {
-            await Application.Current.MainPage.Navigation.PopAsync();
+            await _navigationService.NavigateBackAsync();
         }
     }
 }

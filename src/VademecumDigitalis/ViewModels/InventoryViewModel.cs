@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
 using VademecumDigitalis.Models;
 using VademecumDigitalis.Services;
 
@@ -13,8 +12,9 @@ namespace VademecumDigitalis.ViewModels
 {
     public partial class InventoryViewModel : ObservableObject
     {
-        private readonly InventoryService _service;
         private readonly PersistenceService _persistence;
+        private readonly IDialogService _dialogService;
+        private readonly IInventoryNavigationService _navigationService;
         private CancellationTokenSource? _saveCts;
         private CancellationTokenSource? _recalcCts;
 
@@ -34,14 +34,18 @@ namespace VademecumDigitalis.ViewModels
         [ObservableProperty]
         private double _carriedWeight;
 
-        // Stabile Objekte – Bindings bleiben intakt, Werte werden in-place aktualisiert
+        // Stabile Objekte ï¿½ Bindings bleiben intakt, Werte werden in-place aktualisiert
         public CurrencyAccount TotalBank { get; } = new();
         public CurrencyAccount FormattedTotalValue { get; } = new();
 
-        public InventoryViewModel(InventoryService service, PersistenceService persistence)
+        public InventoryViewModel(
+            PersistenceService persistence,
+            IDialogService dialogService,
+            IInventoryNavigationService navigationService)
         {
-            _service = service;
             _persistence = persistence;
+            _dialogService = dialogService;
+            _navigationService = navigationService;
             Containers.CollectionChanged += Containers_CollectionChanged;
         }
 
@@ -71,7 +75,7 @@ namespace VademecumDigitalis.ViewModels
                     IsFixedTreasury = true,
                     IsCarried = false,
                     IncludeCoinWeight = true,
-                    Details = "Der zentrale Tresor für Ersparnisse."
+                    Details = "Der zentrale Tresor fï¿½r Ersparnisse."
                 };
                 Containers.Add(treasury);
                 SubscribeToContainerChanges(treasury);
@@ -170,7 +174,7 @@ namespace VademecumDigitalis.ViewModels
         }
 
         /// <summary>
-        /// Einzelner Aufruf für beide verzögerten Operationen – reduziert doppelte Timer-Starts.
+        /// Einzelner Aufruf fï¿½r beide verzï¿½gerten Operationen ï¿½ reduziert doppelte Timer-Starts.
         /// </summary>
         private void OnDataChanged()
         {
@@ -199,7 +203,7 @@ namespace VademecumDigitalis.ViewModels
         [RelayCommand]
         private async Task CreateNewContainer()
         {
-            string result = await Application.Current.MainPage.DisplayPromptAsync("Neues Inventar", "Name des Containers:", "OK", "Abbrechen", "Neuer Container");
+            string? result = await _dialogService.DisplayPromptAsync("Neues Inventar", "Name des Containers:", "OK", "Abbrechen", "Neuer Container");
             if (!string.IsNullOrWhiteSpace(result))
             {
                 var c = new InventoryContainer { Name = result };
@@ -213,13 +217,13 @@ namespace VademecumDigitalis.ViewModels
             if (container == null) return;
 
             string editAction = "Container bearbeiten (Name/Details)";
-            string deleteAction = "Container löschen";
+            string deleteAction = "Container lï¿½schen";
 
             var options = new System.Collections.Generic.List<string> { editAction };
             if (!container.IsFixedTreasury)
                 options.Add(deleteAction);
 
-            var action = await Application.Current.MainPage.DisplayActionSheet($"Optionen: {container.Name}", "Abbrechen", null, options.ToArray());
+            var action = await _dialogService.DisplayActionSheet($"Optionen: {container.Name}", "Abbrechen", null, options.ToArray());
 
             if (action == editAction)
                 await EditContainer(container);
@@ -231,19 +235,19 @@ namespace VademecumDigitalis.ViewModels
         {
             if (container == null || container.IsFixedTreasury) return;
 
-            string delOption = await Application.Current.MainPage.DisplayActionSheet($"Löschen: {container.Name}", "Abbrechen", "Löschen & Inhalt vernichten", "Löschen & Inhalt verschieben");
+            string? delOption = await _dialogService.DisplayActionSheet($"LÃ¶schen: {container.Name}", "Abbrechen", "LÃ¶schen & Inhalt vernichten", "LÃ¶schen & Inhalt verschieben");
             if (delOption == "Abbrechen" || delOption == null) return;
 
-            if (delOption == "Löschen & Inhalt verschieben")
+            if (delOption == "LÃ¶schen & Inhalt verschieben")
             {
                 var targets = Containers.Where(c => c != container).Select(c => c.Name).ToArray();
                 if (targets.Length == 0)
                 {
-                    await Application.Current.MainPage.DisplayAlert("Fehler", "Kein Ziel-Container verfügbar.", "OK");
+                    await _dialogService.DisplayAlert("Fehler", "Kein Ziel-Container verfÃ¼gbar.", "OK");
                     return;
                 }
 
-                string targetName = await Application.Current.MainPage.DisplayActionSheet("Ziel wählen", "Abbrechen", null, targets);
+                string? targetName = await _dialogService.DisplayActionSheet("Ziel wÃ¤hlen", "Abbrechen", null, targets);
                 if (string.IsNullOrWhiteSpace(targetName) || targetName == "Abbrechen") return;
 
                 var targetContainer = Containers.FirstOrDefault(c => c.Name == targetName);
@@ -259,9 +263,9 @@ namespace VademecumDigitalis.ViewModels
                     Containers.Remove(container);
                 }
             }
-            else if (delOption == "Löschen & Inhalt vernichten")
+            else if (delOption == "LÃ¶schen & Inhalt vernichten")
             {
-                bool confirm = await Application.Current.MainPage.DisplayAlert("Sicher?", "Wirklich alles vernichten?", "Ja, weg damit", "Nein");
+                bool confirm = await _dialogService.DisplayAlert("Sicher?", "Wirklich alles vernichten?", "Ja, weg damit", "Nein");
                 if (confirm)
                     Containers.Remove(container);
             }
@@ -271,18 +275,18 @@ namespace VademecumDigitalis.ViewModels
         {
             if (container == null) return;
 
-            string subAction = await Application.Current.MainPage.DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name ändern", "Details ändern", "Münzgewicht an/aus");
-            if (subAction == "Name ändern")
+            string? subAction = await _dialogService.DisplayActionSheet($"Bearbeiten: {container.Name}", "Abbrechen", null, "Name Ã¤ndern", "Details Ã¤ndern", "MÃ¼nzgewicht an/aus");
+            if (subAction == "Name Ã¤ndern")
             {
-                string newName = await Application.Current.MainPage.DisplayPromptAsync("Name", "Neuer Name:", initialValue: container.Name);
+                string? newName = await _dialogService.DisplayPromptAsync("Name", "Neuer Name:", initialValue: container.Name);
                 if (!string.IsNullOrWhiteSpace(newName)) container.Name = newName;
             }
-            else if (subAction == "Details ändern")
+            else if (subAction == "Details Ã¤ndern")
             {
-                string newDetails = await Application.Current.MainPage.DisplayPromptAsync("Details", "Details:", initialValue: container.Details);
+                string? newDetails = await _dialogService.DisplayPromptAsync("Details", "Details:", initialValue: container.Details);
                 if (newDetails != null) container.Details = newDetails;
             }
-            else if (subAction == "Münzgewicht an/aus")
+            else if (subAction == "MÃ¼nzgewicht an/aus")
             {
                 container.IncludeCoinWeight = !container.IncludeCoinWeight;
             }
@@ -293,18 +297,13 @@ namespace VademecumDigitalis.ViewModels
         {
             if (container == null) return;
 
-            var page = Application.Current.Handler.MauiContext.Services.GetService<InventoryContainerPage>();
-            var vm = page.BindingContext as InventoryContainerViewModel;
-            if (vm != null) vm.Container = container;
-
-            await Application.Current.MainPage.Navigation.PushAsync(page);
+            await _navigationService.NavigateToContainerAsync(container);
         }
 
         [RelayCommand]
         private async Task NavigateToSearch()
         {
-            var page = Application.Current.Handler.MauiContext.Services.GetService<GlobalItemSearchPage>();
-            await Application.Current.MainPage.Navigation.PushAsync(page);
+            await _navigationService.NavigateToGlobalSearchAsync();
         }
 
         private void SubscribeToContainerChanges(InventoryContainer container)

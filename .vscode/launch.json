@@ -2,24 +2,34 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run MAUI (Android) - via Task",
+            "name": "Run MAUI Windows",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "run-maui-android",
-            "program": "${workspaceFolder}/src/VademecumDigitalis/bin/Debug/net9.0-android/VademecumDigitalis.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/VademecumDigitalis",
+            "program": "C:\\Program Files\\dotnet\\dotnet.exe",
+            "args": [
+                "build",
+                "${workspaceFolder}\\src\\VademecumDigitalis\\VademecumDigitalis.csproj",
+                "-t:Run",
+                "-f",
+                "net9.0-windows10.0.19041.0"
+            ],
+            "cwd": "${workspaceFolder}\\src\\VademecumDigitalis",
             "console": "integratedTerminal",
             "stopAtEntry": false
         },
         {
-            "name": "Run MAUI (Windows) - via Task",
+            "name": "Run MAUI Android",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "run-maui-windows",
-            "program": "${workspaceFolder}/src/VademecumDigitalis/bin/Debug/net9.0-windows10.0.19041.0/VademecumDigitalis.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/src/VademecumDigitalis",
+            "program": "C:\\Program Files\\dotnet\\dotnet.exe",
+            "args": [
+                "build",
+                "${workspaceFolder}\\src\\VademecumDigitalis\\VademecumDigitalis.csproj",
+                "-t:Run",
+                "-f",
+                "net9.0-android"
+            ],
+            "cwd": "${workspaceFolder}\\src\\VademecumDigitalis",
             "console": "integratedTerminal",
             "stopAtEntry": false
         },

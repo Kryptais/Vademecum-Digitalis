@@ -2,8 +2,8 @@ using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Services;
 
 namespace VademecumDigitalis.ViewModels
 {
@@ -12,6 +12,7 @@ namespace VademecumDigitalis.ViewModels
     public partial class InventoryAddItemViewModel : ObservableObject
     {
         private InventoryItem? _editingItem;
+        private readonly IDialogService _dialogService;
         
         // Properties für die View
         [ObservableProperty]
@@ -38,6 +39,11 @@ namespace VademecumDigitalis.ViewModels
         // Event (oder Action), um dem View mitzuteilen, dass geschlossen werden soll
         public event EventHandler? RequestClose;
 
+        public InventoryAddItemViewModel(IDialogService dialogService)
+        {
+            _dialogService = dialogService;
+        }
+
         public void SetEditingItem(InventoryItem item)
         {
             _editingItem = item;
@@ -58,7 +64,7 @@ namespace VademecumDigitalis.ViewModels
             var name = Name?.Trim();
             if (string.IsNullOrWhiteSpace(name))
             {
-                await Application.Current.MainPage.DisplayAlert("Fehler", "Name erforderlich", "OK");
+                await _dialogService.DisplayAlert("Fehler", "Name erforderlich", "OK");
                 return;
             }
             
@@ -85,7 +91,7 @@ namespace VademecumDigitalis.ViewModels
 
                 if (changed)
                 {
-                    var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
+                    var comment = await _dialogService.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
                     if (!string.IsNullOrWhiteSpace(comment))
                     {
                         _editingItem.AddLog(comment);
@@ -106,7 +112,7 @@ namespace VademecumDigitalis.ViewModels
                     Details = Details ?? string.Empty,
                     AcquiredDate = DateTime.UtcNow
                 };
-                var comment = await Application.Current.MainPage.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
+                var comment = await _dialogService.DisplayPromptAsync("Kommentar (optional)", "Kommentar für Log:", "OK", "Abbrechen", "");
                 if (!string.IsNullOrWhiteSpace(comment))
                 {
                     ResultItem.AddLog(comment);

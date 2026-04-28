@@ -182,10 +182,10 @@
                                         <Label Text="{Binding BeschreibungKurz}" FontSize="11"
                                                TextColor="{StaticResource TextSecondary}" />
                                     </VerticalStackLayout>
-                                    <Button Grid.Column="1" Text="🗑"
+                                    <Button Grid.Column="1" Text="✕"
                                             BackgroundColor="Transparent" TextColor="#DC2626"
                                             FontSize="18" Padding="4"
-                                            Clicked="OnEintragLoeschen"
+                                            Command="{Binding BindingContext.EintragLoeschenCommand, Source={x:Reference KalenderSeite}}"
                                             CommandParameter="{Binding .}" />
                                 </Grid>
                             </DataTemplate>
@@ -195,15 +195,15 @@
                     <!-- Neuen Eintrag hinzufügen -->
                     <Label Text="Neuer Eintrag für gewählten Tag" FontSize="12" FontAttributes="Bold"
                            TextColor="{StaticResource TextSecondary}" Margin="0,8,0,0" />
-                    <Entry x:Name="NeuEintragTitelEntry"
-                           Placeholder="Titel (z. B. Geburtstag Rohaja, Praiostag-Fest ...)"
+                    <Entry Placeholder="Titel (z. B. Geburtstag Rohaja, Praiostag-Fest ...)"
+                           Text="{Binding NeuerEintragTitel}"
                            FontSize="13" />
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                         <Label Grid.Column="0" Text="Jährlich wiederkehrend" FontSize="13" VerticalOptions="Center" />
-                        <Switch x:Name="NeuEintragJaehrlichSwitch" Grid.Column="1" IsToggled="True" />
+                        <Switch Grid.Column="1" IsToggled="{Binding NeuerEintragIstJaehrlich}" />
                     </Grid>
                     <Button Text="✚ Eintrag hinzufügen"
-                            Clicked="OnEintragHinzufuegen"
+                            Command="{Binding NeuerEintragHinzufuegenCommand}"
                             BackgroundColor="#0E7490" TextColor="White" Padding="12,10" />
                 </VerticalStackLayout>
             </Border>

@@ -4,7 +4,7 @@ using VademecumDigitalis.Models;
 
 namespace VademecumDigitalis.Services
 {
-    public class InventoryService
+    public class InventoryService : IInventoryService
     {
         public void MoveItem(InventoryContainer from, InventoryContainer to, InventoryItem item, int quantity)
         {

@@ -17,6 +17,19 @@
     "MaxStufe": 3,
     "ApKostenProStufe": [20, 20, 20],
     "VoraussetzungenProStufe": [],
+    "Effects": [
+      {
+        "Id": "add_schip",
+        "Kind": "Modifier",
+        "Title": "Schicksalspunkt +1",
+        "Target": "derived.SchiP",
+        "Operation": "Add",
+        "Value": 1,
+        "PerLevel": true,
+        "Phase": "derived_values",
+        "Stacking": "Stack"
+      }
+    ],
     "Anmerkungen": "+1 SchiP pro Stufe."
   },
   {
@@ -25,7 +38,7 @@
     "Beschreibung": "Der Held verfügt über eine überdurchschnittliche Lebensenergie. Pro Stufe erhält er +1 LeP.",
     "Kategorie": "AllgemeineVorteile",
     "MaxStufe": 7,
-    "ApKostenProStufe": [25, 25, 25, 25, 25, 25, 25],
+    "ApKostenProStufe": [6, 6, 6, 6, 6, 6, 6],
     "VoraussetzungenProStufe": [
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 12 }],
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 12 }],
@@ -34,6 +47,19 @@
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 14 }],
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 14 }],
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 15 }]
+    ],
+    "Effects": [
+      {
+        "Id": "add_lep",
+        "Kind": "Modifier",
+        "Title": "Lebensenergie +1",
+        "Target": "derived.LEP",
+        "Operation": "Add",
+        "Value": 1,
+        "PerLevel": true,
+        "Phase": "derived_values",
+        "Stacking": "Stack"
+      }
     ],
     "Anmerkungen": "+1 LeP pro Stufe."
   },
@@ -45,6 +71,19 @@
     "MaxStufe": 1,
     "ApKostenProStufe": [25],
     "VoraussetzungenProStufe": [],
+    "Effects": [
+      {
+        "Id": "add_sk",
+        "Kind": "Modifier",
+        "Title": "Seelenkraft +1",
+        "Target": "derived.SK",
+        "Operation": "Add",
+        "Value": 1,
+        "PerLevel": true,
+        "Phase": "derived_values",
+        "Stacking": "Stack"
+      }
+    ],
     "Anmerkungen": "+1 SK."
   },
   {
@@ -55,6 +94,19 @@
     "MaxStufe": 1,
     "ApKostenProStufe": [25],
     "VoraussetzungenProStufe": [],
+    "Effects": [
+      {
+        "Id": "add_zk",
+        "Kind": "Modifier",
+        "Title": "Zähigkeit +1",
+        "Target": "derived.ZK",
+        "Operation": "Add",
+        "Value": 1,
+        "PerLevel": true,
+        "Phase": "derived_values",
+        "Stacking": "Stack"
+      }
+    ],
     "Anmerkungen": "+1 ZK."
   },
   {
@@ -66,6 +118,19 @@
     "ApKostenProStufe": [10],
     "VoraussetzungenProStufe": [
       [{ "Type": "Attribut", "Name": "GE", "MinValue": 12 }]
+    ],
+    "Effects": [
+      {
+        "Id": "add_gs",
+        "Kind": "Modifier",
+        "Title": "Geschwindigkeit +1",
+        "Target": "derived.GS",
+        "Operation": "Add",
+        "Value": 1,
+        "PerLevel": true,
+        "Phase": "derived_values",
+        "Stacking": "Stack"
+      }
     ],
     "Anmerkungen": "+1 GS."
   },
@@ -95,7 +160,7 @@
     "Beschreibung": "Der Held hat ein ausgeprägtes Gespür für Himmelsrichtungen und kann sich nur schwer verirren.",
     "Kategorie": "AllgemeineVorteile",
     "MaxStufe": 1,
-    "ApKostenProStufe": [15],
+    "ApKostenProStufe": [10],
     "VoraussetzungenProStufe": [
       [{ "Type": "Attribut", "Name": "IN", "MinValue": 12 }]
     ],
@@ -112,6 +177,36 @@
       [{ "Type": "Attribut", "Name": "KO", "MinValue": 13 }]
     ],
     "Anmerkungen": "Ignoriert 1 Stufe Schmerz."
+  },
+  {
+    "Id": "zeitgefuehl",
+    "Name": "Zeitgefühl",
+    "Beschreibung": "Der Held kann die Tageszeit auch ohne Hilfsmittel sehr zuverlässig einschätzen.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [2],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": ""
+  },
+  {
+    "Id": "wohlklang",
+    "Name": "Wohlklang",
+    "Beschreibung": "Der Held besitzt eine besonders angenehme Stimme und ist bei Singen-Proben im Vorteil.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [5],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Nicht mit dem Nachteil Stumm kombinieren."
+  },
+  {
+    "Id": "vertrauenerweckend",
+    "Name": "Vertrauenerweckend",
+    "Beschreibung": "Der Held wirkt glaubwürdig und überzeugend in passenden gesellschaftlichen Situationen.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
+    "ApKostenProStufe": [25],
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Nicht mit Unfähig in einem Gesellschaftstalent kombinieren."
   },
   {
     "Id": "entfernungssinn",

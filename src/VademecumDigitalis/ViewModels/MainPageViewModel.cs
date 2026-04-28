@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Models.RuleEngine;
 using VademecumDigitalis.Services;
+using VademecumDigitalis.Services.RuleEngine;
 
 namespace VademecumDigitalis.ViewModels;
 
@@ -11,16 +13,24 @@ public class MainPageViewModel : INotifyPropertyChanged
     private readonly CharacterSheet _sheet = new();
     private readonly PersistenceService _persistence;
     private readonly TalentModifierService? _talentModifierService;
+    private readonly VorteilNachteilService? _vorteilNachteilService;
+    private readonly EffectResolver? _effectResolver;
     private CancellationTokenSource? _saveCts;
 
     public MainPageViewModel() : this(new PersistenceService(), null)
     {
     }
 
-    public MainPageViewModel(PersistenceService persistence, TalentModifierService? talentModifierService = null)
+    public MainPageViewModel(
+        PersistenceService persistence,
+        TalentModifierService? talentModifierService = null,
+        VorteilNachteilService? vorteilNachteilService = null,
+        EffectResolver? effectResolver = null)
     {
         _persistence = persistence;
         _talentModifierService = talentModifierService;
+        _vorteilNachteilService = vorteilNachteilService;
+        _effectResolver = effectResolver;
         TalentGruppen = BuildTalentGruppen();
         Kampftechniken = BuildKampftechniken();
         KampfStatiRows = BuildKampfStatiRows();
@@ -28,6 +38,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         SubscribeToKampftechnikenChanges();
         SubscribeToStatusChanges();
         ToggleExpandCommand = new Command<TalentGroup>(g => g.IsExpanded = !g.IsExpanded);
+        _ = LoadRuleCatalogAsync();
     }
 
     /// <summary>Command zum Auf-/Zuklappen einer Talentgruppe.</summary>
@@ -117,62 +128,6 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public ObservableCollection<CharakterEreignis> Ereignisse { get; } = [];
 
-    // --- Sonderfertigkeiten ---
-
-    public ObservableCollection<CharakterSonderfertigkeitEintrag> SonderfertigkeitEintraege { get; } = [];
-
-    /// <summary>True wenn keine Sonderfertigkeiten vorhanden.</summary>
-    public bool KeineSonderfertigkeiten => SonderfertigkeitEintraege.Count == 0;
-
-    public void SonderfertigkeitHinzufuegen(CharakterSonderfertigkeitEintrag eintrag)
-    {
-        eintrag.PropertyChanged += OnSonderfertigkeitChanged;
-        SonderfertigkeitEintraege.Add(eintrag);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
-        RequestDelayedSave();
-    }
-
-    public void SonderfertigkeitEntfernen(CharakterSonderfertigkeitEintrag eintrag)
-    {
-        eintrag.PropertyChanged -= OnSonderfertigkeitChanged;
-        SonderfertigkeitEintraege.Remove(eintrag);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineSonderfertigkeiten)));
-        RequestDelayedSave();
-    }
-
-    private void OnSonderfertigkeitChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        RequestDelayedSave();
-    }
-
-    // --- Vorteile / Nachteile ---
-
-    public ObservableCollection<CharaktervorteilEintrag> VorteilNachteilEintraege { get; } = [];
-
-    /// <summary>True wenn keine strukturierten Einträge vorhanden.</summary>
-    public bool KeineVorteilNachteilEintraege => VorteilNachteilEintraege.Count == 0;
-
-    public void VorteilNachteilHinzufuegen(CharaktervorteilEintrag eintrag)
-    {
-        eintrag.PropertyChanged += OnVorteilNachteilChanged;
-        VorteilNachteilEintraege.Add(eintrag);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
-        RequestDelayedSave();
-    }
-
-    public void VorteilNachteilEntfernen(CharaktervorteilEintrag eintrag)
-    {
-        eintrag.PropertyChanged -= OnVorteilNachteilChanged;
-        VorteilNachteilEintraege.Remove(eintrag);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteilNachteilEintraege)));
-        RequestDelayedSave();
-    }
-
-    private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        RequestDelayedSave();
-    }
-
     /// <summary>True wenn keine Ereignisse vorhanden (für Empty-Label-Binding).</summary>
     public bool KeinEreignisse => Ereignisse.Count == 0;
 
@@ -188,6 +143,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         eintrag.PropertyChanged += OnVorteilNachteilChanged;
         VorteilNachteilEintraege.Add(eintrag);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        NotifyRuleEffectValuesChanged();
         RequestDelayedSave();
     }
 
@@ -196,12 +152,14 @@ public class MainPageViewModel : INotifyPropertyChanged
         eintrag.PropertyChanged -= OnVorteilNachteilChanged;
         VorteilNachteilEintraege.Remove(eintrag);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        NotifyRuleEffectValuesChanged();
         RequestDelayedSave();
     }
 
     private void OnVorteilNachteilChanged(object? sender, PropertyChangedEventArgs e)
     {
         RecalculateTalentProben();
+        NotifyRuleEffectValuesChanged();
         RequestDelayedSave();
     }
 
@@ -270,6 +228,8 @@ public class MainPageViewModel : INotifyPropertyChanged
     public int ZähigkeitBoniGesamt       => _sheet.ZähigkeitVorteilsBonus     + EreignisZkBonus;
     public int InitiativeBasisBoniGesamt => _sheet.InitiativeBasisVorteilsBonus;
     public int GeschwindigkeitBoniGesamt => _sheet.GeschwindigkeitVorteilsBonus;
+
+    public string GeschwindigkeitAuditText => BuildGeschwindigkeitAuditText();
 
     private void OnEreignisChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -730,6 +690,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitAuditText)));
 
         RecalculateTalentProben();
         RecalculateKampftechniken();
@@ -787,6 +748,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBoniGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisBoniGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitAuditText)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteVerfuegbar)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AbenteuerpunkteAusgegeben)));
@@ -1002,7 +964,9 @@ public class MainPageViewModel : INotifyPropertyChanged
     }
 
     /// <summary>LeP gesamt = Basis + Zugekauft + Vorteilsboni + EreignisBoni</summary>
-    public int Lebensenergie => LebensenergieBasis + _sheet.LebensenergieZugekauft + _sheet.LebensenergieVorteilsBonus + EreignisLepBonus;
+    public int Lebensenergie => (int)ResolveDerivedValue(
+        "derived.LEP",
+        LebensenergieBasis + _sheet.LebensenergieZugekauft + _sheet.LebensenergieVorteilsBonus + EreignisLepBonus).FinalValue;
 
     public string LebensenergieFormel
     {
@@ -1034,7 +998,9 @@ public class MainPageViewModel : INotifyPropertyChanged
     }
 
     /// <summary>SK gesamt = Basis + Vorteilsboni + EreignisBoni (kein Zukauf möglich)</summary>
-    public int Seelenkraft => SeelenkraftBasis + _sheet.SeelenkraftVorteilsBonus + EreignisSkBonus;
+    public int Seelenkraft => (int)ResolveDerivedValue(
+        "derived.SK",
+        SeelenkraftBasis + _sheet.SeelenkraftVorteilsBonus + EreignisSkBonus).FinalValue;
 
     public string SeelenkraftFormel
     {
@@ -1056,7 +1022,9 @@ public class MainPageViewModel : INotifyPropertyChanged
     }
 
     /// <summary>ZK gesamt = Basis + Vorteilsboni + EreignisBoni (kein Zukauf möglich)</summary>
-    public int Zähigkeit => ZähigkeitBasis + _sheet.ZähigkeitVorteilsBonus + EreignisZkBonus;
+    public int Zähigkeit => (int)ResolveDerivedValue(
+        "derived.ZK",
+        ZähigkeitBasis + _sheet.ZähigkeitVorteilsBonus + EreignisZkBonus).FinalValue;
 
     public string ZähigkeitFormel
     {
@@ -1078,10 +1046,16 @@ public class MainPageViewModel : INotifyPropertyChanged
     /// <summary>GS-Basiswert = SpeziesGS</summary>
     public int GeschwindigkeitBasis => AktuelleSpezies?.Geschwindigkeit ?? 8;
 
-    /// <summary>GS gesamt = SpeziesGS + Vorteilsboni</summary>
-    public int Geschwindigkeit => GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus;
+    /// <summary>GS gesamt = SpeziesGS + manuelle Boni + aktive RuleEffects</summary>
+    public int Geschwindigkeit => (int)ResolveDerivedValue(
+        "derived.GS",
+        GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus).FinalValue;
 
-    public string GeschwindigkeitFormel => $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})";
+    public string GeschwindigkeitFormel =>
+        $"Spezieswert ({AktuelleSpezies?.Name ?? "Mensch"}: {GeschwindigkeitBasis})"
+        + (_sheet.GeschwindigkeitVorteilsBonus != 0
+            ? $" + manuell {_sheet.GeschwindigkeitVorteilsBonus:+#;-#;0}"
+            : "");
 
     /// <summary>Wundschwelle = ⌈KO/2⌉</summary>
     public int Wundschwelle => (int)Math.Ceiling(_sheet.Konstitution / 2.0);
@@ -1250,10 +1224,62 @@ public class MainPageViewModel : INotifyPropertyChanged
             if (_sheet.GeschwindigkeitVorteilsBonus == value) return;
             _sheet.GeschwindigkeitVorteilsBonus = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitVorteilsBonus)));
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
+            NotifyRuleEffectValuesChanged();
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBoniGesamt)));
             RequestDelayedSave();
         }
+    }
+
+    private async Task LoadRuleCatalogAsync()
+    {
+        if (_vorteilNachteilService is null)
+            return;
+
+        await _vorteilNachteilService.LoadCatalogAsync();
+        NotifyRuleEffectValuesChanged();
+    }
+
+    private RuleEffectResolution ResolveDerivedValue(string target, decimal baseValue)
+    {
+        if (_vorteilNachteilService is null || _effectResolver is null)
+        {
+            return new RuleEffectResolution
+            {
+                Target = target,
+                BaseValue = baseValue,
+                FinalValue = baseValue
+            };
+        }
+
+        var sources = _vorteilNachteilService.CreateEffectSources(VorteilNachteilEintraege);
+        return _effectResolver.Resolve(target, baseValue, sources);
+    }
+
+    private string BuildGeschwindigkeitAuditText()
+    {
+        var resolution = ResolveDerivedValue(
+            "derived.GS",
+            GeschwindigkeitBasis + _sheet.GeschwindigkeitVorteilsBonus);
+        if (resolution.AuditEntries.Count == 0)
+            return GeschwindigkeitFormel;
+
+        var audit = string.Join(
+            " | ",
+            resolution.AuditEntries.Select(entry =>
+                $"{entry.SourceName}: {entry.Before:0.##} -> {entry.After:0.##} ({entry.AppliedValue:+0.##;-0.##;0})"));
+
+        return $"{GeschwindigkeitFormel} | {audit}";
+    }
+
+    private void NotifyRuleEffectValuesChanged()
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchicksalspunkteGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitAuditText)));
     }
 
     // --- AP / SchiP ---
@@ -1278,7 +1304,9 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     public int SchicksalspunkteGesamt
     {
-        get => _sheet.SchicksalspunkteGesamt + EreignisSchiPBonus;
+        get => (int)ResolveDerivedValue(
+            "derived.SchiP",
+            _sheet.SchicksalspunkteGesamt + EreignisSchiPBonus).FinalValue;
         set => SetProperty(_sheet.SchicksalspunkteGesamt, value - EreignisSchiPBonus, v => _sheet.SchicksalspunkteGesamt = v);
     }
 

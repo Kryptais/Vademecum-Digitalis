@@ -15,6 +15,7 @@ namespace VademecumDigitalis.ViewModels;
 public partial class BoronKalenderViewModel : ObservableObject
 {
     private readonly PersistenceService _persistence;
+    private readonly IDialogService _dialogService;
     private CancellationTokenSource? _saveCts;
 
     // Das aktuelle Spielwelt-Datum (persistiert)
@@ -72,6 +73,12 @@ public partial class BoronKalenderViewModel : ObservableObject
 
     public ObservableCollection<KalenderEintrag> SelectedTagEintraege { get; } = [];
 
+    [ObservableProperty]
+    private string _neuerEintragTitel = string.Empty;
+
+    [ObservableProperty]
+    private bool _neuerEintragIstJaehrlich = true;
+
     public string SelectedTagText
     {
         get
@@ -82,9 +89,10 @@ public partial class BoronKalenderViewModel : ObservableObject
         }
     }
 
-    public BoronKalenderViewModel(PersistenceService persistence)
+    public BoronKalenderViewModel(PersistenceService persistence, IDialogService dialogService)
     {
         _persistence = persistence;
+        _dialogService = dialogService;
     }
 
     public async Task LoadDataAsync()
@@ -282,6 +290,43 @@ public partial class BoronKalenderViewModel : ObservableObject
         RebuildTage();
         AktualisiereSelectedTagEintraege();
         RequestDelayedSave();
+    }
+
+    [RelayCommand]
+    private async Task NeuerEintragHinzufuegen()
+    {
+        if (SelectedTag == null || SelectedTag.IstLeer)
+        {
+            await _dialogService.DisplayAlert("Kein Tag gewählt", "Bitte erst einen Tag im Kalender antippen.", "OK");
+            return;
+        }
+
+        var titel = NeuerEintragTitel?.Trim();
+        if (string.IsNullOrWhiteSpace(titel))
+        {
+            await _dialogService.DisplayAlert("Kein Titel", "Bitte einen Titel eingeben.", "OK");
+            return;
+        }
+
+        EintragHinzufuegen(new KalenderEintrag
+        {
+            Titel = titel,
+            EintragTag = SelectedTag.Tag,
+            EintragMonat = AngezeigterMonatIndex,
+            EintragJahr = AngezeigtesJahr,
+            IstJaehrlich = NeuerEintragIstJaehrlich
+        });
+
+        NeuerEintragTitel = string.Empty;
+    }
+
+    [RelayCommand]
+    private void EintragLoeschen(KalenderEintrag eintrag)
+    {
+        if (eintrag != null)
+        {
+            EintragEntfernen(eintrag);
+        }
     }
 
     // --- Date Picker Command (für Geburtstag etc.) ---

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using VademecumDigitalis.Models;
+using VademecumDigitalis.Models.RuleEngine;
 
 namespace VademecumDigitalis.Services;
 
@@ -45,7 +46,11 @@ public class VorteilNachteilService
             return _catalog;
 
         return _catalog
-            .Where(vn => vn.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .Where(vn =>
+                vn.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                vn.Beschreibung.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                vn.Anmerkungen.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                vn.Kategorie.ToDisplayString().Contains(query, StringComparison.OrdinalIgnoreCase))
             .ToList();
     }
 
@@ -131,6 +136,40 @@ public class VorteilNachteilService
         return total;
     }
 
+    /// <summary>
+    /// Erzeugt aktive Effektquellen aus den erworbenen VN-Einträgen.
+    /// Bestehende ProbenModifikatoren werden zusätzlich als RuleEffect abgebildet.
+    /// </summary>
+    public IReadOnlyList<RuleEffectSource> CreateEffectSources(IEnumerable<CharakterVorteilNachteilEintrag> entries)
+    {
+        ArgumentNullException.ThrowIfNull(entries);
+
+        var sources = new List<RuleEffectSource>();
+        foreach (var entry in entries)
+        {
+            var catalogEntry = FindById(entry.VnId);
+            if (catalogEntry is null)
+                continue;
+
+            var effects = catalogEntry.Effects
+                .Concat(catalogEntry.ProbenModifikatoren.Select(ToRuleEffect))
+                .ToList();
+
+            if (effects.Count == 0)
+                continue;
+
+            sources.Add(new RuleEffectSource
+            {
+                SourceId = catalogEntry.Id,
+                SourceName = catalogEntry.Name,
+                Level = Math.Max(1, entry.Stufe),
+                Effects = effects
+            });
+        }
+
+        return sources;
+    }
+
     /// <summary>Erstellt einen Charakter-Eintrag aus einem Katalogeintrag.</summary>
     public static CharakterVorteilNachteilEintrag CreateEntry(VorteilNachteil vn, int stufe = 1, bool forceAdd = false)
     {
@@ -152,5 +191,35 @@ public class VorteilNachteilService
     {
         ArgumentNullException.ThrowIfNull(homebrew);
         _catalog.Add(homebrew);
+    }
+
+    private static RuleEffect ToRuleEffect(ProbenModifikator modifikator)
+    {
+        return new RuleEffect
+        {
+            Id = $"probe_{modifikator.Typ}_{NormalizeTarget(modifikator.Ziel)}",
+            Kind = RuleEffectKind.Modifier,
+            Title = $"Probe: {modifikator.Ziel}",
+            Target = modifikator.Typ switch
+            {
+                ModifikatorTyp.Attribut => $"check.attribute.{modifikator.Ziel}",
+                ModifikatorTyp.Talent => $"check.talent.{modifikator.Ziel}",
+                ModifikatorTyp.TalentGruppe => $"check.talentGroup.{modifikator.Ziel}",
+                _ => modifikator.Ziel
+            },
+            Operation = RuleModifierOperation.Add,
+            Value = modifikator.Wert,
+            PerLevel = true,
+            Phase = "checks",
+            Stacking = RuleEffectStacking.Stack
+        };
+    }
+
+    private static string NormalizeTarget(string value)
+    {
+        return string.Concat(value
+            .Trim()
+            .ToLowerInvariant()
+            .Select(ch => char.IsLetterOrDigit(ch) ? ch : '_'));
     }
 }

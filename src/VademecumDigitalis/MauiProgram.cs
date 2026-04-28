@@ -1,6 +1,7 @@
 namespace VademecumDigitalis;
 
 using VademecumDigitalis.Services;
+using VademecumDigitalis.Services.RuleEngine;
 using VademecumDigitalis.ViewModels;
 
 public static class MauiProgram
@@ -13,7 +14,8 @@ public static class MauiProgram
 
     // register services and viewmodels
     builder.Services.AddSingleton<PersistenceService>();
-    builder.Services.AddSingleton<InventoryService>();
+    builder.Services.AddSingleton<IInventoryService, InventoryService>();
+    builder.Services.AddSingleton<IInventoryNavigationService, InventoryNavigationService>();
     builder.Services.AddSingleton<InventoryViewModel>();
     builder.Services.AddSingleton<InventoryLogService>();
     builder.Services.AddSingleton<IDialogService, DialogService>();
@@ -26,6 +28,8 @@ public static class MauiProgram
     // Pages + VMs
     builder.Services.AddTransient<InventoryContainerPage>();
     builder.Services.AddTransient<InventoryContainerViewModel>();
+    builder.Services.AddTransient<InventoryAddItemViewModel>();
+    builder.Services.AddTransient<MoneyTransferViewModel>();
     
     builder.Services.AddTransient<GlobalItemSearchPage>();
     builder.Services.AddTransient<GlobalItemSearchViewModel>();
@@ -42,6 +46,7 @@ public static class MauiProgram
     builder.Services.AddTransient<AdvantagesPage>();
 
     builder.Services.AddSingleton<TalentModifierService>();
+    builder.Services.AddSingleton<EffectResolver>();
 
         return builder.Build();
     }

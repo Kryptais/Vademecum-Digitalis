@@ -14,10 +14,9 @@ namespace VademecumDigitalis
         public int Heller => (BindingContext as MoneyTransferViewModel)?.Heller ?? 0;
         public int Kreuzer => (BindingContext as MoneyTransferViewModel)?.Kreuzer ?? 0;
 
-        public MoneyTransferPage(Models.InventoryContainer source)
+        public MoneyTransferPage(MoneyTransferViewModel vm)
         {
             InitializeComponent();
-            var vm = new MoneyTransferViewModel(source);
             BindingContext = vm;
 
             vm.RequestClose += (s, e) =>

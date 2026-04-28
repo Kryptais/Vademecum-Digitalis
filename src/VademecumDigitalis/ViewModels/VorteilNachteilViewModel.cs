@@ -17,6 +17,7 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
 
     private bool _isSearchVisible;
     private bool _isHomebrewMode;
+    private bool _showNachteile;
     private string _searchText = string.Empty;
 
     // Homebrew-Felder
@@ -42,6 +43,19 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
     /// <summary>True wenn keine Vorteile/Nachteile vorhanden.</summary>
     public bool KeineVorteileNachteile => Vm.VorteilNachteilEintraege.Count == 0;
 
+    public int VorteileCount => Vm.VorteilNachteilEintraege.Count(e => !e.Kategorie.IstNachteil());
+
+    public int NachteileCount => Vm.VorteilNachteilEintraege.Count(e => e.Kategorie.IstNachteil());
+
+    public int GesamtApKosten => _vnService.CalculateTotalApCost(Vm.VorteilNachteilEintraege);
+
+    public string GesamtApAnzeige => GesamtApKosten switch
+    {
+        > 0 => $"{GesamtApKosten} AP Kosten",
+        < 0 => $"{Math.Abs(GesamtApKosten)} AP Rückgewinn",
+        _ => "0 AP"
+    };
+
     // --- Suche ---
 
     /// <summary>Ob der Such-/Hinzufügen-Bereich sichtbar ist.</summary>
@@ -60,6 +74,24 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
 
     /// <summary>Ob die Katalogsuche aktiv ist (Gegenteil von Homebrew).</summary>
     public bool IsCatalogSearchMode => !_isHomebrewMode;
+
+    /// <summary>Schaltet die Katalogsuche zwischen Vorteilen und Nachteilen um.</summary>
+    public bool ShowNachteile
+    {
+        get => _showNachteile;
+        set
+        {
+            if (_showNachteile != value)
+            {
+                _showNachteile = value;
+                Notify();
+                Notify(nameof(KatalogModusTitel));
+                UpdateSearchResults();
+            }
+        }
+    }
+
+    public string KatalogModusTitel => ShowNachteile ? "Nachteile" : "Vorteile";
 
     /// <summary>Suchtext für die Katalogsuche.</summary>
     public string SearchText
@@ -129,6 +161,7 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
     {
         await _vnService.LoadCatalogAsync();
         RefreshGroupedList();
+        UpdateSearchResults();
     }
 
     // --- Aktionen ---
@@ -250,11 +283,17 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         }
 
         Notify(nameof(KeineVorteileNachteile));
+        Notify(nameof(VorteileCount));
+        Notify(nameof(NachteileCount));
+        Notify(nameof(GesamtApKosten));
+        Notify(nameof(GesamtApAnzeige));
     }
 
     private void UpdateSearchResults()
     {
-        var results = _vnService.Search(_searchText);
+        var results = _vnService.Search(_searchText)
+            .Where(vn => ShowNachteile == vn.Kategorie.IstNachteil());
+
         SearchResults.Clear();
         foreach (var vn in results)
         {

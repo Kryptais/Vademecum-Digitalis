@@ -19,6 +19,8 @@ namespace VademecumDigitalis.ViewModels
         private readonly InventoryLogService _logService;
         private readonly InventoryViewModel _parentViewModel;
         private readonly IDialogService _dialogService;
+        private readonly IInventoryService _inventoryService;
+        private readonly IInventoryNavigationService _navigationService;
 
         [ObservableProperty]
         private InventoryContainer _container;
@@ -28,11 +30,18 @@ namespace VademecumDigitalis.ViewModels
 
         public ObservableCollection<InventoryItem> FilteredItems { get; } = new();
 
-        public InventoryContainerViewModel(InventoryLogService logService, InventoryViewModel parentViewModel, IDialogService dialogService)
+        public InventoryContainerViewModel(
+            InventoryLogService logService,
+            InventoryViewModel parentViewModel,
+            IDialogService dialogService,
+            IInventoryService inventoryService,
+            IInventoryNavigationService navigationService)
         {
             _logService = logService;
             _parentViewModel = parentViewModel;
             _dialogService = dialogService;
+            _inventoryService = inventoryService;
+            _navigationService = navigationService;
         }
 
         partial void OnContainerChanged(InventoryContainer value)
@@ -147,23 +156,18 @@ namespace VademecumDigitalis.ViewModels
         [RelayCommand]
         private async Task AddItem()
         {
-            var page = new InventoryAddItemPage();
-            await _dialogService.PushModalAsync(new NavigationPage(page));
-
-            page.Disappearing += (s, ev) =>
+            var item = await _navigationService.AddItemAsync();
+            if (item != null)
             {
-                if (page.ResultItem != null)
-                    Container.Items.Add(page.ResultItem);
-            };
+                Container.Items.Add(item);
+            }
         }
 
         [RelayCommand]
         private async Task EditItem(InventoryItem item)
         {
             if (item == null) return;
-            var page = new InventoryAddItemPage();
-            page.SetEditingItem(item);
-            await _dialogService.PushModalAsync(new NavigationPage(page));
+            await _navigationService.EditItemAsync(item);
         }
 
         [RelayCommand]
@@ -310,7 +314,7 @@ namespace VademecumDigitalis.ViewModels
         [RelayCommand]
         private async Task NavigateBack()
         {
-            await Shell.Current.GoToAsync("..");
+            await _navigationService.NavigateBackAsync();
         }
 
         [RelayCommand]
@@ -333,39 +337,43 @@ namespace VademecumDigitalis.ViewModels
             var target = _parentViewModel.Containers.FirstOrDefault(c => c.Name == targetName);
             if (target == null) return;
 
-            var transferPage = new MoneyTransferPage(Container);
-            await _dialogService.PushModalAsync(transferPage);
+            var transfer = await _navigationService.RequestMoneyTransferAsync(Container);
+            if (transfer == null) return;
 
-            transferPage.Disappearing += async (s, args) =>
+            if (transfer.Dukaten > Container.Money.Dukaten ||
+                transfer.Silbertaler > Container.Money.Silbertaler ||
+                transfer.Heller > Container.Money.Heller ||
+                transfer.Kreuzer > Container.Money.Kreuzer)
             {
-                if (!transferPage.Confirmed) return;
+                await _dialogService.DisplayAlert("Fehler", "Nicht genügend Münzen vorhanden.", "OK");
+                return;
+            }
 
-                int d = transferPage.Dukaten;
-                int s1 = transferPage.Silbertaler;
-                int h = transferPage.Heller;
-                int k = transferPage.Kreuzer;
+            if (transfer.Dukaten == 0 &&
+                transfer.Silbertaler == 0 &&
+                transfer.Heller == 0 &&
+                transfer.Kreuzer == 0)
+            {
+                return;
+            }
 
-                if (d > Container.Money.Dukaten || s1 > Container.Money.Silbertaler ||
-                    h > Container.Money.Heller || k > Container.Money.Kreuzer)
-                {
-                    await _dialogService.DisplayAlert("Fehler", "Nicht genügend Münzen vorhanden.", "OK");
-                    return;
-                }
+            try
+            {
+                _inventoryService.TransferMoney(
+                    Container,
+                    target,
+                    transfer.Dukaten,
+                    transfer.Silbertaler,
+                    transfer.Heller,
+                    transfer.Kreuzer);
 
-                if (d == 0 && s1 == 0 && h == 0 && k == 0) return;
-
-                var svc = new InventoryService();
-                try
-                {
-                    svc.TransferMoney(Container, target, d, s1, h, k);
-                    WeakReferenceMessenger.Default.Send(new MoneyTransferredMessage(Container, target));
-                    await _dialogService.DisplayAlert("OK", "Transfer durchgeführt.", "OK");
-                }
-                catch (Exception ex)
-                {
-                    await _dialogService.DisplayAlert("Fehler", ex.Message, "OK");
-                }
-            };
+                WeakReferenceMessenger.Default.Send(new MoneyTransferredMessage(Container, target));
+                await _dialogService.DisplayAlert("OK", "Transfer durchgeführt.", "OK");
+            }
+            catch (Exception ex)
+            {
+                await _dialogService.DisplayAlert("Fehler", ex.Message, "OK");
+            }
         }
 
         [RelayCommand]
@@ -387,8 +395,7 @@ namespace VademecumDigitalis.ViewModels
                 "Transfer in Tresor", "Soll das gesamte Geld dieses Containers in den Tresor verschoben werden?", "Ja, alles", "Nein");
             if (!confirm) return;
 
-            var svc = new InventoryService();
-            svc.TransferMoney(Container, treasury,
+            _inventoryService.TransferMoney(Container, treasury,
                 (int)Container.Money.Dukaten, (int)Container.Money.Silbertaler,
                 (int)Container.Money.Heller, (int)Container.Money.Kreuzer);
 

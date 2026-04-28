@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
+             xmlns:controls="clr-namespace:VademecumDigitalis.Controls"
              x:Class="VademecumDigitalis.MainPage"
              Title="Charakterbogen">
 
@@ -10,6 +11,8 @@
             <Label Text="Vademecum Digitalis" Style="{StaticResource HeadlineLabel}" />
             <Label Text="Digitaler DSA-5-Charakterbogen (Hauptblatt)"
                    FontSize="14" TextColor="{StaticResource TextSecondary}" Margin="0,-8,0,4" />
+
+            <controls:CalendarDateWidget />
 
             <!-- Hauptattribute -->
             <Border Style="{StaticResource CardBorder}">
@@ -214,7 +217,7 @@
                         <!-- GS (Spezies-abh&#xE4;ngig, kein Zukauf) -->
                         <VerticalStackLayout Grid.Row="6" Grid.Column="0" Spacing="1" VerticalOptions="Center">
                             <Label Text="Geschwindigkeit (GS)" />
-                            <Label Text="{Binding GeschwindigkeitFormel}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding GeschwindigkeitAuditText}" FontSize="12" TextColor="{StaticResource TextSecondary}" />
                         </VerticalStackLayout>
                         <Label Grid.Row="6" Grid.Column="1" Text="{Binding GeschwindigkeitBasis}" WidthRequest="52"
                                FontSize="14" HorizontalTextAlignment="Center" VerticalOptions="Center" TextColor="{StaticResource TextSecondary}" />

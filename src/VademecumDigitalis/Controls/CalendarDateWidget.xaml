@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:VademecumDigitalis.ViewModels"
+             x:Class="VademecumDigitalis.Controls.CalendarDateWidget"
+             x:DataType="viewmodels:BoronKalenderViewModel">
+    <Border Style="{StaticResource CardBorder}" Padding="10">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+              RowDefinitions="Auto,Auto"
+              ColumnSpacing="8"
+              RowSpacing="6">
+            <Button x:Name="ToggleButton"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Text="▾"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    Padding="0"
+                    BackgroundColor="Transparent"
+                    TextColor="{StaticResource TextSecondary}"
+                    Clicked="OnToggleClicked" />
+
+            <VerticalStackLayout Grid.Row="0" Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                <Label Text="Datum"
+                       FontSize="11"
+                       TextColor="{StaticResource TextSecondary}" />
+                <Label Text="{Binding AktuellesDatumText}"
+                       FontSize="14"
+                       FontAttributes="Bold"
+                       TextColor="{StaticResource AccentCyan}"
+                       LineBreakMode="TailTruncation" />
+            </VerticalStackLayout>
+
+            <Button Grid.Row="0"
+                    Grid.Column="2"
+                    Text="-"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    Padding="0"
+                    Command="{Binding TagZurückCommand}" />
+            <Button Grid.Row="0"
+                    Grid.Column="3"
+                    Text="+"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    Padding="0"
+                    BackgroundColor="{StaticResource AccentCyan}"
+                    Command="{Binding TagVorCommand}" />
+
+            <Grid x:Name="ExpandedContent"
+                  Grid.Row="1"
+                  Grid.ColumnSpan="4"
+                  ColumnDefinitions="*,Auto"
+                  ColumnSpacing="8">
+                <Label Grid.Column="0"
+                       Text="{Binding AngezeigterMonatName}"
+                       FontSize="12"
+                       TextColor="{StaticResource TextSecondary}"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        Text="+7 Tage"
+                        FontSize="12"
+                        Padding="10,4"
+                        Command="{Binding WocheVorCommand}" />
+            </Grid>
+        </Grid>
+    </Border>
+</ContentView>

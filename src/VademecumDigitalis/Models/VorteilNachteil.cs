@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json.Serialization;
+using VademecumDigitalis.Models.RuleEngine;
 
 namespace VademecumDigitalis.Models;
 
@@ -75,6 +76,12 @@ public record VorteilNachteil
     /// <summary>Proben-Modifikatoren, die dieser Vorteil/Nachteil gewährt (pro Stufe multipliziert).</summary>
     public List<ProbenModifikator> ProbenModifikatoren { get; init; } = [];
 
+    /// <summary>
+    /// Neue generische Effekte. Narrative Effekte beschreiben nur, Modifier-Effekte
+    /// können über die RuleEngine konkrete Werte verändern.
+    /// </summary>
+    public List<RuleEffect> Effects { get; init; } = [];
+
     /// <summary>Redaktionelle Hinweise / spezifische Modifikatoren.</summary>
     public string Anmerkungen { get; init; } = string.Empty;
 
@@ -84,6 +91,38 @@ public record VorteilNachteil
     /// <summary>True wenn der VN mehr als eine Stufe hat.</summary>
     [JsonIgnore]
     public bool IstStufenbasiert => MaxStufe > 1;
+
+    [JsonIgnore]
+    public string KategorieAnzeige => Kategorie.ToDisplayString();
+
+    [JsonIgnore]
+    public string ApKostenAnzeige
+    {
+        get
+        {
+            if (ApKostenProStufe.Count == 0)
+                return "AP n/a";
+
+            return MaxStufe > 1
+                ? $"{string.Join("/", ApKostenProStufe)} AP"
+                : $"{ApKostenProStufe[0]} AP";
+        }
+    }
+
+    [JsonIgnore]
+    public string EffektKurztext
+    {
+        get
+        {
+            var mechanical = Effects.Count(e => e.IsMechanical);
+            if (mechanical > 0)
+                return $"{mechanical} mechanische Effekte";
+
+            return ProbenModifikatoren.Count > 0
+                ? $"{ProbenModifikatoren.Count} Probenmodifikatoren"
+                : "Narrativ / manuell";
+        }
+    }
 }
 
 /// <summary>
@@ -172,6 +211,12 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
             return text;
             }
         }
+
+    [JsonIgnore]
+    public bool IstNachteil => Kategorie.IstNachteil();
+
+    [JsonIgnore]
+    public string TypAnzeige => IstNachteil ? "Nachteil" : "Vorteil";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
