@@ -14,6 +14,7 @@ public class MainPageViewModel : INotifyPropertyChanged
     private readonly PersistenceService _persistence;
     private readonly TalentModifierService? _talentModifierService;
     private readonly VorteilNachteilService? _vorteilNachteilService;
+    private readonly TalentCatalogService? _talentCatalogService;
     private readonly EffectResolver? _effectResolver;
     private CancellationTokenSource? _saveCts;
 
@@ -25,11 +26,13 @@ public class MainPageViewModel : INotifyPropertyChanged
         PersistenceService persistence,
         TalentModifierService? talentModifierService = null,
         VorteilNachteilService? vorteilNachteilService = null,
-        EffectResolver? effectResolver = null)
+        EffectResolver? effectResolver = null,
+        TalentCatalogService? talentCatalogService = null)
     {
         _persistence = persistence;
         _talentModifierService = talentModifierService;
         _vorteilNachteilService = vorteilNachteilService;
+        _talentCatalogService = talentCatalogService;
         _effectResolver = effectResolver;
         TalentGruppen = BuildTalentGruppen();
         Kampftechniken = BuildKampftechniken();
@@ -1311,11 +1314,16 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private async Task LoadRuleCatalogAsync()
     {
-        if (_vorteilNachteilService is null)
-            return;
+        var tasks = new List<Task>();
+        if (_vorteilNachteilService is not null)
+            tasks.Add(_vorteilNachteilService.LoadCatalogAsync());
+        if (_talentCatalogService is not null)
+            tasks.Add(_talentCatalogService.EnsureLoadedAsync());
 
-        await _vorteilNachteilService.LoadCatalogAsync();
+        if (tasks.Count == 0) return;
+        await Task.WhenAll(tasks);
         NotifyRuleEffectValuesChanged();
+        RecalculateTalentProben();
     }
 
     private RuleEffectResolution ResolveDerivedValue(string target, decimal baseValue)
