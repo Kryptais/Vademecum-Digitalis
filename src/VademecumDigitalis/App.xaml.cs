@@ -13,10 +13,10 @@ public partial class App : Application
         _services = services;
         CharacterSheetSession.Initialize(mainVm);
 
-        // Dashboard als Startseite setzen
+        // Dashboard als Startseite setzen (in NavigationPage für Push-Navigation)
         try
         {
-            MainPage = services.GetRequiredService<DashboardPage>();
+            MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>());
         }
         catch (Exception ex)
         {
@@ -32,9 +32,9 @@ public partial class App : Application
         MainPage = services.GetRequiredService<AppShell>();
     }
 
-    /// <summary>Wechselt zurück zum Dashboard (z. B. aus Einstellungen).</summary>
+    /// <summary>Wechselt zurück zum Dashboard (z. B. aus der Charakteransicht).</summary>
     public void SwitchToDashboard(IServiceProvider services)
     {
-        MainPage = services.GetRequiredService<DashboardPage>();
+        MainPage = new NavigationPage(services.GetRequiredService<DashboardPage>());
     }
 }

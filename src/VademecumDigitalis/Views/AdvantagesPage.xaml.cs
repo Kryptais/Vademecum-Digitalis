@@ -25,17 +25,18 @@ public partial class AdvantagesPage : ContentPage
         _vm.ToggleSearch();
     }
 
-    private void OnAddFromCatalogClicked(object? sender, EventArgs e)
+    private async void OnAddFromCatalogClicked(object? sender, EventArgs e)
     {
         if (sender is Button btn && btn.CommandParameter is VorteilNachteil vn)
         {
-            _vm.AddFromCatalog(vn);
+            await _vm.AddFromCatalogAsync(vn, ShowTalentPickerAsync);
         }
     }
 
-    private void OnAddHomebrewClicked(object? sender, EventArgs e)
+    private async Task<string?> ShowTalentPickerAsync(string[] talente, string title)
     {
-        _vm.AddHomebrew();
+        var result = await DisplayActionSheet(title, "Abbrechen", null, talente);
+        return result == "Abbrechen" || result == null ? null : result;
     }
 
     private void OnLevelUpClicked(object? sender, EventArgs e)

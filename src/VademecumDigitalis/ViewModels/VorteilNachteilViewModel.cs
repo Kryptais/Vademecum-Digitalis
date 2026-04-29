@@ -8,29 +8,22 @@ namespace VademecumDigitalis.ViewModels;
 
 /// <summary>
 /// ViewModel für die Vorteile/Nachteile-Seite mit Katalogsuche,
-/// gruppierter Darstellung, Homebrew-Erstellung und Stufenaufstieg.
+/// gruppierter Darstellung und Stufenaufstieg.
 /// </summary>
 public class VorteilNachteilViewModel : INotifyPropertyChanged
 {
     private readonly VorteilNachteilService _vnService;
+    private readonly TalentCatalogService _talentCatalogService;
     private MainPageViewModel Vm => CharacterSheetSession.Current;
 
     private bool _isSearchVisible;
-    private bool _isHomebrewMode;
     private bool _showNachteile;
     private string _searchText = string.Empty;
 
-    // Homebrew-Felder
-    private string _homebrewName = string.Empty;
-    private string _homebrewBeschreibung = string.Empty;
-    private int _homebrewMaxStufe = 1;
-    private string _homebrewApKosten = string.Empty;
-    private int _homebrewKategorieIndex;
-    private string _homebrewAnmerkungen = string.Empty;
-
-    public VorteilNachteilViewModel(VorteilNachteilService vnService)
+    public VorteilNachteilViewModel(VorteilNachteilService vnService, TalentCatalogService talentCatalogService)
     {
         _vnService = vnService;
+        _talentCatalogService = talentCatalogService;
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -64,16 +57,6 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         get => _isSearchVisible;
         set { if (_isSearchVisible != value) { _isSearchVisible = value; Notify(); } }
     }
-
-    /// <summary>Ob der Homebrew-Modus aktiv ist.</summary>
-    public bool IsHomebrewMode
-    {
-        get => _isHomebrewMode;
-        set { if (_isHomebrewMode != value) { _isHomebrewMode = value; Notify(); Notify(nameof(IsCatalogSearchMode)); } }
-    }
-
-    /// <summary>Ob die Katalogsuche aktiv ist (Gegenteil von Homebrew).</summary>
-    public bool IsCatalogSearchMode => !_isHomebrewMode;
 
     /// <summary>Schaltet die Katalogsuche zwischen Vorteilen und Nachteilen um.</summary>
     public bool ShowNachteile
@@ -111,55 +94,15 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
     /// <summary>Suchergebnisse aus dem Katalog.</summary>
     public ObservableCollection<VorteilNachteil> SearchResults { get; } = [];
 
-    // --- Homebrew-Felder ---
-
-    public string HomebrewName
-    {
-        get => _homebrewName;
-        set { if (_homebrewName != value) { _homebrewName = value; Notify(); } }
-    }
-
-    public string HomebrewBeschreibung
-    {
-        get => _homebrewBeschreibung;
-        set { if (_homebrewBeschreibung != value) { _homebrewBeschreibung = value; Notify(); } }
-    }
-
-    public int HomebrewMaxStufe
-    {
-        get => _homebrewMaxStufe;
-        set { if (_homebrewMaxStufe != value) { _homebrewMaxStufe = Math.Max(1, value); Notify(); } }
-    }
-
-    public string HomebrewApKosten
-    {
-        get => _homebrewApKosten;
-        set { if (_homebrewApKosten != value) { _homebrewApKosten = value; Notify(); } }
-    }
-
-    public int HomebrewKategorieIndex
-    {
-        get => _homebrewKategorieIndex;
-        set { if (_homebrewKategorieIndex != value) { _homebrewKategorieIndex = value; Notify(); } }
-    }
-
-    public string HomebrewAnmerkungen
-    {
-        get => _homebrewAnmerkungen;
-        set { if (_homebrewAnmerkungen != value) { _homebrewAnmerkungen = value; Notify(); } }
-    }
-
-    /// <summary>Alle Kategorienamen für den Picker.</summary>
-    public IReadOnlyList<string> KategorieNamen { get; } = Enum.GetValues<VorteilNachteilKategorie>()
-        .Select(c => c.ToDisplayString())
-        .ToList();
-
     // --- Initialisierung ---
 
     /// <summary>Lädt den Katalog und aktualisiert die gruppierte Ansicht.</summary>
     public async Task InitializeAsync()
     {
-        await _vnService.LoadCatalogAsync();
+        await Task.WhenAll(
+            _vnService.LoadCatalogAsync(),
+            _talentCatalogService.EnsureLoadedAsync()
+        );
         RefreshGroupedList();
         UpdateSearchResults();
     }
@@ -173,67 +116,88 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         if (IsSearchVisible)
         {
             SearchText = string.Empty;
-            IsHomebrewMode = false;
             UpdateSearchResults();
         }
     }
 
-    /// <summary>Fügt einen Vorteil/Nachteil aus dem Katalog zum Charakter hinzu.</summary>
-    public void AddFromCatalog(VorteilNachteil vn, bool forceAdd = false)
+    /// <summary>
+    /// Fügt einen Vorteil/Nachteil aus dem Katalog zum Charakter hinzu.
+    /// Für talent-gebundene VNs (Begabung/Unfähigkeit) wird ein Talent-Picker angezeigt.
+    /// </summary>
+    public async Task AddFromCatalogAsync(
+        VorteilNachteil vn,
+        Func<string[], string, Task<string?>>? talentPicker = null,
+        bool forceAdd = false)
     {
         ArgumentNullException.ThrowIfNull(vn);
 
+        if (vn.TalentTyp != TalentGebundenerTyp.Keiner)
+        {
+            if (talentPicker == null) return;
+
+            // Alle Talentnamen aus dem Katalog, alphabetisch
+            var alleTalente = _talentCatalogService.Katalog
+                .Select(t => t.Name)
+                .OrderBy(t => t)
+                .ToArray();
+
+            var title = vn.TalentTyp == TalentGebundenerTyp.Begabung
+                ? "Talent für Begabung wählen"
+                : "Talent für Unfähigkeit wählen";
+
+            var selectedTalent = await talentPicker(alleTalente, title);
+            if (string.IsNullOrEmpty(selectedTalent)) return;
+
+            // Begabung: kein Duplikat für dasselbe Talent
+            if (vn.TalentTyp == TalentGebundenerTyp.Begabung)
+            {
+                var alreadyHas = Vm.VorteilNachteilEintraege.Any(e =>
+                    string.Equals(e.VnId, vn.Id, StringComparison.OrdinalIgnoreCase) &&
+                    string.Equals(e.Notiz?.Trim(), selectedTalent, StringComparison.OrdinalIgnoreCase));
+                if (alreadyHas) return;
+            }
+
+            // AP-Kosten dynamisch berechnen (SF des Talents)
+            var katalogTalent = _talentCatalogService.FindByName(selectedTalent);
+            var sfIndex = SfToIndex(katalogTalent?.Sf ?? "A");
+            var apKosten = vn.TalentTyp == TalentGebundenerTyp.Begabung
+                ? sfIndex * 6
+                : -(sfIndex * 10);
+
+            var entry = VorteilNachteilService.CreateEntry(vn, stufe: 1, forceAdd: forceAdd);
+            entry.Notiz = selectedTalent;
+            entry.ApKosten = apKosten;
+            Vm.VorteilNachteilHinzufuegen(entry);
+            RefreshGroupedList();
+            IsSearchVisible = false;
+            return;
+        }
+
+        // Normaler (nicht talent-gebundener) VN
         var existing = Vm.VorteilNachteilEintraege
             .FirstOrDefault(e => e.VnId == vn.Id);
 
         if (existing != null)
         {
             if (existing.Stufe < vn.MaxStufe)
-            {
                 LevelUp(existing);
-            }
             return;
         }
 
-        var entry = VorteilNachteilService.CreateEntry(vn, stufe: 1, forceAdd: forceAdd);
-        Vm.VorteilNachteilHinzufuegen(entry);
+        var newEntry = VorteilNachteilService.CreateEntry(vn, stufe: 1, forceAdd: forceAdd);
+        Vm.VorteilNachteilHinzufuegen(newEntry);
         RefreshGroupedList();
         IsSearchVisible = false;
     }
 
-    /// <summary>Erstellt einen Homebrew-Vorteil/Nachteil und fügt ihn zum Charakter hinzu.</summary>
-    public void AddHomebrew()
+    private static int SfToIndex(string sf) => (sf?.ToUpperInvariant() ?? "A") switch
     {
-        if (string.IsNullOrWhiteSpace(HomebrewName))
-            return;
-
-        var category = Enum.GetValues<VorteilNachteilKategorie>()
-            .ElementAtOrDefault(HomebrewKategorieIndex);
-
-        var apCosts = ParseApCosts(HomebrewApKosten, HomebrewMaxStufe);
-        var id = $"homebrew-{Guid.NewGuid():N}";
-
-        var homebrew = new VorteilNachteil
-        {
-            Id = id,
-            Name = HomebrewName.Trim(),
-            Beschreibung = HomebrewBeschreibung?.Trim() ?? string.Empty,
-            Kategorie = category,
-            MaxStufe = HomebrewMaxStufe,
-            ApKostenProStufe = apCosts,
-            Anmerkungen = HomebrewAnmerkungen?.Trim() ?? string.Empty,
-            IsHomebrew = true
-        };
-
-        _vnService.AddHomebrewEntry(homebrew);
-
-        var entry = VorteilNachteilService.CreateEntry(homebrew, stufe: 1, forceAdd: true);
-        Vm.VorteilNachteilHinzufuegen(entry);
-
-        ResetHomebrewFields();
-        RefreshGroupedList();
-        IsSearchVisible = false;
-    }
+        "A" => 1,
+        "B" => 2,
+        "C" => 3,
+        "D" => 4,
+        _ => 1
+    };
 
     /// <summary>Erhöht die Stufe eines stufenbasierten VN.</summary>
     public void LevelUp(CharakterVorteilNachteilEintrag entry)
@@ -299,36 +263,6 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         {
             SearchResults.Add(vn);
         }
-    }
-
-    private void ResetHomebrewFields()
-    {
-        HomebrewName = string.Empty;
-        HomebrewBeschreibung = string.Empty;
-        HomebrewMaxStufe = 1;
-        HomebrewApKosten = string.Empty;
-        HomebrewKategorieIndex = 0;
-        HomebrewAnmerkungen = string.Empty;
-    }
-
-    private static List<int> ParseApCosts(string input, int maxStufe)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return Enumerable.Repeat(10, maxStufe).ToList();
-
-        var parts = input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        var costs = new List<int>();
-        foreach (var part in parts)
-        {
-            costs.Add(int.TryParse(part, out int val) ? val : 10);
-        }
-
-        while (costs.Count < maxStufe)
-        {
-            costs.Add(costs.Count > 0 ? costs[^1] : 10);
-        }
-
-        return costs;
     }
 
     private void Notify([CallerMemberName] string? propertyName = null)

@@ -4,6 +4,15 @@ using VademecumDigitalis.Models.RuleEngine;
 
 namespace VademecumDigitalis.Models;
 
+/// <summary>Bestimmt ob ein VN an ein bestimmtes Talent gebunden ist (Begabung/Unfähigkeit).</summary>
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TalentGebundenerTyp
+{
+    Keiner,
+    Begabung,
+    Unfaehigkeit
+}
+
 /// <summary>Kategorien für Vorteile und Nachteile nach DSA 5 Regelwiki.</summary>
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum VorteilNachteilKategorie
@@ -99,9 +108,43 @@ public record VorteilNachteil
     /// <summary>True wenn vom Benutzer als Homebrew erstellt.</summary>
     public bool IsHomebrew { get; init; }
 
+    /// <summary>Wenn gesetzt, ist dieser VN talent-gebunden (Begabung/Unfähigkeit).</summary>
+    public TalentGebundenerTyp TalentTyp { get; init; } = TalentGebundenerTyp.Keiner;
+
     /// <summary>True wenn der VN mehr als eine Stufe hat.</summary>
     [JsonIgnore]
     public bool IstStufenbasiert => MaxStufe > 1;
+
+    /// <summary>Lesbare Kategoriebezeichnung.</summary>
+    [JsonIgnore]
+    public string KategorieAnzeige => Kategorie.ToDisplayString();
+
+    /// <summary>Lesbare AP-Kosten-Anzeige.</summary>
+    [JsonIgnore]
+    public string ApKostenAnzeige => TalentTyp != TalentGebundenerTyp.Keiner
+        ? "variabel"
+        : ApKostenProStufe.Count == 1
+            ? $"{ApKostenProStufe[0]} AP"
+            : ApKostenProStufe.Count > 1
+                ? $"{ApKostenProStufe[0]}-{ApKostenProStufe[^1]} AP"
+                : "k.A.";
+
+    /// <summary>Kurzbeschreibung der mechanischen Effekte.</summary>
+    [JsonIgnore]
+    public string EffektKurztext
+    {
+        get
+        {
+            if (TalentTyp == TalentGebundenerTyp.Begabung)
+                return "Erleichterung +1 auf alle Proben";
+            if (TalentTyp == TalentGebundenerTyp.Unfaehigkeit)
+                return "Besten Wurf neu würfeln, schlechteren nehmen";
+            if (ProbenModifikatoren.Count > 0)
+                return string.Join(", ", ProbenModifikatoren.Select(pm =>
+                    $"{pm.Ziel} {(pm.Wert > 0 ? "+" : "")}{pm.Wert}"));
+            return string.Empty;
+        }
+    }
 }
 
 /// <summary>
@@ -160,6 +203,16 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
         set { if (_forceAdded != value) { _forceAdded = value; OnPropertyChanged(); } }
     }
 
+    /// <summary>
+    /// Tatsächliche AP-Kosten für diesen Eintrag (überschreibt Katalogwert,
+    /// z. B. bei talent-gebundenen VNs wie Begabung/Unfähigkeit).
+    /// </summary>
+    public int ApKosten
+    {
+        get => _apKosten;
+        set { if (_apKosten != value) { _apKosten = value; OnPropertyChanged(); } }
+    }
+
     /// <summary>Maximale Stufe aus dem Katalog (wird beim Laden gesetzt, nicht persistiert).</summary>
     [JsonIgnore]
     public int MaxStufe { get; set; } = 1;
@@ -171,6 +224,10 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     /// <summary>Lesbare Kategorie-Anzeige.</summary>
     [JsonIgnore]
     public string KategorieAnzeige => Kategorie.ToDisplayString();
+
+    /// <summary>Zeigt "Vorteil" oder "Nachteil".</summary>
+    [JsonIgnore]
+    public string TypAnzeige => Kategorie.IstNachteil() ? "Nachteil" : "Vorteil";
 
     /// <summary>Stufenanzeige, z.B. "II" (leer bei einstufigen VNs).</summary>
     [JsonIgnore]

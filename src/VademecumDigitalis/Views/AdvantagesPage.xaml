@@ -48,117 +48,83 @@
 
             <Border Style="{StaticResource CardBorder}" IsVisible="{Binding IsSearchVisible}">
                 <VerticalStackLayout Spacing="12">
-                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                        <Label Text="Aus Katalog wählen" Style="{StaticResource SectionHeaderLabel}" VerticalOptions="Center" />
-                        <Label Grid.Column="1" Text="Homebrew" FontSize="12" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" />
-                        <Switch Grid.Column="2" IsToggled="{Binding IsHomebrewMode}" />
-                    </Grid>
+                    <Border Stroke="{StaticResource BorderColor}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 8"
+                            BackgroundColor="{StaticResource InputBackground}"
+                            Padding="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                            <VerticalStackLayout Grid.Column="0" Spacing="1">
+                                <Label Text="{Binding KatalogModusTitel}"
+                                       FontSize="14"
+                                       FontAttributes="Bold" />
+                                <Label Text="Katalogauswahl"
+                                       FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1"
+                                   Text="Nachteile"
+                                   FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center" />
+                            <Switch Grid.Column="2"
+                                    IsToggled="{Binding ShowNachteile}"
+                                    VerticalOptions="Center" />
+                        </Grid>
+                    </Border>
 
-                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsCatalogSearchMode}">
-                        <Border Stroke="{StaticResource BorderColor}"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 8"
-                                BackgroundColor="{StaticResource InputBackground}"
-                                Padding="10">
-                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
-                                <VerticalStackLayout Grid.Column="0" Spacing="1">
-                                    <Label Text="{Binding KatalogModusTitel}"
-                                           FontSize="14"
-                                           FontAttributes="Bold" />
-                                    <Label Text="Katalogauswahl"
-                                           FontSize="11"
-                                           TextColor="{StaticResource TextSecondary}" />
-                                </VerticalStackLayout>
-                                <Label Grid.Column="1"
-                                       Text="Nachteile"
-                                       FontSize="12"
-                                       TextColor="{StaticResource TextSecondary}"
-                                       VerticalOptions="Center" />
-                                <Switch Grid.Column="2"
-                                        IsToggled="{Binding ShowNachteile}"
-                                        VerticalOptions="Center" />
-                            </Grid>
-                        </Border>
+                    <SearchBar Placeholder="Name, Kategorie oder Regeltext suchen"
+                               Text="{Binding SearchText}" />
 
-                        <SearchBar Placeholder="Name, Kategorie oder Regeltext suchen"
-                                   Text="{Binding SearchText}" />
-
-                        <CollectionView ItemsSource="{Binding SearchResults}"
-                                        MaximumHeightRequest="420"
-                                        SelectionMode="None">
-                            <CollectionView.EmptyView>
-                                <Label Text="Keine passenden Einträge gefunden."
-                                       TextColor="{StaticResource TextSecondary}"
-                                       HorizontalTextAlignment="Center"
-                                       Margin="0,16" />
-                            </CollectionView.EmptyView>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate x:DataType="models:VorteilNachteil">
-                                    <Border Stroke="{StaticResource BorderColor}"
-                                            StrokeThickness="1"
-                                            StrokeShape="RoundRectangle 8"
-                                            BackgroundColor="{StaticResource InputBackground}"
-                                            Padding="12"
-                                            Margin="0,4">
-                                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="4">
-                                            <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
-                                                <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" />
-                                                <Label Text="{Binding ApKostenAnzeige}"
-                                                       FontSize="12"
-                                                       TextColor="{StaticResource TextSecondary}"
-                                                       VerticalOptions="Center" />
-                                            </HorizontalStackLayout>
-                                            <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
-                                                    Text="＋"
-                                                    WidthRequest="40"
-                                                    HeightRequest="40"
-                                                    Padding="0"
-                                                    BackgroundColor="{StaticResource AccentCyan}"
-                                                    Clicked="OnAddFromCatalogClicked"
-                                                    CommandParameter="{Binding .}" />
-                                            <Label Grid.Row="1" Grid.Column="0"
-                                                   Text="{Binding Beschreibung}"
+                    <CollectionView ItemsSource="{Binding SearchResults}"
+                                    MaximumHeightRequest="420"
+                                    SelectionMode="None">
+                        <CollectionView.EmptyView>
+                            <Label Text="Keine passenden Einträge gefunden."
+                                   TextColor="{StaticResource TextSecondary}"
+                                   HorizontalTextAlignment="Center"
+                                   Margin="0,16" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:VorteilNachteil">
+                                <Border Stroke="{StaticResource BorderColor}"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8"
+                                        BackgroundColor="{StaticResource InputBackground}"
+                                        Padding="12"
+                                        Margin="0,4">
+                                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="10" RowSpacing="4">
+                                        <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
+                                            <Label Text="{Binding Name}" FontSize="15" FontAttributes="Bold" />
+                                            <Label Text="{Binding ApKostenAnzeige}"
                                                    FontSize="12"
                                                    TextColor="{StaticResource TextSecondary}"
-                                                   MaxLines="2"
-                                                   LineBreakMode="TailTruncation" />
-                                            <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="8">
-                                                <Label Text="{Binding KategorieAnzeige}" FontSize="11" TextColor="{StaticResource AccentCyan}" />
-                                                <Label Text="{Binding EffektKurztext}" FontSize="11" TextColor="{StaticResource TextSecondary}" />
-                                                <Label Text="{Binding Anmerkungen}" FontSize="11" TextColor="{StaticResource TextSecondary}" />
-                                            </HorizontalStackLayout>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </VerticalStackLayout>
-
-                    <VerticalStackLayout Spacing="10" IsVisible="{Binding IsHomebrewMode}">
-                        <Label Text="Eigenen Eintrag erstellen" Style="{StaticResource SectionHeaderLabel}" />
-                        <Entry Placeholder="Name" Text="{Binding HomebrewName}" />
-                        <Editor Placeholder="Beschreibung / Regeltext"
-                                Text="{Binding HomebrewBeschreibung}"
-                                HeightRequest="88"
-                                AutoSize="TextChanges" />
-                        <Picker Title="Kategorie wählen"
-                                ItemsSource="{Binding KategorieNamen}"
-                                SelectedIndex="{Binding HomebrewKategorieIndex}" />
-                        <Grid ColumnDefinitions="120,*" ColumnSpacing="8">
-                            <Entry Grid.Column="0"
-                                   Placeholder="Max. Stufe"
-                                   Keyboard="Numeric"
-                                   Text="{Binding HomebrewMaxStufe}" />
-                            <Entry Grid.Column="1"
-                                   Placeholder="AP pro Stufe, z. B. 15,20,25"
-                                   Keyboard="Numeric"
-                                   Text="{Binding HomebrewApKosten}" />
-                        </Grid>
-                        <Entry Placeholder="Anmerkungen" Text="{Binding HomebrewAnmerkungen}" />
-                        <Button Text="Homebrew hinzufügen"
-                                BackgroundColor="{StaticResource AccentCyan}"
-                                Clicked="OnAddHomebrewClicked" />
-                    </VerticalStackLayout>
+                                                   VerticalOptions="Center" />
+                                        </HorizontalStackLayout>
+                                        <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                                Text="＋"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                Padding="0"
+                                                BackgroundColor="{StaticResource AccentCyan}"
+                                                Clicked="OnAddFromCatalogClicked"
+                                                CommandParameter="{Binding .}" />
+                                        <Label Grid.Row="1" Grid.Column="0"
+                                               Text="{Binding Beschreibung}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondary}"
+                                               MaxLines="2"
+                                               LineBreakMode="TailTruncation" />
+                                        <HorizontalStackLayout Grid.Row="2" Grid.Column="0" Spacing="8">
+                                            <Label Text="{Binding KategorieAnzeige}" FontSize="11" TextColor="{StaticResource AccentCyan}" />
+                                            <Label Text="{Binding EffektKurztext}" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                            <Label Text="{Binding Anmerkungen}" FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                                        </HorizontalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
                 </VerticalStackLayout>
             </Border>
 

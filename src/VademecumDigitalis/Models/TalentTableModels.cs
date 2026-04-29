@@ -42,6 +42,7 @@ public class TalentRow : INotifyPropertyChanged
     private int _probeWert3;
     private int _fwBonus;
     private bool _hatBegabung;
+    private bool _hatUnfaehigkeit;
 
     public string Talent { get; set; } = string.Empty;
     public string Steigerungsfaktor { get; set; } = string.Empty;
@@ -121,6 +122,13 @@ public class TalentRow : INotifyPropertyChanged
     {
         get => _hatBegabung;
         set { if (_hatBegabung != value) { _hatBegabung = value; OnPropertyChanged(nameof(HatBegabung)); } }
+    }
+
+    /// <summary>True wenn der Charakter eine Unfähigkeit für dieses Talent hat.</summary>
+    public bool HatUnfaehigkeit
+    {
+        get => _hatUnfaehigkeit;
+        set { if (_hatUnfaehigkeit != value) { _hatUnfaehigkeit = value; OnPropertyChanged(nameof(HatUnfaehigkeit)); } }
     }
 
     private string _bonusInfo = string.Empty;

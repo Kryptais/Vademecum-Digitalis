@@ -181,6 +181,27 @@
                     Clicked="OnImportClicked"/>
             </Grid>
 
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button
+                    Grid.Column="0"
+                    Text="📖 Regeln"
+                    FontSize="14"
+                    Padding="0,12"
+                    BackgroundColor="#3A5580"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Clicked="OnRegelnClicked"/>
+                <Button
+                    Grid.Column="1"
+                    Text="⚙ Einstellungen"
+                    FontSize="14"
+                    Padding="0,12"
+                    BackgroundColor="#4A4A6A"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Clicked="OnEinstellungenClicked"/>
+            </Grid>
+
         </VerticalStackLayout>
 
     </Grid>
