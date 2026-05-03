@@ -56,6 +56,9 @@
     <MauiXaml Update="Controls\CalendarDateWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>
+    <MauiXaml Update="Controls\MainAttributesView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </MauiXaml>
     <MauiXaml Update="Views\DsaDatePickerPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </MauiXaml>

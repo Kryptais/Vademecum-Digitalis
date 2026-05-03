@@ -16,6 +16,7 @@ public class MainPageViewModel : INotifyPropertyChanged
     private readonly VorteilNachteilService? _vorteilNachteilService;
     private readonly TalentCatalogService? _talentCatalogService;
     private readonly EffectResolver? _effectResolver;
+    private readonly CharacterSaveService? _characterSaveService;
     private CancellationTokenSource? _saveCts;
 
     public MainPageViewModel() : this(new PersistenceService(), null)
@@ -27,13 +28,15 @@ public class MainPageViewModel : INotifyPropertyChanged
         TalentModifierService? talentModifierService = null,
         VorteilNachteilService? vorteilNachteilService = null,
         EffectResolver? effectResolver = null,
-        TalentCatalogService? talentCatalogService = null)
+        TalentCatalogService? talentCatalogService = null,
+        CharacterSaveService? characterSaveService = null)
     {
         _persistence = persistence;
         _talentModifierService = talentModifierService;
         _vorteilNachteilService = vorteilNachteilService;
         _talentCatalogService = talentCatalogService;
         _effectResolver = effectResolver;
+        _characterSaveService = characterSaveService;
         TalentGruppen = BuildTalentGruppen();
         Kampftechniken = BuildKampftechniken();
         KampfStatiRows = BuildKampfStatiRows();
@@ -591,11 +594,37 @@ public class MainPageViewModel : INotifyPropertyChanged
         {
             var data = BuildSaveData();
             await _persistence.SaveCharacterSheetAsync(data);
+
+            // Zusätzlich in den benutzerseitigen Charakter-Slot schreiben, damit das
+            // Dashboard die Änderungen sieht. Dateiname = aktiver Slot oder
+            // (bei neuem Charakter) abgeleitet aus dem Namen.
+            if (_characterSaveService != null)
+            {
+                string? filename = ActiveCharacterFileName;
+                if (string.IsNullOrWhiteSpace(filename))
+                {
+                    filename = SanitizeFileName(_sheet.Name);
+                    if (!string.IsNullOrWhiteSpace(filename))
+                        ActiveCharacterFileName = filename;
+                }
+
+                if (!string.IsNullOrWhiteSpace(filename))
+                {
+                    await _characterSaveService.SaveCharacterAsync(data, filename);
+                }
+            }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error saving character sheet: {ex.Message}");
         }
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+        var invalid = Path.GetInvalidFileNameChars();
+        return string.Concat(name.Select(c => invalid.Contains(c) ? '_' : c)).Trim();
     }
 
     // --- Dashboard-Schnittstelle ---

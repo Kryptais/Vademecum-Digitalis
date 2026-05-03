@@ -173,7 +173,7 @@
                                         StrokeThickness="1"
                                         BackgroundColor="#0D2D36"
                                         Padding="10,8">
-                                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
                                         <!-- Name + Stufe -->
                                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
                                             <Label Text="{Binding DisplayName}"
@@ -183,8 +183,18 @@
                                                    FontSize="12" TextColor="#0E7490"
                                                    VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <!-- Level-Up Button -->
+                                        <!-- Level-Down Button -->
                                         <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                Text="▼"
+                                                WidthRequest="36" HeightRequest="36" Padding="0"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#0E7490"
+                                                FontSize="14"
+                                                IsVisible="{Binding KannReduzieren}"
+                                                Clicked="OnLevelDownClicked"
+                                                CommandParameter="{Binding .}" />
+                                        <!-- Level-Up Button -->
+                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                                 Text="▲"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
@@ -194,7 +204,7 @@
                                                 Clicked="OnLevelUpClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Entfernen Button -->
-                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                                 Text="✕"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
@@ -236,7 +246,7 @@
                                         StrokeThickness="1"
                                         BackgroundColor="#2D0D0D"
                                         Padding="10,8">
-                                    <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
                                         <!-- Name + Stufe -->
                                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
                                             <Label Text="{Binding DisplayName}"
@@ -246,8 +256,18 @@
                                                    FontSize="12" TextColor="#C0392B"
                                                    VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <!-- Level-Up Button -->
+                                        <!-- Level-Down Button -->
                                         <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                Text="▼"
+                                                WidthRequest="36" HeightRequest="36" Padding="0"
+                                                BackgroundColor="Transparent"
+                                                TextColor="#C0392B"
+                                                FontSize="14"
+                                                IsVisible="{Binding KannReduzieren}"
+                                                Clicked="OnLevelDownClicked"
+                                                CommandParameter="{Binding .}" />
+                                        <!-- Level-Up Button -->
+                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                                 Text="▲"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
@@ -257,7 +277,7 @@
                                                 Clicked="OnLevelUpClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Entfernen Button -->
-                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                                 Text="✕"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"

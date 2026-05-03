@@ -15,7 +15,19 @@
             <Color x:Key="BorderColor">#333333</Color>
             <Color x:Key="AccentCyan">#0E7490</Color>
 
+            <!-- Hauptattribute-Farben (DSA 5) -->
+            <Color x:Key="AttrMU">#FF6B6B</Color>
+            <Color x:Key="AttrKL">#6BB5FF</Color>
+            <Color x:Key="AttrIN">#C19BFF</Color>
+            <Color x:Key="AttrCH">#FF8FB1</Color>
+            <Color x:Key="AttrFF">#FFD93D</Color>
+            <Color x:Key="AttrGE">#6BCF7F</Color>
+            <Color x:Key="AttrKO">#FF9F43</Color>
+            <Color x:Key="AttrKK">#D4A574</Color>
+
             <converters:IntStringConverter x:Key="IntStringConverter" />
+            <converters:AttributeColorConverter x:Key="AttributeColorConverter" />
+            <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:StatusButtonColorConverter x:Key="StatusButtonColorConverter" />
 
             <!-- Default Page Background -->

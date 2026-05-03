@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
+             x:Class="VademecumDigitalis.Controls.MainAttributesView"
+             x:Name="Root">
+
+    <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e" Padding="10,8">
+        <VerticalStackLayout Spacing="6">
+            <Label Text="Hauptattribute" HorizontalOptions="Center" FontAttributes="Bold"
+                   TextColor="#0E7490" FontSize="14" />
+
+            <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto"
+                  ColumnSpacing="6" RowSpacing="4">
+
+                <!-- Header -->
+                <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrMU}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKL}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="2" Text="IN" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrIN}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="3" Text="CH" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrCH}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="4" Text="FF" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrFF}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="5" Text="GE" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrGE}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKO}" FontSize="14" />
+                <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKK}" FontSize="14" />
+
+                <!-- Editable Entries -->
+                <Entry Grid.Row="1" Grid.Column="0" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Mut}" TextColor="{StaticResource AttrMU}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="1" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Klugheit}" TextColor="{StaticResource AttrKL}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="2" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Intuition}" TextColor="{StaticResource AttrIN}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="3" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Charisma}" TextColor="{StaticResource AttrCH}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Fingerfertigkeit}" TextColor="{StaticResource AttrFF}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Gewandtheit}" TextColor="{StaticResource AttrGE}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Konstitution}" TextColor="{StaticResource AttrKO}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+                <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center"
+                       Text="{Binding Körperkraft}" TextColor="{StaticResource AttrKK}" FontAttributes="Bold"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}}">
+                    <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
+                </Entry>
+
+                <!-- Read-only Labels -->
+                <Label Grid.Row="1" Grid.Column="0" Text="{Binding Mut}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrMU}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="1" Text="{Binding Klugheit}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKL}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="2" Text="{Binding Intuition}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrIN}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="3" Text="{Binding Charisma}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrCH}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="4" Text="{Binding Fingerfertigkeit}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrFF}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="5" Text="{Binding Gewandtheit}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrGE}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="6" Text="{Binding Konstitution}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKO}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+                <Label Grid.Row="1" Grid.Column="7" Text="{Binding Körperkraft}" FontAttributes="Bold" FontSize="16"
+                       HorizontalOptions="Center" TextColor="{StaticResource AttrKK}"
+                       IsVisible="{Binding Editable, Source={x:Reference Root}, Converter={StaticResource InverseBoolConverter}}" />
+            </Grid>
+        </VerticalStackLayout>
+    </Border>
+</ContentView>

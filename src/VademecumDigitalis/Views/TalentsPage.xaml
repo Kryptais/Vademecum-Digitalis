@@ -3,16 +3,21 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:VademecumDigitalis.Models"
              xmlns:behaviors="clr-namespace:VademecumDigitalis.Behaviors"
+             xmlns:controls="clr-namespace:VademecumDigitalis.Controls"
+             xmlns:converters="clr-namespace:VademecumDigitalis.Converters"
              x:Class="VademecumDigitalis.TalentsPage"
              Title="Talente">
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <converters:AttributeColorConverter x:Key="AttributeColorConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <ScrollView Orientation="Both">
-        <VerticalStackLayout Padding="{OnIdiom Phone='8', Tablet='12', Default='16'}" Spacing="{OnIdiom Phone='8', Default='12'}"
+        <VerticalStackLayout Padding="{OnIdiom Phone='8', Tablet='12', Default='16'}" Spacing="{OnIdiom Phone='8', Default='12'}">
+            <controls:MainAttributesView />
+        <VerticalStackLayout Spacing="{OnIdiom Phone='8', Default='12'}"
                              BindableLayout.ItemsSource="{Binding TalentGruppen}">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="models:TalentGroup">
@@ -94,14 +99,23 @@
                                                 <Label Grid.Column="0" Text="{Binding Talent}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
                                                 <Label Grid.Column="1" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" VerticalOptions="Center" />
                                                 <!-- Begabung-Checkbox (nicht editierbar) -->
-                                                <CheckBox Grid.Column="2" IsChecked="{Binding HatBegabung}" IsEnabled="False"
-                                                          HorizontalOptions="Center" VerticalOptions="Center" Color="#00AA44" />
-                                                <Label Grid.Column="3" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                                <Label Grid.Column="4" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                                <Label Grid.Column="5" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
-                                                <Label Grid.Column="6" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                                <Label Grid.Column="7" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
-                                                <Label Grid.Column="8" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold" />
+                                                <Grid Grid.Column="2" HorizontalOptions="Center" VerticalOptions="Center">
+                                                    <CheckBox IsChecked="{Binding HatBegabung}" IsEnabled="False"
+                                                              HorizontalOptions="Center" VerticalOptions="Center"
+                                                              MinimumWidthRequest="0" Margin="0" Color="#00AA44" />
+                                                </Grid>
+                                                <Label Grid.Column="3" Text="{Binding Probe1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center"
+                                                       TextColor="{Binding Probe1, Converter={StaticResource AttributeColorConverter}}" />
+                                                <Label Grid.Column="4" Text="{Binding Probe2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center"
+                                                       TextColor="{Binding Probe2, Converter={StaticResource AttributeColorConverter}}" />
+                                                <Label Grid.Column="5" Text="{Binding Probe3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center"
+                                                       TextColor="{Binding Probe3, Converter={StaticResource AttributeColorConverter}}" />
+                                                <Label Grid.Column="6" Text="{Binding ProbeWert1}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold"
+                                                       TextColor="{Binding Probe1, Converter={StaticResource AttributeColorConverter}}" />
+                                                <Label Grid.Column="7" Text="{Binding ProbeWert2}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold"
+                                                       TextColor="{Binding Probe2, Converter={StaticResource AttributeColorConverter}}" />
+                                                <Label Grid.Column="8" Text="{Binding ProbeWert3}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" FontAttributes="Bold"
+                                                       TextColor="{Binding Probe3, Converter={StaticResource AttributeColorConverter}}" />
                                                 <Label Grid.Column="9" Text="{Binding Belastungseinfluss}" HorizontalOptions="Center" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" VerticalOptions="Center" />
                                                 <Entry Grid.Column="10" Keyboard="Numeric" Text="{Binding Fw}" FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" HeightRequest="50" HorizontalTextAlignment="Center" Background="LightGray" TextColor="Black" >
                                                     <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
@@ -124,6 +138,7 @@
                     </VerticalStackLayout>
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 

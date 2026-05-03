@@ -15,46 +15,7 @@
             <controls:CalendarDateWidget />
 
             <!-- Hauptattribute -->
-            <Border Style="{StaticResource CardBorder}">
-                <VerticalStackLayout Spacing="10">
-                    <Label Text="Hauptattribute" Style="{StaticResource SectionHeaderLabel}" />
-                    <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
-                        <Label Grid.Row="0" Grid.Column="0" Text="MU" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="1" Text="KL" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="2" Text="IN" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="3" Text="CH" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="4" Text="FF" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="5" Text="GE" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="6" Text="KO" FontAttributes="Bold" HorizontalOptions="Center" />
-                        <Label Grid.Row="0" Grid.Column="7" Text="KK" FontAttributes="Bold" HorizontalOptions="Center" />
-
-                        <Entry Grid.Row="1" Grid.Column="0" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Mut}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="1" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Klugheit}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="2" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Intuition}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="3" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Charisma}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="4" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Fingerfertigkeit}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="5" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Gewandtheit}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="6" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Konstitution}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                        <Entry Grid.Row="1" Grid.Column="7" Keyboard="Numeric" HorizontalTextAlignment="Center" Text="{Binding Körperkraft}">
-                            <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
-                        </Entry>
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
+            <controls:MainAttributesView Editable="True" />
 
             <!-- Charakterinfos -->
             <Border Style="{StaticResource CardBorder}">

@@ -6,6 +6,10 @@
     xmlns:local="clr-namespace:VademecumDigitalis"
     Title="Vademecum Digitalis">
 
+    <Shell.ToolbarItems>
+        <ToolbarItem Text="⌂ Dashboard" Clicked="OnDashboardClicked" />
+    </Shell.ToolbarItems>
+
     <TabBar>
         <ShellContent
             Title="Hauptblatt"

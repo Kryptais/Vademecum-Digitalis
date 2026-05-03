@@ -49,6 +49,14 @@ public partial class AdvantagesPage : ContentPage
         }
     }
 
+    private void OnLevelDownClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.CommandParameter is CharakterVorteilNachteilEintrag entry)
+        {
+            _vm.LevelDown(entry);
+        }
+    }
+
     private void OnEntfernenClicked(object? sender, EventArgs e)
     {
         if (sender is Button btn && btn.CommandParameter is CharakterVorteilNachteilEintrag entry)

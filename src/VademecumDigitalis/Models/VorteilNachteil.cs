@@ -187,7 +187,18 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     public int Stufe
     {
         get => _stufe;
-        set { if (_stufe != value) { _stufe = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); OnPropertyChanged(nameof(StufeAnzeige)); } }
+        set
+        {
+            if (_stufe != value)
+            {
+                _stufe = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Anzeige));
+                OnPropertyChanged(nameof(StufeAnzeige));
+                OnPropertyChanged(nameof(KannAufsteigen));
+                OnPropertyChanged(nameof(KannReduzieren));
+            }
+        }
     }
 
     /// <summary>Optionale Notiz / Anmerkung des Spielers.</summary>
@@ -243,6 +254,10 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     /// <summary>True wenn die nächste Stufe verfügbar wäre.</summary>
     [JsonIgnore]
     public bool KannAufsteigen => Stufe < MaxStufe;
+
+    /// <summary>True wenn die Stufe reduziert werden kann (Stufe > 1).</summary>
+    [JsonIgnore]
+    public bool KannReduzieren => MaxStufe > 1 && Stufe > 1;
 
     /// <summary>Lesbare Kategorie-Anzeige.</summary>
     [JsonIgnore]

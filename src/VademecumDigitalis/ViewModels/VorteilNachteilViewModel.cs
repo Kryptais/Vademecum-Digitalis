@@ -223,6 +223,18 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Reduziert die Stufe eines stufenbasierten VN (min. 1).</summary>
+    public void LevelDown(CharakterVorteilNachteilEintrag entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+
+        if (entry.Stufe > 1)
+        {
+            entry.Stufe--;
+            RefreshGroupedList();
+        }
+    }
+
     /// <summary>Entfernt einen Vorteil/Nachteil vom Charakter.</summary>
     public void Remove(CharakterVorteilNachteilEintrag entry)
     {
