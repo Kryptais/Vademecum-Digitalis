@@ -160,6 +160,7 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     private int _apKosten = 0;
     private string _notiz = string.Empty;
     private bool _forceAdded;
+    private string _apKostenDisplay = string.Empty;
 
     /// <summary>Referenz auf VorteilNachteil.Id im Katalog.</summary>
     public string VnId
@@ -172,7 +173,7 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     public string Name
     {
         get => _name;
-        set { if (_name != value) { _name = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); } }
+        set { if (_name != value) { _name = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); OnPropertyChanged(nameof(DisplayName)); } }
     }
 
     /// <summary>Kategorie (denormalisiert für Gruppierung).</summary>
@@ -193,7 +194,7 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     public string Notiz
             {
         get => _notiz;
-        set { if (_notiz != value) { _notiz = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); } }
+        set { if (_notiz != value) { _notiz = value; OnPropertyChanged(); OnPropertyChanged(nameof(Anzeige)); OnPropertyChanged(nameof(DisplayName)); } }
     }
 
     /// <summary>True wenn der VN ohne Voraussetzungsprüfung hinzugefügt wurde (Homebrew).</summary>
@@ -216,6 +217,28 @@ public class CharakterVorteilNachteilEintrag : INotifyPropertyChanged
     /// <summary>Maximale Stufe aus dem Katalog (wird beim Laden gesetzt, nicht persistiert).</summary>
     [JsonIgnore]
     public int MaxStufe { get; set; } = 1;
+
+    /// <summary>
+    /// Anzeigename inkl. Notiz, z. B. "Begabung Kraftakt" oder "Glück".
+    /// </summary>
+    [JsonIgnore]
+    public string DisplayName => string.IsNullOrWhiteSpace(_notiz)
+        ? _name
+        : $"{_name} {_notiz}";
+
+    /// <summary>
+    /// AP-Kosten als lesbarer Text, wird von außen (ViewModel) gesetzt.
+    /// </summary>
+    [JsonIgnore]
+    public string ApKostenDisplay
+    {
+        get => _apKostenDisplay;
+        set { if (_apKostenDisplay != value) { _apKostenDisplay = value; OnPropertyChanged(); } }
+    }
+
+    /// <summary>True wenn dieser Eintrag ein Nachteil ist.</summary>
+    [JsonIgnore]
+    public bool IstNachteil => Kategorie.IstNachteil();
 
     /// <summary>True wenn die nächste Stufe verfügbar wäre.</summary>
     [JsonIgnore]

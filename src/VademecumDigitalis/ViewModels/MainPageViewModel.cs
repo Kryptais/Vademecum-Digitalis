@@ -146,6 +146,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         eintrag.PropertyChanged += OnVorteilNachteilChanged;
         VorteilNachteilEintraege.Add(eintrag);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        RecalculateTalentProben();
         NotifyRuleEffectValuesChanged();
         RequestDelayedSave();
     }
@@ -155,6 +156,7 @@ public class MainPageViewModel : INotifyPropertyChanged
         eintrag.PropertyChanged -= OnVorteilNachteilChanged;
         VorteilNachteilEintraege.Remove(eintrag);
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        RecalculateTalentProben();
         NotifyRuleEffectValuesChanged();
         RequestDelayedSave();
     }

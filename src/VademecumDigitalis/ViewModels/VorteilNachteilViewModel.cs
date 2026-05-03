@@ -33,8 +33,17 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
     /// <summary>Gruppierte Vorteile/Nachteile des Charakters.</summary>
     public ObservableCollection<VnGruppe> GruppierteVorteileNachteile { get; } = [];
 
+    /// <summary>Nur Vorteile (für Nebeneinander-Darstellung, linke Spalte).</summary>
+    public ObservableCollection<CharakterVorteilNachteilEintrag> VorteileEintraege { get; } = [];
+
+    /// <summary>Nur Nachteile (für Nebeneinander-Darstellung, rechte Spalte).</summary>
+    public ObservableCollection<CharakterVorteilNachteilEintrag> NachteileEintraege { get; } = [];
+
     /// <summary>True wenn keine Vorteile/Nachteile vorhanden.</summary>
     public bool KeineVorteileNachteile => Vm.VorteilNachteilEintraege.Count == 0;
+
+    /// <summary>True wenn mindestens ein Eintrag vorhanden (für IsVisible-Binding).</summary>
+    public bool HatVorteileNachteile => Vm.VorteilNachteilEintraege.Count > 0;
 
     public int VorteileCount => Vm.VorteilNachteilEintraege.Count(e => !e.Kategorie.IstNachteil());
 
@@ -162,7 +171,7 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
             var sfIndex = SfToIndex(katalogTalent?.Sf ?? "A");
             var apKosten = vn.TalentTyp == TalentGebundenerTyp.Begabung
                 ? sfIndex * 6
-                : -(sfIndex * 10);
+                : -sfIndex;
 
             var entry = VorteilNachteilService.CreateEntry(vn, stufe: 1, forceAdd: forceAdd);
             entry.Notiz = selectedTalent;
@@ -231,6 +240,19 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
             if (catalogEntry != null)
             {
                 entry.MaxStufe = catalogEntry.MaxStufe;
+
+                // AP-Kosten-Anzeige berechnen
+                int cost;
+                if (entry.ApKosten != 0)
+                {
+                    cost = entry.ApKosten;
+                }
+                else
+                {
+                    cost = _vnService.GetTotalCost(catalogEntry, entry.Stufe);
+                }
+                var kum = (entry.MaxStufe > 1 && entry.Stufe > 1) ? " (kum.)" : string.Empty;
+                entry.ApKostenDisplay = $"{cost} AP{kum}";
             }
         }
 
@@ -246,7 +268,19 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
             GruppierteVorteileNachteile.Add(group);
         }
 
+        // Nebeneinander-Listen aktualisieren
+        var alleEintraege = Vm.VorteilNachteilEintraege.OrderBy(e => e.DisplayName).ToList();
+
+        VorteileEintraege.Clear();
+        foreach (var e in alleEintraege.Where(e => !e.IstNachteil))
+            VorteileEintraege.Add(e);
+
+        NachteileEintraege.Clear();
+        foreach (var e in alleEintraege.Where(e => e.IstNachteil))
+            NachteileEintraege.Add(e);
+
         Notify(nameof(KeineVorteileNachteile));
+        Notify(nameof(HatVorteileNachteile));
         Notify(nameof(VorteileCount));
         Notify(nameof(NachteileCount));
         Notify(nameof(GesamtApKosten));
