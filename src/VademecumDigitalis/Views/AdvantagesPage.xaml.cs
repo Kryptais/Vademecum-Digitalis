@@ -6,11 +6,13 @@ namespace VademecumDigitalis;
 public partial class AdvantagesPage : ContentPage
 {
     private readonly VorteilNachteilViewModel _vm;
+    private readonly IServiceProvider _services;
 
-    public AdvantagesPage(VorteilNachteilViewModel vm)
+    public AdvantagesPage(VorteilNachteilViewModel vm, IServiceProvider services)
     {
         InitializeComponent();
         _vm = vm;
+        _services = services;
         BindingContext = _vm;
     }
 
@@ -25,17 +27,18 @@ public partial class AdvantagesPage : ContentPage
         _vm.ToggleSearch();
     }
 
-    private void OnAddFromCatalogClicked(object? sender, EventArgs e)
+    private async void OnAddFromCatalogClicked(object? sender, EventArgs e)
     {
         if (sender is Button btn && btn.CommandParameter is VorteilNachteil vn)
         {
-            _vm.AddFromCatalog(vn);
+            await _vm.AddFromCatalogAsync(vn, ShowTalentPickerAsync);
         }
     }
 
-    private void OnAddHomebrewClicked(object? sender, EventArgs e)
+    private async Task<string?> ShowTalentPickerAsync(string[] talente, string title)
     {
-        _vm.AddHomebrew();
+        var result = await DisplayActionSheet(title, "Abbrechen", null, talente);
+        return result == "Abbrechen" || result == null ? null : result;
     }
 
     private void OnLevelUpClicked(object? sender, EventArgs e)
@@ -52,5 +55,11 @@ public partial class AdvantagesPage : ContentPage
         {
             _vm.Remove(entry);
         }
+    }
+
+    private void OnDashboardClicked(object? sender, EventArgs e)
+    {
+        if (Application.Current is App app)
+            app.SwitchToDashboard(_services);
     }
 }

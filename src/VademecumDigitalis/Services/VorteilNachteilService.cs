@@ -127,10 +127,16 @@ public class VorteilNachteilService
         int total = 0;
         foreach (var entry in entries)
         {
-            var catalogEntry = FindById(entry.VnId);
-            if (catalogEntry != null)
+            if (entry.ApKosten != 0)
             {
-                total += GetTotalCost(catalogEntry, entry.Stufe);
+                // Talent-gebundener VN: direkt gespeicherte AP-Kosten verwenden
+                total += entry.ApKosten;
+            }
+            else
+            {
+                var catalogEntry = FindById(entry.VnId);
+                if (catalogEntry != null)
+                    total += GetTotalCost(catalogEntry, entry.Stufe);
             }
         }
         return total;

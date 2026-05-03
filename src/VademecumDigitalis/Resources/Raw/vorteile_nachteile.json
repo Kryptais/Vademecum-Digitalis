@@ -5,9 +5,33 @@
     "Beschreibung": "Der Held ist in einem bestimmten Talent besonders begabt. Er erhält eine Erleichterung von 1 auf alle Proben mit diesem Talent.",
     "Kategorie": "AllgemeineVorteile",
     "MaxStufe": 1,
+    "ApKostenProStufe": [0],
+    "TalentTyp": "Begabung",
+    "VoraussetzungenProStufe": [],
+    "Anmerkungen": "Kosten abhängig vom SF des gewählten Talents: A=6, B=12, C=18, D=24 AP."
+  },
+  {
+    "Id": "verbessertes-fliegen",
+    "Name": "Verbessertes Fliegen",
+    "Beschreibung": "Der Held hat eine besondere Begabung für das Talent Fliegen. Sein Fertigkeitswert für Fliegen erhöht sich dauerhaft um 2.",
+    "Kategorie": "AllgemeineVorteile",
+    "MaxStufe": 1,
     "ApKostenProStufe": [10],
     "VoraussetzungenProStufe": [],
-    "Anmerkungen": "Muss für ein bestimmtes Talent gewählt werden."
+    "ExplicitEffects": [
+      {
+        "Id": "fw_fliegen_bonus",
+        "Kind": "Modifier",
+        "Title": "Fliegen FW +2",
+        "Target": "fw.fliegen",
+        "Operation": "Add",
+        "Value": 2,
+        "PerLevel": false,
+        "Phase": "DerivedValues",
+        "Stacking": "Stack"
+      }
+    ],
+    "Anmerkungen": "+2 FW auf das Talent Fliegen."
   },
   {
     "Id": "glueck",
@@ -424,12 +448,13 @@
   },
   {
     "Id": "unfaehig",
-    "Name": "Unfähig",
-    "Beschreibung": "Der Held ist in einem bestimmten Talent besonders unbegabt. Er erhält eine Erschwernis von 1 auf alle Proben mit diesem Talent.",
+    "Name": "Unfähigkeit",
+    "Beschreibung": "Der Held ist in einem bestimmten Talent besonders unbegabt. Bei Proben muss er den besten Wurf neu würfeln und den schlechteren der beiden Würfe nehmen.",
     "Kategorie": "AllgemeineNachteile",
     "MaxStufe": 1,
-    "ApKostenProStufe": [3],
+    "ApKostenProStufe": [0],
+    "TalentTyp": "Unfaehigkeit",
     "VoraussetzungenProStufe": [],
-    "Anmerkungen": "Muss für ein bestimmtes Talent gewählt werden."
+    "Anmerkungen": "Kosten abhängig vom SF des gewählten Talents: A=-10, B=-20, C=-30, D=-40 AP. Mehrere Unfähigkeiten möglich."
   }
 ]

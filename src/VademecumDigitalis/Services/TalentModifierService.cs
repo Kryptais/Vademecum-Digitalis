@@ -46,9 +46,14 @@ public class TalentModifierService
         List<ActiveModifier> modifiers,
         IReadOnlyList<CharakterVorteilNachteilEintrag> vnEintraege)
     {
-        // Begabung: Vorteil "Begabung" mit Notiz == Talentname
+        // Begabung: Vorteil "begabung" mit Notiz == Talentname
         row.HatBegabung = vnEintraege.Any(vn =>
             string.Equals(vn.VnId, "begabung", StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(vn.Notiz?.Trim(), row.Talent, StringComparison.OrdinalIgnoreCase));
+
+        // Unfähigkeit: Nachteil "unfaehig" mit Notiz == Talentname
+        row.HatUnfaehigkeit = vnEintraege.Any(vn =>
+            string.Equals(vn.VnId, "unfaehig", StringComparison.OrdinalIgnoreCase) &&
             string.Equals(vn.Notiz?.Trim(), row.Talent, StringComparison.OrdinalIgnoreCase));
 
         int begabungBonus = row.HatBegabung ? 1 : 0;
@@ -56,22 +61,52 @@ public class TalentModifierService
         row.ProbeWert1 = GetEffectiveValue(row.Talent, gruppenName, row.Probe1, attribute, modifiers) + begabungBonus;
         row.ProbeWert2 = GetEffectiveValue(row.Talent, gruppenName, row.Probe2, attribute, modifiers) + begabungBonus;
         row.ProbeWert3 = GetEffectiveValue(row.Talent, gruppenName, row.Probe3, attribute, modifiers) + begabungBonus;
-        row.FwBonus = 0;
+
+        // FW-Bonus aus ExplicitEffects (z.B. "fw.fliegen" +2)
+        int fwBonus = 0;
+        foreach (var vnEintrag in vnEintraege)
+        {
+            var katalog = _vnService.Catalog.FirstOrDefault(k =>
+                string.Equals(k.Id, vnEintrag.VnId, StringComparison.OrdinalIgnoreCase));
+            if (katalog?.ExplicitEffects is { Count: > 0 } effects)
+            {
+                foreach (var effect in effects)
+                {
+                    if (effect.Target?.StartsWith("fw.", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        var targetTalent = effect.Target["fw.".Length..];
+                        if (string.Equals(targetTalent, row.Talent, StringComparison.OrdinalIgnoreCase))
+                        {
+                            fwBonus += (int)(effect.Value ?? 0);
+                        }
+                    }
+                }
+            }
+        }
+        row.FwBonus = fwBonus;
 
         // BonusInfo: zeige welche VN/SF dieses Talent beeinflussen
-        row.BonusInfo = BuildBonusInfo(row.Talent, gruppenName, modifiers, row.HatBegabung);
+        row.BonusInfo = BuildBonusInfo(row.Talent, gruppenName, modifiers, row.HatBegabung, row.HatUnfaehigkeit, fwBonus);
     }
 
     private static string BuildBonusInfo(
         string talentName,
         string gruppenName,
         List<ActiveModifier> modifiers,
-        bool hatBegabung)
+        bool hatBegabung,
+        bool hatUnfaehigkeit = false,
+        int fwBonus = 0)
     {
         var parts = new List<string>();
 
         if (hatBegabung)
-            parts.Add("Begabung +1");
+            parts.Add("Begabung: Proben +1");
+
+        if (hatUnfaehigkeit)
+            parts.Add("Unfähigkeit: besten Wurf neu würfeln");
+
+        if (fwBonus != 0)
+            parts.Add($"FW {(fwBonus > 0 ? "+" : "")}{fwBonus}");
 
         foreach (var mod in modifiers)
         {

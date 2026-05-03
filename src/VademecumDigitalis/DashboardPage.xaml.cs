@@ -59,6 +59,18 @@ public partial class DashboardPage : ContentPage
             await _vm.LoadCharactersAsync();
     }
 
+    private async void OnRegelnClicked(object sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<RegelnPage>();
+        await Navigation.PushAsync(page);
+    }
+
+    private async void OnEinstellungenClicked(object sender, EventArgs e)
+    {
+        var page = _services.GetRequiredService<EinstellungenPage>();
+        await Navigation.PushAsync(page);
+    }
+
     private void NavigateToCharacterShell()
     {
         if (Application.Current is App app)
