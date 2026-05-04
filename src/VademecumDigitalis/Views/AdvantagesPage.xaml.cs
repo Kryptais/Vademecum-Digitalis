@@ -6,13 +6,11 @@ namespace VademecumDigitalis;
 public partial class AdvantagesPage : ContentPage
 {
     private readonly VorteilNachteilViewModel _vm;
-    private readonly IServiceProvider _services;
 
-    public AdvantagesPage(VorteilNachteilViewModel vm, IServiceProvider services)
+    public AdvantagesPage(VorteilNachteilViewModel vm)
     {
         InitializeComponent();
         _vm = vm;
-        _services = services;
         BindingContext = _vm;
     }
 
@@ -65,9 +63,4 @@ public partial class AdvantagesPage : ContentPage
         }
     }
 
-    private void OnDashboardClicked(object? sender, EventArgs e)
-    {
-        if (Application.Current is App app)
-            app.SwitchToDashboard(_services);
-    }
 }

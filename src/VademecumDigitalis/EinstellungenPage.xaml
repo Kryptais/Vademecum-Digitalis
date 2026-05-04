@@ -14,19 +14,6 @@
                 FontAttributes="Bold"
                 Margin="0,8,0,4"/>
 
-            <!-- Zurück zum Dashboard -->
-            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
-                <VerticalStackLayout Spacing="8">
-                    <Label Text="Charakter" FontAttributes="Bold" FontSize="15"/>
-                    <Button
-                        Text="Zur Charakterauswahl (Dashboard)"
-                        BackgroundColor="#7A5C38"
-                        TextColor="White"
-                        CornerRadius="8"
-                        Clicked="OnDashboardClicked"/>
-                </VerticalStackLayout>
-            </Border>
-
             <!-- Platzhalter für zukünftige Einstellungen -->
             <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
                 <VerticalStackLayout Spacing="8">

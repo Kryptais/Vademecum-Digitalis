@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet build *)"
+      "Bash(dotnet build *)",
+      "Bash(git branch *)",
+      "Bash(grep -E \"\\(XC0009|Fehler$|0 Fehler|Build succeeded\\)\")",
+      "WebFetch(domain:dsa.ulisses-regelwiki.de)"
     ]
   }
 }

@@ -14,13 +14,19 @@ public class VorteilNachteilService
         PropertyNameCaseInsensitive = true
     };
 
+    private readonly HomebrewCatalogService _homebrewService;
     private List<VorteilNachteil> _catalog = [];
     private bool _loaded;
+
+    public VorteilNachteilService(HomebrewCatalogService homebrewService)
+    {
+        _homebrewService = homebrewService;
+    }
 
     /// <summary>Der geladene Katalog aller Vorteile und Nachteile.</summary>
     public IReadOnlyList<VorteilNachteil> Catalog => _catalog;
 
-    /// <summary>Lädt den Katalog aus der eingebetteten vorteile_nachteile.json Ressource.</summary>
+    /// <summary>Lädt den Katalog aus der eingebetteten Ressource + Homebrew-Einträge.</summary>
     public async Task LoadCatalogAsync()
     {
         if (_loaded) return;
@@ -30,14 +36,74 @@ public class VorteilNachteilService
             using var stream = await FileSystem.OpenAppPackageFileAsync("vorteile_nachteile.json");
             var items = await JsonSerializer.DeserializeAsync<List<VorteilNachteil>>(stream, JsonOptions);
             _catalog = items ?? [];
-            _loaded = true;
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Error loading VN catalog: {ex.Message}");
             _catalog = [];
         }
+
+        // Homebrew-Einträge laden und mergen
+        try
+        {
+            var homebrew = await _homebrewService.LoadAsync();
+            if (homebrew.Count > 0)
+            {
+                // Homebrew-Einträge mit gleicher Id überschreiben gebündelte
+                var homebrewIds = homebrew.Select(h => h.Id).ToHashSet();
+                _catalog.RemoveAll(c => homebrewIds.Contains(c.Id));
+                _catalog.AddRange(homebrew);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error loading homebrew catalog: {ex.Message}");
+        }
+
+        _loaded = true;
     }
+
+    /// <summary>Erzwingt ein erneutes Laden des Katalogs (z.B. nach CRUD-Operationen).</summary>
+    public async Task ReloadCatalogAsync()
+    {
+        _loaded = false;
+        await LoadCatalogAsync();
+    }
+
+    /// <summary>Fügt einen neuen Homebrew-Eintrag hinzu und persistiert ihn.</summary>
+    public async Task AddHomebrewEntryAndPersistAsync(VorteilNachteil entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        _catalog.Add(entry);
+        await _homebrewService.AddAsync(entry);
+    }
+
+    /// <summary>Aktualisiert einen Homebrew-Eintrag im Katalog und persistiert.</summary>
+    public async Task UpdateHomebrewEntryAsync(VorteilNachteil entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var index = _catalog.FindIndex(c => c.Id == entry.Id);
+        if (index >= 0)
+            _catalog[index] = entry;
+        else
+            _catalog.Add(entry);
+        await _homebrewService.UpdateAsync(entry);
+    }
+
+    /// <summary>Löscht einen Homebrew-Eintrag aus dem Katalog und von der Persistenz.</summary>
+    public async Task DeleteHomebrewEntryAsync(string id)
+    {
+        _catalog.RemoveAll(c => c.Id == id);
+        await _homebrewService.DeleteAsync(id);
+    }
+
+    /// <summary>Gibt alle Vorteile aus dem Katalog zurück.</summary>
+    public IReadOnlyList<VorteilNachteil> GetVorteile()
+        => _catalog.Where(vn => !vn.Kategorie.IstNachteil()).ToList();
+
+    /// <summary>Gibt alle Nachteile aus dem Katalog zurück.</summary>
+    public IReadOnlyList<VorteilNachteil> GetNachteile()
+        => _catalog.Where(vn => vn.Kategorie.IstNachteil()).ToList();
 
     /// <summary>Sucht im Katalog nach Name (case-insensitive Teilstring).</summary>
     public IReadOnlyList<VorteilNachteil> Search(string query)
@@ -157,9 +223,7 @@ public class VorteilNachteilService
             if (catalogEntry is null)
                 continue;
 
-            var effects = catalogEntry.Effects
-                .Concat(catalogEntry.ProbenModifikatoren.Select(ToRuleEffect))
-                .ToList();
+            var effects = catalogEntry.Effects.ToList();
 
             if (effects.Count == 0)
                 continue;

@@ -4,113 +4,429 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:vm="clr-namespace:VademecumDigitalis.ViewModels"
-    Title="Regeln">
+    x:DataType="vm:RegelnViewModel"
+    Title="Regeln"
+    BackgroundColor="{AppThemeBinding Light=#F5F0E8, Dark=#1A1A2E}">
 
-    <Grid RowDefinitions="Auto,Auto,*">
+    <Grid RowDefinitions="Auto,*">
 
-        <!-- Suche -->
-        <SearchBar
-            Grid.Row="0"
-            Placeholder="Vor-/Nachteil suchen..."
-            Text="{Binding SearchText}"
-            Margin="12,8"/>
+        <!-- ===== Tab-Leiste ===== -->
+        <ScrollView Grid.Row="0" Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
+                    BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#0D0D1A}">
+            <HorizontalStackLayout Spacing="0" Padding="8,6">
+                <Button Text="Vorteile / Nachteile" Clicked="OnTabVnClicked"
+                        x:Name="TabVnBtn"
+                        FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
+                        BackgroundColor="#0E7490" TextColor="White" />
+                <Button Text="Sonderfertigkeiten" Clicked="OnTabSfClicked"
+                        x:Name="TabSfBtn"
+                        FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
+                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+                <Button Text="Magie" Clicked="OnTabMagieClicked"
+                        x:Name="TabMagieBtn"
+                        FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
+                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+                <Button Text="Götterwirken" Clicked="OnTabGoetterwirkenClicked"
+                        x:Name="TabGoetterwirkenBtn"
+                        FontSize="13" Padding="14,8" CornerRadius="6"
+                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+            </HorizontalStackLayout>
+        </ScrollView>
 
-        <!-- Ladeindikator -->
-        <ActivityIndicator
-            Grid.Row="1"
-            IsRunning="{Binding IsLoading}"
-            IsVisible="{Binding IsLoading}"
-            HorizontalOptions="Center"
-            Margin="0,8"/>
+        <!-- ===== Content-Bereich ===== -->
+        <Grid Grid.Row="1">
 
-        <!-- Katalogliste (gruppiert) -->
-        <CollectionView
-            Grid.Row="2"
-            ItemsSource="{Binding Gruppen}"
-            IsGrouped="True">
+            <!-- Ladeindikator -->
+            <ActivityIndicator
+                IsRunning="{Binding VnTab.IsLoading}"
+                IsVisible="{Binding VnTab.IsLoading}"
+                HorizontalOptions="Center" VerticalOptions="Center" />
 
-            <!-- Gruppenheader -->
-            <CollectionView.GroupHeaderTemplate>
-                <DataTemplate x:DataType="vm:RegelnKategorie">
-                    <Border
-                        Padding="16,10"
-                        BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
-                        Margin="0,4,0,0">
-                        <Label
-                            Text="{Binding Titel}"
-                            FontAttributes="Bold"
-                            FontSize="14"
-                            TextColor="#C8A96E"/>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.GroupHeaderTemplate>
+            <!-- ======================== VN-Tab ======================== -->
+            <ScrollView IsVisible="{Binding IsVnVisible}">
+                <VerticalStackLayout Padding="12" Spacing="12">
 
-            <!-- Eintrag -->
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
-                    <Border
-                        Margin="8,2"
-                        Padding="14,12"
-                        StrokeShape="RoundRectangle 8"
-                        BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                        Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
-                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                    <!-- Suchleiste + Neu-Button -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <SearchBar Grid.Column="0"
+                                   Placeholder="Vorteil / Nachteil suchen..."
+                                   Text="{Binding VnTab.SearchText}" />
+                        <Button Grid.Column="1"
+                                Text="＋ Neu"
+                                FontSize="13" Padding="12,8"
+                                BackgroundColor="#0E7490" TextColor="White" CornerRadius="8"
+                                Clicked="OnCreateClicked"
+                                IsVisible="{Binding VnTab.IsListVisible}" />
+                    </Grid>
 
-                            <!-- Name + Homebrew-Badge -->
-                            <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
-                                <Label
-                                    Text="{Binding Name}"
-                                    FontAttributes="Bold"
-                                    FontSize="15"
-                                    TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}"/>
-                                <Border
-                                    IsVisible="{Binding IsHomebrew}"
-                                    Padding="4,2"
-                                    BackgroundColor="#7A5C38"
-                                    StrokeShape="RoundRectangle 4">
-                                    <Label Text="HB" FontSize="10" TextColor="White"/>
-                                </Border>
-                            </HorizontalStackLayout>
+                    <!-- ===== Editor-Panel ===== -->
+                    <Border IsVisible="{Binding VnTab.IsEditorVisible}"
+                            Padding="14" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="10">
 
-                            <!-- AP-Kosten -->
-                            <Label
-                                Grid.Row="0"
-                                Grid.Column="1"
-                                Text="{Binding ApInfo}"
-                                FontSize="13"
-                                FontAttributes="Bold"
-                                TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
-                                VerticalOptions="Center"/>
+                            <Label Text="{Binding VnTab.EditorTitle}" FontSize="18" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#C8A96E}" />
+
+                            <!-- Name -->
+                            <Label Text="Name" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                            <Entry Text="{Binding VnTab.CurrentEdit.Name}"
+                                   Placeholder="Name des Vorteils/Nachteils" />
 
                             <!-- Beschreibung -->
-                            <Label
-                                Grid.Row="1"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="2"
-                                Text="{Binding Beschreibung}"
-                                FontSize="13"
-                                TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
-                                Margin="0,4,0,0"
-                                IsVisible="{Binding HasBeschreibung}"/>
+                            <Label Text="Beschreibung" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                            <Editor Text="{Binding VnTab.CurrentEdit.Beschreibung}"
+                                    Placeholder="Regelbeschreibung..."
+                                    AutoSize="TextChanges" MinimumHeightRequest="60" />
 
-                            <!-- Effekte -->
-                            <Label
-                                Grid.Row="2"
-                                Grid.Column="0"
-                                Grid.ColumnSpan="2"
-                                Text="{Binding Effekte}"
-                                FontSize="12"
-                                TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
-                                FontFamily="Monospace"
-                                Margin="0,4,0,0"
-                                IsVisible="{Binding HasEffekte}"/>
+                            <!-- Kategorie + MaxStufe -->
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="Kategorie" FontSize="12" FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                    <Picker ItemsSource="{x:Static vm:VorteilNachteilEditModel.KategorieOptionen}"
+                                            SelectedItem="{Binding VnTab.CurrentEdit.Kategorie}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" WidthRequest="80">
+                                    <Label Text="Max-Stufe" FontSize="12" FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                    <Entry Text="{Binding VnTab.CurrentEdit.MaxStufe}"
+                                           Keyboard="Numeric" HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Grid>
 
-                        </Grid>
+                            <!-- AP-Kosten + TalentTyp -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="AP-Kosten (kommagetrennt)" FontSize="12" FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                    <Entry Text="{Binding VnTab.CurrentEdit.ApKostenText}"
+                                           Placeholder="z.B. 20, 20, 20" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="Talent-Typ" FontSize="12" FontAttributes="Bold"
+                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                    <Picker ItemsSource="{x:Static vm:VorteilNachteilEditModel.TalentTypOptionen}"
+                                            SelectedItem="{Binding VnTab.CurrentEdit.TalentTyp}" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                            <!-- Anmerkungen -->
+                            <Label Text="Anmerkungen" FontSize="12" FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                            <Entry Text="{Binding VnTab.CurrentEdit.Anmerkungen}"
+                                   Placeholder="Redaktionelle Hinweise..." />
+
+                            <!-- === Effekte === -->
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                                <Label Grid.Column="0" Text="Effekte" FontSize="15" FontAttributes="Bold"
+                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#C8A96E}"
+                                       VerticalOptions="Center" />
+                                <Button Grid.Column="1" Text="＋ Effekt" FontSize="12" Padding="10,6"
+                                        BackgroundColor="#4A6B5C" TextColor="White" CornerRadius="6"
+                                        Clicked="OnAddEffectClicked" />
+                            </Grid>
+
+                            <VerticalStackLayout Spacing="8"
+                                                 BindableLayout.ItemsSource="{Binding VnTab.CurrentEdit.Effects}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="vm:RuleEffectEditModel">
+                                        <Border Padding="10" StrokeShape="RoundRectangle 8"
+                                                BackgroundColor="{AppThemeBinding Light=#F0EBE0, Dark=#1E1E2E}"
+                                                Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                                            <VerticalStackLayout Spacing="8">
+                                                <!-- Typ + Entfernen -->
+                                                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                                    <Picker Grid.Column="0"
+                                                            ItemsSource="{x:Static vm:RuleEffectEditModel.KindOptionen}"
+                                                            SelectedItem="{Binding Kind}"
+                                                            WidthRequest="120" />
+                                                    <Entry Grid.Column="1"
+                                                           Text="{Binding Title}"
+                                                           Placeholder="Titel / Kurzbeschreibung" />
+                                                    <Button Grid.Column="2" Text="✕"
+                                                            FontSize="12" Padding="8,4"
+                                                            BackgroundColor="#8B4444" TextColor="White"
+                                                            CornerRadius="4"
+                                                            Clicked="OnRemoveEffectClicked"
+                                                            CommandParameter="{Binding .}" />
+                                                </Grid>
+
+                                                <!-- Narrative: Beschreibung -->
+                                                <Editor Text="{Binding Description}"
+                                                        Placeholder="Narrative Beschreibung..."
+                                                        AutoSize="TextChanges"
+                                                        IsVisible="{Binding IsNarrative}"
+                                                        MinimumHeightRequest="40" />
+
+                                                <!-- Modifier-Felder -->
+                                                <VerticalStackLayout Spacing="6" IsVisible="{Binding IsModifier}">
+                                                    <!-- Zielwert-Auswahl (Kategorie + Unteroption) -->
+                                                    <Label Text="Zielwert:" FontSize="12"
+                                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                                                        <Picker Grid.Column="0"
+                                                                Title="Kategorie wählen"
+                                                                ItemsSource="{x:Static vm:RuleEffectEditModel.TargetKategorieOptionen}"
+                                                                SelectedIndex="{Binding TargetCategoryIndex}"
+                                                                FontSize="12" />
+                                                        <Picker Grid.Column="1"
+                                                                Title="Ziel wählen"
+                                                                ItemsSource="{Binding TargetSubOptions}"
+                                                                ItemDisplayBinding="{Binding Label}"
+                                                                SelectedItem="{Binding TargetOption}"
+                                                                FontSize="12" />
+                                                    </Grid>
+                                                    <!-- Operation + Wert -->
+                                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                                        <Picker Grid.Column="0"
+                                                                ItemsSource="{x:Static vm:RuleEffectEditModel.OperationOptionen}"
+                                                                SelectedItem="{Binding Operation}" />
+                                                        <Entry Grid.Column="1"
+                                                               Text="{Binding ValueText}"
+                                                               Keyboard="Numeric"
+                                                               Placeholder="Wert"
+                                                               WidthRequest="80"
+                                                               HorizontalTextAlignment="Center" />
+                                                    </Grid>
+                                                    <!-- Pro Stufe, Phase, Stacking -->
+                                                    <Grid ColumnDefinitions="Auto,Auto,*,*" ColumnSpacing="8">
+                                                        <Label Grid.Column="0" Text="Pro Stufe:" FontSize="12"
+                                                               VerticalOptions="Center"
+                                                               TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                                        <Switch Grid.Column="1" IsToggled="{Binding PerLevel}" />
+                                                        <Picker Grid.Column="2"
+                                                                ItemsSource="{x:Static vm:RuleEffectEditModel.PhaseOptionen}"
+                                                                SelectedItem="{Binding Phase}" />
+                                                        <Picker Grid.Column="3"
+                                                                ItemsSource="{x:Static vm:RuleEffectEditModel.StackingOptionen}"
+                                                                SelectedItem="{Binding Stacking}" />
+                                                    </Grid>
+                                                </VerticalStackLayout>
+                                            </VerticalStackLayout>
+                                        </Border>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+
+                            <!-- Speichern / Abbrechen -->
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,8,0,0">
+                                <Button Grid.Column="0" Text="Speichern" FontSize="14"
+                                        BackgroundColor="#4A6B5C" TextColor="White" CornerRadius="8"
+                                        Clicked="OnSaveClicked" />
+                                <Button Grid.Column="1" Text="Abbrechen" FontSize="14"
+                                        BackgroundColor="#6B5B45" TextColor="White" CornerRadius="8"
+                                        Clicked="OnCancelClicked" />
+                            </Grid>
+                        </VerticalStackLayout>
                     </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
 
-        </CollectionView>
+                    <!-- ===== Katalog-Liste (Vorteile) ===== -->
+                    <VerticalStackLayout IsVisible="{Binding VnTab.IsListVisible}" Spacing="8">
+
+                        <Label Text="Vorteile" FontSize="18" FontAttributes="Bold"
+                               TextColor="#0E7490" Margin="0,4,0,0" />
+
+                        <CollectionView ItemsSource="{Binding VnTab.VorteileGruppen}"
+                                        IsGrouped="True">
+                            <CollectionView.GroupHeaderTemplate>
+                                <DataTemplate x:DataType="vm:RegelnKategorie">
+                                    <Border Padding="12,8"
+                                            BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
+                                            Margin="0,4,0,0">
+                                        <Label Text="{Binding Titel}" FontAttributes="Bold" FontSize="14"
+                                               TextColor="#C8A96E" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.GroupHeaderTemplate>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
+                                    <Border Margin="4,2" Padding="12,10" StrokeShape="RoundRectangle 8"
+                                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                                            Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
+                                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                            <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15"
+                                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                                <Border IsVisible="{Binding IsHomebrew}" Padding="4,2"
+                                                        BackgroundColor="#7A5C38" StrokeShape="RoundRectangle 4"
+                                                        StrokeThickness="0">
+                                                    <Label Text="HB" FontSize="10" TextColor="White" />
+                                                </Border>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                                <Label Text="{Binding ApInfo}" FontSize="13" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                       VerticalOptions="Center" />
+                                                <Button Text="✎" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="#3A5580" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsHomebrew}"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnEditClicked" />
+                                                <Button Text="✕" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="#8B4444" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsHomebrew}"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnDeleteClicked" />
+                                            </HorizontalStackLayout>
+                                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                                   Text="{Binding Beschreibung}" FontSize="13"
+                                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
+                                                   Margin="0,4,0,0" IsVisible="{Binding HasBeschreibung}" />
+                                            <Label Grid.Row="2" Grid.ColumnSpan="2"
+                                                   Text="{Binding Effekte}" FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                   FontFamily="Monospace" Margin="0,4,0,0"
+                                                   IsVisible="{Binding HasEffekte}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Nachteile -->
+                        <Label Text="Nachteile" FontSize="18" FontAttributes="Bold"
+                               TextColor="#C85050" Margin="0,8,0,0" />
+
+                        <CollectionView ItemsSource="{Binding VnTab.NachteileGruppen}"
+                                        IsGrouped="True">
+                            <CollectionView.GroupHeaderTemplate>
+                                <DataTemplate x:DataType="vm:RegelnKategorie">
+                                    <Border Padding="12,8"
+                                            BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
+                                            Margin="0,4,0,0">
+                                        <Label Text="{Binding Titel}" FontAttributes="Bold" FontSize="14"
+                                               TextColor="#C8A96E" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.GroupHeaderTemplate>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
+                                    <Border Margin="4,2" Padding="12,10" StrokeShape="RoundRectangle 8"
+                                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                                            Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
+                                        <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
+                                            <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
+                                                <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15"
+                                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                                <Border IsVisible="{Binding IsHomebrew}" Padding="4,2"
+                                                        BackgroundColor="#7A5C38" StrokeShape="RoundRectangle 4"
+                                                        StrokeThickness="0">
+                                                    <Label Text="HB" FontSize="10" TextColor="White" />
+                                                </Border>
+                                            </HorizontalStackLayout>
+                                            <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
+                                                <Label Text="{Binding ApInfo}" FontSize="13" FontAttributes="Bold"
+                                                       TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                       VerticalOptions="Center" />
+                                                <Button Text="✎" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="#3A5580" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsHomebrew}"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnEditClicked" />
+                                                <Button Text="✕" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="#8B4444" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsHomebrew}"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnDeleteClicked" />
+                                            </HorizontalStackLayout>
+                                            <Label Grid.Row="1" Grid.ColumnSpan="2"
+                                                   Text="{Binding Beschreibung}" FontSize="13"
+                                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
+                                                   Margin="0,4,0,0" IsVisible="{Binding HasBeschreibung}" />
+                                            <Label Grid.Row="2" Grid.ColumnSpan="2"
+                                                   Text="{Binding Effekte}" FontSize="12"
+                                                   TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                   FontFamily="Monospace" Margin="0,4,0,0"
+                                                   IsVisible="{Binding HasEffekte}" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- ======================== SF-Tab (Placeholder) ======================== -->
+            <ScrollView IsVisible="{Binding IsSfVisible}">
+                <VerticalStackLayout Padding="16" Spacing="16">
+                    <Label Text="Sonderfertigkeiten" FontSize="22" FontAttributes="Bold"
+                           TextColor="#C8A96E" />
+
+                    <Border Padding="16" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Profane Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                            <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Kampf-Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                            <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Magische Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                            <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Karmale Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                            <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border Padding="16" StrokeShape="RoundRectangle 10"
+                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
+                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="Tierische Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
+                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                            <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- ======================== Magie-Tab (Placeholder) ======================== -->
+            <VerticalStackLayout IsVisible="{Binding IsMagieVisible}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Padding="32">
+                <Label Text="✨" FontSize="48" HorizontalOptions="Center" />
+                <Label Text="Magie" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center"
+                       TextColor="#C8A96E" />
+                <Label Text="Zaubersprüche, Rituale und magische Traditionen werden in einer zukünftigen Version hinzugefügt."
+                       FontSize="14" TextColor="Gray" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+            <!-- ======================== Götterwirken-Tab (Placeholder) ======================== -->
+            <VerticalStackLayout IsVisible="{Binding IsGoetterwirkenVisible}"
+                                 VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Padding="32">
+                <Label Text="☀" FontSize="48" HorizontalOptions="Center" />
+                <Label Text="Götterwirken" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center"
+                       TextColor="#C8A96E" />
+                <Label Text="Liturgien, Zeremonien und göttliche Traditionen werden in einer zukünftigen Version hinzugefügt."
+                       FontSize="14" TextColor="Gray" HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+        </Grid>
     </Grid>
 
 </ContentPage>

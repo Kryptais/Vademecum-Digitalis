@@ -17,6 +17,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<IDialogService, DialogService>();
         builder.Services.AddSingleton<AdvantagesService>();
         builder.Services.AddSingleton<SpecialAbilityService>();
+        builder.Services.AddSingleton<HomebrewCatalogService>();
         builder.Services.AddSingleton<VorteilNachteilService>();
         builder.Services.AddSingleton<TalentModifierService>();
         builder.Services.AddSingleton<TalentCatalogService>();
@@ -34,6 +35,7 @@ public static class MauiProgram
         builder.Services.AddTransient<GlobalItemSearchViewModel>();
         builder.Services.AddTransient<SonderfertigkeitenViewModel>();
         builder.Services.AddTransient<VorteilNachteilViewModel>();
+        builder.Services.AddTransient<RegelnVnViewModel>();
         builder.Services.AddTransient<RegelnViewModel>();
         builder.Services.AddTransient<MoneyTransferViewModel>();
 

@@ -11,24 +11,13 @@
         <VerticalStackLayout Padding="16" Spacing="14">
 
             <!-- Header -->
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="10">
-                <Button Grid.Column="0"
-                        Text="⌂"
-                        WidthRequest="44"
-                        HeightRequest="44"
-                        Padding="0"
-                        FontSize="18"
-                        BackgroundColor="#7A5C38"
-                        TextColor="White"
-                        CornerRadius="8"
-                        Clicked="OnDashboardClicked"
-                        ToolTipProperties.Text="Zurück zum Dashboard" />
-                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
                     <Label Text="Vorteile &amp; Nachteile" Style="{StaticResource HeadlineLabel}" Margin="0,0,0,0" />
                     <Label Text="AP-Bilanz und regeltechnische Effekte."
                            TextColor="{StaticResource TextSecondary}" FontSize="12" />
                 </VerticalStackLayout>
-                <Button Grid.Column="2"
+                <Button Grid.Column="1"
                         Text="＋"
                         WidthRequest="44"
                         HeightRequest="44"

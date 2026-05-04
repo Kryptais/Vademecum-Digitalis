@@ -98,8 +98,8 @@ public record VorteilNachteil
     /// </summary>
     [JsonIgnore]
     public IReadOnlyList<RuleEffect> Effects =>
-        ProbenModifikatoren.Select(pm => pm.ToRuleEffect())
-            .Concat(ExplicitEffects)
+        (ProbenModifikatoren ?? []).Select(pm => pm.ToRuleEffect())
+            .Concat(ExplicitEffects ?? [])
             .ToList();
 
     /// <summary>Redaktionelle Hinweise / spezifische Modifikatoren.</summary>
