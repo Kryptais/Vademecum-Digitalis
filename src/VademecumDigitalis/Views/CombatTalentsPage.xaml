@@ -20,7 +20,7 @@
             <controls:MainAttributesView />
 
             <!-- === Abgeleitete Kampfwerte === -->
-            <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e">
+            <Border Stroke="{StaticResource Gold}" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Background}">
                 <Border.Padding>
                     <OnIdiom x:TypeArguments="Thickness" Phone="8,6" Tablet="10,7" Desktop="12,8" />
                 </Border.Padding>
@@ -69,27 +69,27 @@
                         </Label.FontSize>
                     </Label>
 
-                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding Ausweichen}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding Ausweichen}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                         <Label.FontSize>
                             <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                         </Label.FontSize>
                     </Label>
-                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding InitiativeBasis}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                    <Label Grid.Row="1" Grid.Column="1" Text="{Binding InitiativeBasis}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                         <Label.FontSize>
                             <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                         </Label.FontSize>
                     </Label>
-                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding Seelenkraft}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                    <Label Grid.Row="1" Grid.Column="2" Text="{Binding Seelenkraft}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                         <Label.FontSize>
                             <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                         </Label.FontSize>
                     </Label>
-                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding Zähigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                    <Label Grid.Row="1" Grid.Column="3" Text="{Binding Zähigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                         <Label.FontSize>
                             <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                         </Label.FontSize>
                     </Label>
-                    <Label Grid.Row="1" Grid.Column="4" Text="{Binding Geschwindigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                    <Label Grid.Row="1" Grid.Column="4" Text="{Binding Geschwindigkeit}" HorizontalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                         <Label.FontSize>
                             <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                         </Label.FontSize>
@@ -107,7 +107,7 @@
                 </Grid.RowSpacing>
 
                 <!-- Lebensenergie -->
-                <Border Stroke="#B71C1C" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e" HorizontalOptions="Fill">
+                <Border Stroke="#B71C1C" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Background}" HorizontalOptions="Fill">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Grid.Column">
@@ -129,7 +129,7 @@
                         <VerticalStackLayout.Spacing>
                             <OnIdiom x:TypeArguments="x:Double" Phone="5" Tablet="6" Desktop="8" />
                         </VerticalStackLayout.Spacing>
-                        <Label Text="Lebensenergie" FontAttributes="Bold" TextColor="#EF5350">
+                        <Label Text="Lebensenergie" FontAttributes="Bold" TextColor="{StaticResource Danger}">
                             <Label.FontSize>
                                 <OnIdiom x:TypeArguments="x:Double" Phone="16" Tablet="18" Desktop="20" />
                             </Label.FontSize>
@@ -143,7 +143,7 @@
                                     <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                                 </Label.FontSize>
                             </Label>
-                            <Label Grid.Column="1" Text="{Binding Lebensenergie}" FontAttributes="Bold" TextColor="#EF5350" VerticalOptions="Center">
+                            <Label Grid.Column="1" Text="{Binding Lebensenergie}" FontAttributes="Bold" TextColor="{StaticResource Danger}" VerticalOptions="Center">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="14" Tablet="17" Desktop="20" />
                                 </Label.FontSize>
@@ -172,7 +172,7 @@
                 </Border>
 
                 <!-- Status-Tracking -->
-                <Border Stroke="#FF6F00" StrokeShape="RoundRectangle 8" Padding="0" BackgroundColor="#1a1a2e" HorizontalOptions="Fill">
+                <Border Stroke="#FF6F00" StrokeShape="RoundRectangle 8" Padding="0" BackgroundColor="{StaticResource Background}" HorizontalOptions="Fill">
                     <Border.Style>
                         <Style TargetType="Border">
                             <Setter Property="Grid.Column">
@@ -202,30 +202,30 @@
                                         <Label Text="{Binding StatusName}" TextColor="White" FontSize="13" FontAttributes="Bold" />
                                         <HorizontalStackLayout Spacing="4" HorizontalOptions="Start">
                                             <!-- Segmented Control: 5 Buttons für Stufen 0-4 -->
-                                            <Border Stroke="#4DD0E1" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1a1a2e">
+                                            <Border Stroke="{StaticResource GoldBright}" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="{StaticResource Background}">
                                                 <HorizontalStackLayout Spacing="0">
                                                     <Button Text="0" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
                                                             BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=0}"
                                                             TextColor="White" Clicked="OnStatusButton0Clicked" />
-                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <BoxView Color="{StaticResource GoldBright}" WidthRequest="1" />
                                                     <Button Text="1" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
                                                             BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=1}"
                                                             TextColor="White" Clicked="OnStatusButton1Clicked" />
-                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <BoxView Color="{StaticResource GoldBright}" WidthRequest="1" />
                                                     <Button Text="2" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
                                                             BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=2}"
                                                             TextColor="White" Clicked="OnStatusButton2Clicked" />
-                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <BoxView Color="{StaticResource GoldBright}" WidthRequest="1" />
                                                     <Button Text="3" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
                                                             BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=3}"
                                                             TextColor="White" Clicked="OnStatusButton3Clicked" />
-                                                    <BoxView Color="#4DD0E1" WidthRequest="1" />
+                                                    <BoxView Color="{StaticResource GoldBright}" WidthRequest="1" />
                                                     <Button Text="4" WidthRequest="28" HeightRequest="26" FontSize="11" Padding="0"
                                                             BackgroundColor="{Binding Stufe, Converter={StaticResource StatusButtonColorConverter}, ConverterParameter=4}"
                                                             TextColor="White" Clicked="OnStatusButton4Clicked" />
                                                 </HorizontalStackLayout>
                                             </Border>
-                                            <Label Text="{Binding Stufe, StringFormat='Stufe {0}'}" TextColor="#4DD0E1" FontSize="12" VerticalOptions="Center" />
+                                            <Label Text="{Binding Stufe, StringFormat='Stufe {0}'}" TextColor="{StaticResource GoldBright}" FontSize="12" VerticalOptions="Center" />
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
                                 </DataTemplate>
@@ -239,7 +239,7 @@
             </Grid>
 
             <!-- === Kampftechniken Header === -->
-            <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*" BackgroundColor="#0E7490">
+            <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*,0.6*" BackgroundColor="{StaticResource Gold}">
                 <Grid.ColumnSpacing>
                     <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
                 </Grid.ColumnSpacing>
@@ -285,7 +285,16 @@
                         <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
                     </Label.FontSize>
                 </Label>
-                <Label Grid.Column="6" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label Grid.Column="6" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"
+                       ToolTipProperties.Text="Boni aus Vorteilen/Sonderfertigkeiten und Zustandsstufen">
+                    <Label.Text>
+                        <OnIdiom x:TypeArguments="x:String" Phone="Ef" Tablet="Eff." Desktop="VT/SF" />
+                    </Label.Text>
+                    <Label.FontSize>
+                        <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
+                    </Label.FontSize>
+                </Label>
+                <Label Grid.Column="7" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.Text>
                         <OnIdiom x:TypeArguments="x:String" Phone="Ges" Tablet="Ges." Desktop="Gesamt" />
                     </Label.Text>
@@ -293,7 +302,7 @@
                         <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
                     </Label.FontSize>
                 </Label>
-                <Label Grid.Column="7" Text="PA" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label Grid.Column="8" Text="PA" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center">
                     <Label.FontSize>
                         <OnIdiom x:TypeArguments="x:Double" Phone="13" Tablet="16" Desktop="18" />
                     </Label.FontSize>
@@ -305,7 +314,7 @@
                                  BindableLayout.ItemsSource="{Binding Kampftechniken}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate x:DataType="models:KampftechnikRow">
-                        <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.6*,0.6*" BackgroundColor="#222222">
+                        <Grid ColumnDefinitions="*,0.8*,0.6*,0.6*,0.6*,0.5*,0.5*,0.6*,0.6*" BackgroundColor="{StaticResource SurfaceHigh}">
                             <Grid.ColumnSpacing>
                                 <OnIdiom x:TypeArguments="x:Double" Phone="2" Tablet="3" Desktop="4" />
                             </Grid.ColumnSpacing>
@@ -317,12 +326,12 @@
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>
                             </Label>
-                            <Label Grid.Column="1" Text="{Binding Leiteigenschaft}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#B0E0E6">
+                            <Label Grid.Column="1" Text="{Binding Leiteigenschaft}" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource TextPrimary}">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>
                             </Label>
-                            <Label Grid.Column="2" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="#0E7490">
+                            <Label Grid.Column="2" Text="{Binding Steigerungsfaktor}" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" TextColor="{StaticResource Gold}">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>
@@ -333,7 +342,7 @@
                                 </Entry.FontSize>
                                 <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                             </Entry>
-                            <Label Grid.Column="4" Text="{Binding AtFkBasis}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                            <Label Grid.Column="4" Text="{Binding AtFkBasis}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>
@@ -344,12 +353,17 @@
                                 </Entry.FontSize>
                                 <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                             </Entry>
-                            <Label Grid.Column="6" Text="{Binding Gesamt}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#4DD0E1">
+                            <Label Grid.Column="6" Text="{Binding BoniEffekte, StringFormat='{0:+#;-#;0}'}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="#FFC857">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>
                             </Label>
-                            <Label Grid.Column="7" Text="{Binding Parade}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="White">
+                            <Label Grid.Column="7" Text="{Binding Gesamt}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="{StaticResource GoldBright}">
+                                <Label.FontSize>
+                                    <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
+                                </Label.FontSize>
+                            </Label>
+                            <Label Grid.Column="8" Text="{Binding Parade}" HorizontalOptions="Center" VerticalOptions="Center" FontAttributes="Bold" TextColor="White">
                                 <Label.FontSize>
                                     <OnIdiom x:TypeArguments="x:Double" Phone="12" Tablet="15" Desktop="18" />
                                 </Label.FontSize>

@@ -5,129 +5,390 @@
              x:Class="VademecumDigitalis.App">
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="Primary">#2563EB</Color>
-            <Color x:Key="BackgroundDark">#121212</Color>
-            <Color x:Key="SurfaceDark">#1E1E1E</Color>
-            <Color x:Key="CardBackground">#1E1E1E</Color>
-            <Color x:Key="InputBackground">#2A2A2A</Color>
-            <Color x:Key="TextPrimary">#E6E6E6</Color>
-            <Color x:Key="TextSecondary">#B0B0B0</Color>
-            <Color x:Key="BorderColor">#333333</Color>
-            <Color x:Key="AccentCyan">#0E7490</Color>
 
-            <!-- Hauptattribute-Farben (DSA 5) -->
-            <Color x:Key="AttrMU">#FF6B6B</Color>
+            <!-- ════════════════════════════════════════════════════════════════ -->
+            <!-- AVENTURISCHES MANUSKRIPT – Dark Theme                              -->
+            <!-- Farbtokens, Typografie und Komponentenstile.                       -->
+            <!-- Einheitlich, deshalb hier zentral.                                 -->
+            <!-- ════════════════════════════════════════════════════════════════ -->
+
+            <!-- ─── Flächen (warme Eiche) ─────────────────────────────────────── -->
+            <Color x:Key="Background">#1C1510</Color>
+            <Color x:Key="SurfaceLow">#261C14</Color>
+            <Color x:Key="SurfaceHigh">#322519</Color>
+            <Color x:Key="SurfaceElevated">#3F2E1F</Color>
+            <Color x:Key="Border">#5C4423</Color>
+            <Color x:Key="BorderSoft">#3A2A1B</Color>
+
+            <!-- ─── Akzent (Gold/Bernstein) ───────────────────────────────────── -->
+            <Color x:Key="GoldBright">#E8C580</Color>
+            <Color x:Key="Gold">#C8A96E</Color>
+            <Color x:Key="GoldDeep">#8A6F3D</Color>
+            <Color x:Key="Amber">#E8B36A</Color>
+
+            <!-- ─── Semantik ──────────────────────────────────────────────────── -->
+            <Color x:Key="Success">#6E8B5C</Color>
+            <Color x:Key="Danger">#B83D38</Color>
+            <Color x:Key="Warning">#E0A953</Color>
+            <Color x:Key="Info">#7193B0</Color>
+            <Color x:Key="Magic">#8E5BAE</Color>
+            <Color x:Key="Karmal">#D4A85C</Color>
+
+            <!-- ─── Text ──────────────────────────────────────────────────────── -->
+            <Color x:Key="TextPrimary">#ECDFC4</Color>
+            <Color x:Key="TextSecondary">#B8A88C</Color>
+            <Color x:Key="TextMuted">#7A6D58</Color>
+            <Color x:Key="TextDisabled">#4F4538</Color>
+            <Color x:Key="TextOnGold">#1C1510</Color>
+
+            <!-- ─── Hauptattribute (DSA 5) ────────────────────────────────────── -->
+            <Color x:Key="AttrMU">#D85959</Color>
             <Color x:Key="AttrKL">#6BB5FF</Color>
             <Color x:Key="AttrIN">#C19BFF</Color>
             <Color x:Key="AttrCH">#FF8FB1</Color>
-            <Color x:Key="AttrFF">#FFD93D</Color>
+            <Color x:Key="AttrFF">#E8C580</Color>
             <Color x:Key="AttrGE">#6BCF7F</Color>
-            <Color x:Key="AttrKO">#FF9F43</Color>
+            <Color x:Key="AttrKO">#E89D52</Color>
             <Color x:Key="AttrKK">#D4A574</Color>
 
+            <!-- ─── Legacy-Aliase (Bestandsbindings rauskompatibel) ───────────── -->
+            <!-- Diese Namen werden noch in vielen XAMLs referenziert.
+                 Sie verweisen jetzt auf die neuen Tokens. -->
+            <Color x:Key="Primary">#C8A96E</Color>
+            <Color x:Key="BackgroundDark">#1C1510</Color>
+            <Color x:Key="SurfaceDark">#261C14</Color>
+            <Color x:Key="CardBackground">#261C14</Color>
+            <Color x:Key="InputBackground">#322519</Color>
+            <Color x:Key="BorderColor">#5C4423</Color>
+            <Color x:Key="AccentCyan">#C8A96E</Color>
+
+            <!-- ─── Converters ────────────────────────────────────────────────── -->
             <converters:IntStringConverter x:Key="IntStringConverter" />
             <converters:AttributeColorConverter x:Key="AttributeColorConverter" />
             <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
             <converters:StatusButtonColorConverter x:Key="StatusButtonColorConverter" />
 
-            <!-- Default Page Background -->
+            <!-- ════════════════════════════════════════════════════════════════ -->
+            <!-- DEFAULT-STYLES (greifen ohne x:Key auf alle Elemente)              -->
+            <!-- ════════════════════════════════════════════════════════════════ -->
+
             <Style TargetType="ContentPage">
-                <Setter Property="BackgroundColor" Value="{StaticResource BackgroundDark}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource Background}" />
             </Style>
 
-            <!-- Default Label -->
             <Style TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
             </Style>
 
-            <!-- Default Entry (dark) -->
             <Style TargetType="Entry">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
-                <Setter Property="PlaceholderColor" Value="#666666" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
             </Style>
 
-            <!-- Default Editor (dark) -->
             <Style TargetType="Editor">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
-                <Setter Property="PlaceholderColor" Value="#666666" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
             </Style>
 
-            <!-- Default CheckBox -->
             <Style TargetType="CheckBox">
-                <Setter Property="Color" Value="{StaticResource TextPrimary}" />
+                <Setter Property="Color" Value="{StaticResource Gold}" />
             </Style>
 
-            <!-- Default SearchBar -->
             <Style TargetType="SearchBar">
-                <Setter Property="TextColor" Value="White" />
-                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
-                <Setter Property="PlaceholderColor" Value="#999999" />
-            </Style>
-
-            <!-- Default Picker (dark) -->
-            <Style TargetType="Picker">
+                <Setter Property="FontFamily" Value="Inter" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="BackgroundColor" Value="{StaticResource InputBackground}" />
-                <Setter Property="TitleColor" Value="#666666" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="CancelButtonColor" Value="{StaticResource Gold}" />
             </Style>
 
-            <!-- Headline Style (Large, Bold) -->
-            <Style x:Key="HeadlineLabel" TargetType="Label">
+            <Style TargetType="Picker">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="TitleColor" Value="{StaticResource TextMuted}" />
+            </Style>
+
+            <Style TargetType="DatePicker">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+            </Style>
+
+            <Style TargetType="TimePicker">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+            </Style>
+
+            <Style TargetType="Switch">
+                <Setter Property="OnColor" Value="{StaticResource Gold}" />
+                <Setter Property="ThumbColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="BackgroundColor" Value="{StaticResource Gold}" />
+                <Setter Property="TextColor" Value="{StaticResource TextOnGold}" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="16,10" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+
+            <Style TargetType="ActivityIndicator">
+                <Setter Property="Color" Value="{StaticResource Gold}" />
+            </Style>
+
+            <!-- ════════════════════════════════════════════════════════════════ -->
+            <!-- TYPOGRAFIE-STYLES (mit x:Key)                                      -->
+            <!-- ════════════════════════════════════════════════════════════════ -->
+
+            <Style x:Key="DisplayLargeLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cinzel" />
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource GoldBright}" />
+                <Setter Property="CharacterSpacing" Value="2" />
+            </Style>
+
+            <Style x:Key="DisplaySmallLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cinzel" />
                 <Setter Property="FontSize" Value="24" />
                 <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="Margin" Value="0,10,0,10" />
+                <Setter Property="TextColor" Value="{StaticResource GoldBright}" />
+                <Setter Property="CharacterSpacing" Value="2" />
             </Style>
 
-            <!-- Subhead Style (Medium, Bold) -->
-            <Style x:Key="SubheadLabel" TargetType="Label">
-                <Setter Property="FontSize" Value="20" />
+            <!-- Page-Title (HeadlineLabel-Alias: vorhandene Bindings funktionieren weiter) -->
+            <Style x:Key="HeadlineLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cinzel" />
+                <Setter Property="FontSize" Value="22" />
                 <Setter Property="FontAttributes" Value="Bold" />
-                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
-                <Setter Property="Margin" Value="0,8,0,4" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="CharacterSpacing" Value="2" />
+                <Setter Property="Margin" Value="0,8,0,8" />
             </Style>
 
-            <!-- Section Header (for cards) -->
-            <Style x:Key="SectionHeaderLabel" TargetType="Label">
+            <Style x:Key="SubheadLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cinzel" />
                 <Setter Property="FontSize" Value="18" />
                 <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="CharacterSpacing" Value="1" />
+                <Setter Property="Margin" Value="0,6,0,4" />
+            </Style>
+
+            <Style x:Key="SectionHeaderLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cinzel" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="CharacterSpacing" Value="1" />
+            </Style>
+
+            <Style x:Key="ProseLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Cormorant" />
+                <Setter Property="FontSize" Value="16" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
             </Style>
 
-            <!-- Field Label (small, bold) -->
-            <Style x:Key="FieldLabel" TargetType="Label">
-                <Setter Property="FontSize" Value="13" />
-                <Setter Property="FontAttributes" Value="Bold" />
+            <Style x:Key="ProseItalicLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="CormorantItalic" />
+                <Setter Property="FontSize" Value="15" />
                 <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
             </Style>
 
-            <!-- Table Header Label Style -->
-            <Style x:Key="TableHeaderLabel" TargetType="Label">
+            <Style x:Key="BodyLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
                 <Setter Property="FontSize" Value="14" />
-                <Setter Property="FontAttributes" Value="Bold" />
                 <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <Style x:Key="BodySmallLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
+            </Style>
+
+            <Style x:Key="MutedLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="TextColor" Value="{StaticResource TextMuted}" />
+            </Style>
+
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="11" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextSecondary}" />
+                <Setter Property="CharacterSpacing" Value="2" />
+            </Style>
+
+            <Style x:Key="TableHeaderLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextOnGold}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="CharacterSpacing" Value="1" />
+            </Style>
+
+            <Style x:Key="NumericLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="18" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource GoldBright}" />
                 <Setter Property="HorizontalTextAlignment" Value="Center" />
             </Style>
 
-            <!-- Card Border Style -->
+            <Style x:Key="NumericLargeLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="28" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource GoldBright}" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+            </Style>
+
+            <Style x:Key="MonoLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Mono" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- ════════════════════════════════════════════════════════════════ -->
+            <!-- KOMPONENTEN-STYLES                                                 -->
+            <!-- ════════════════════════════════════════════════════════════════ -->
+
+            <!-- Karte (Standard) -->
             <Style x:Key="CardBorder" TargetType="Border">
-                <Setter Property="BackgroundColor" Value="{StaticResource CardBackground}" />
-                <Setter Property="Stroke" Value="{StaticResource BorderColor}" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceLow}" />
+                <Setter Property="Stroke" Value="{StaticResource Border}" />
                 <Setter Property="StrokeThickness" Value="1" />
-                <Setter Property="StrokeShape" Value="RoundRectangle 8" />
-                <Setter Property="Padding" Value="12" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="14" />
                 <Setter Property="Margin" Value="0,4" />
             </Style>
 
-            <!-- Button Style -->
-            <Style TargetType="Button">
-                <Setter Property="BackgroundColor" Value="{StaticResource Primary}" />
-                <Setter Property="TextColor" Value="White" />
-                <Setter Property="CornerRadius" Value="8" />
-                <Setter Property="Padding" Value="14,10" />
+            <!-- Karte hervorgehoben -->
+            <Style x:Key="ElevatedCardBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="Stroke" Value="{StaticResource Gold}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="14" />
+                <Setter Property="Margin" Value="0,4" />
+            </Style>
+
+            <!-- Karte „Goldenes Wappen" – für Hauptinfos -->
+            <Style x:Key="SigilCardBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceLow}" />
+                <Setter Property="Stroke" Value="{StaticResource Gold}" />
+                <Setter Property="StrokeThickness" Value="1.5" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="16" />
+                <Setter Property="Margin" Value="0,6" />
+            </Style>
+
+            <!-- Sektion-Trenner (Linie + Ornament-Glyph optional außen rum) -->
+            <Style x:Key="Divider" TargetType="BoxView">
+                <Setter Property="HeightRequest" Value="1" />
+                <Setter Property="BackgroundColor" Value="{StaticResource BorderSoft}" />
+                <Setter Property="Margin" Value="0,8" />
+            </Style>
+
+            <!-- Buttons -->
+            <Style x:Key="PrimaryButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
                 <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="BackgroundColor" Value="{StaticResource Gold}" />
+                <Setter Property="TextColor" Value="{StaticResource TextOnGold}" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="20,10" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+
+            <Style x:Key="SecondaryButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="BorderColor" Value="{StaticResource Gold}" />
+                <Setter Property="BorderWidth" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="20,10" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+
+            <Style x:Key="DangerButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="BackgroundColor" Value="{StaticResource Danger}" />
+                <Setter Property="TextColor" Value="#FFFFFF" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="Padding" Value="20,10" />
+                <Setter Property="MinimumHeightRequest" Value="44" />
+            </Style>
+
+            <Style x:Key="GhostButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="CornerRadius" Value="6" />
+                <Setter Property="Padding" Value="12,6" />
+                <Setter Property="MinimumHeightRequest" Value="36" />
+            </Style>
+
+            <Style x:Key="IconButton" TargetType="Button">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource Gold}" />
+                <Setter Property="WidthRequest" Value="36" />
+                <Setter Property="HeightRequest" Value="36" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="CornerRadius" Value="6" />
+            </Style>
+
+            <!-- Numeric-Eingabefeld (helle Inputs wie bisher, aber thematisch eingebunden) -->
+            <Style x:Key="NumericEntry" TargetType="Entry">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Keyboard" Value="Numeric" />
+                <Setter Property="HorizontalTextAlignment" Value="Center" />
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+            </Style>
+
+            <!-- Badge-Stile -->
+            <Style x:Key="BadgeBorder" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource SurfaceHigh}" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 4" />
+                <Setter Property="Padding" Value="6,3" />
+            </Style>
+
+            <Style x:Key="BadgeLabel" TargetType="Label">
+                <Setter Property="FontFamily" Value="Inter" />
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="CharacterSpacing" Value="1" />
             </Style>
 
         </ResourceDictionary>

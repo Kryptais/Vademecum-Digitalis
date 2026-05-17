@@ -7,6 +7,7 @@
     "MaxStufe": 1,
     "ApKostenProStufe": [0],
     "TalentTyp": "Begabung",
+    "HasCodeLogic": true,
     "VoraussetzungenProStufe": [],
     "Anmerkungen": "Kosten abhängig vom SF des gewählten Talents: A=6, B=12, C=18, D=24 AP."
   },
@@ -279,12 +280,13 @@
   {
     "Id": "waffenbegabung",
     "Name": "Waffenbegabung",
-    "Beschreibung": "Der Held ist mit einer bestimmten Kampftechnik besonders begabt und erhält einen Bonus auf Attacke und Parade.",
+    "Beschreibung": "Der Held ist mit einer bestimmten Kampftechnik besonders begabt. Beim Bestätigungswurf für Krit/Patzer wird das bessere/schlechtere Ergebnis genommen.",
     "Kategorie": "Kampfvorteile",
     "MaxStufe": 1,
     "ApKostenProStufe": [20],
+    "HasCodeLogic": true,
     "VoraussetzungenProStufe": [],
-    "Anmerkungen": "Muss für eine bestimmte Kampftechnik gewählt werden."
+    "Anmerkungen": "Muss für eine bestimmte Kampftechnik gewählt werden. Würfellogik fest implementiert."
   },
   {
     "Id": "hohe-astralkraft",
@@ -454,6 +456,7 @@
     "MaxStufe": 1,
     "ApKostenProStufe": [0],
     "TalentTyp": "Unfaehigkeit",
+    "HasCodeLogic": true,
     "VoraussetzungenProStufe": [],
     "Anmerkungen": "Kosten abhängig vom SF des gewählten Talents: A=-10, B=-20, C=-30, D=-40 AP. Mehrere Unfähigkeiten möglich."
   }

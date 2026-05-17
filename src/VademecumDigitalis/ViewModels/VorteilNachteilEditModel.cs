@@ -21,6 +21,7 @@ public class VorteilNachteilEditModel : INotifyPropertyChanged
     private string _anmerkungen = string.Empty;
     private TalentGebundenerTyp _talentTyp = TalentGebundenerTyp.Keiner;
     private bool _isHomebrew = true;
+    private bool _hasCodeLogic;
 
     public string Id
     {
@@ -49,7 +50,32 @@ public class VorteilNachteilEditModel : INotifyPropertyChanged
     public int MaxStufe
     {
         get => _maxStufe;
-        set { if (_maxStufe != value) { _maxStufe = Math.Max(1, value); Notify(); } }
+        set
+        {
+            var clamped = Math.Max(1, value);
+            if (_maxStufe != clamped)
+            {
+                _maxStufe = clamped;
+                Notify();
+                Notify(nameof(MaxStufeText));
+            }
+        }
+    }
+
+    /// <summary>String-Binding für die Max-Stufe — verhindert Crash bei leerem Entry.</summary>
+    public string MaxStufeText
+    {
+        get => _maxStufe.ToString();
+        set
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                MaxStufe = 1;
+                return;
+            }
+            if (int.TryParse(value, out var parsed))
+                MaxStufe = parsed;
+        }
     }
 
     /// <summary>AP-Kosten als Komma-getrennter Text, z.B. "20,20,20".</summary>
@@ -75,6 +101,13 @@ public class VorteilNachteilEditModel : INotifyPropertyChanged
     {
         get => _isHomebrew;
         set { if (_isHomebrew != value) { _isHomebrew = value; Notify(); } }
+    }
+
+    /// <summary>True wenn die Regel-Logik fest im Code steckt (z. B. Begabung/Unfähigkeit).</summary>
+    public bool HasCodeLogic
+    {
+        get => _hasCodeLogic;
+        set { if (_hasCodeLogic != value) { _hasCodeLogic = value; Notify(); } }
     }
 
     /// <summary>Editierbare Effektliste.</summary>
@@ -103,7 +136,8 @@ public class VorteilNachteilEditModel : INotifyPropertyChanged
             ApKostenText = string.Join(", ", vn.ApKostenProStufe),
             Anmerkungen = vn.Anmerkungen,
             TalentTyp = vn.TalentTyp,
-            IsHomebrew = vn.IsHomebrew
+            IsHomebrew = vn.IsHomebrew,
+            HasCodeLogic = vn.HasCodeLogic
         };
 
         foreach (var effect in vn.ExplicitEffects)
@@ -145,7 +179,8 @@ public class VorteilNachteilEditModel : INotifyPropertyChanged
                 ApKostenProStufe = ParseApKosten(ApKostenText),
                 Anmerkungen = Anmerkungen.Trim(),
                 TalentTyp = TalentTyp,
-                IsHomebrew = true,
+                IsHomebrew = IsHomebrew,
+                HasCodeLogic = HasCodeLogic,
                 ExplicitEffects = effects
             };
 

@@ -108,6 +108,14 @@ public record VorteilNachteil
     /// <summary>True wenn vom Benutzer als Homebrew erstellt.</summary>
     public bool IsHomebrew { get; init; }
 
+    /// <summary>
+    /// True, wenn die Logik dieses Vorteils/Nachteils fest in C# implementiert ist
+    /// (z. B. Begabung, Unfähigkeit, Waffenbegabung). Solche Einträge können vom Nutzer
+    /// nicht editiert oder gelöscht werden, weil das Bearbeiten der RuleEffects nichts
+    /// an der eigentlichen Berechnung ändern würde.
+    /// </summary>
+    public bool HasCodeLogic { get; init; }
+
     /// <summary>Wenn gesetzt, ist dieser VN talent-gebunden (Begabung/Unfähigkeit).</summary>
     public TalentGebundenerTyp TalentTyp { get; init; } = TalentGebundenerTyp.Keiner;
 

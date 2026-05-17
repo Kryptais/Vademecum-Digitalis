@@ -169,7 +169,9 @@ public class KampftechnikRow : INotifyPropertyChanged
     private string _ktw = "6";
     private int _boni;
     private int _atFkBasis;
-    private int _parade;
+    private int _atFkBoniEffekte;
+    private int _paradeBasis;
+    private int _paradeBoniEffekte;
 
     public string Kampftechnik { get; set; } = string.Empty;
 
@@ -196,37 +198,66 @@ public class KampftechnikRow : INotifyPropertyChanged
         }
     }
 
-    /// <summary>Berechneter AT/FK-Basiswert aus Leiteigenschaft (MU für Nahkampf, FF für Fernkampf).</summary>
+    /// <summary>
+    /// Reiner AT/FK-Basiswert aus der Leiteigenschaft: ⌊(MU-8)/3⌋ bzw. ⌊(FF-8)/3⌋.
+    /// Enthält keine Status-Modifikatoren und keine RuleEffect-Boni.
+    /// </summary>
     public int AtFkBasis
     {
         get => _atFkBasis;
         set { if (_atFkBasis != value) { _atFkBasis = value; OnPropertyChanged(nameof(AtFkBasis)); OnPropertyChanged(nameof(Gesamt)); } }
     }
 
-    /// <summary>Boni aus Vorteilen, Sonderfertigkeiten etc.</summary>
+    /// <summary>Manueller AT-Boni (z. B. Formation, Umstandsmodifikatoren) – editierbar.</summary>
     public int Boni
     {
         get => _boni;
         set { if (_boni != value) { _boni = value; OnPropertyChanged(nameof(Boni)); OnPropertyChanged(nameof(Gesamt)); } }
     }
 
-    /// <summary>Gesamtwert = KTW + AT/FK-Basis + Boni.</summary>
+    /// <summary>
+    /// AT/FK-Boni aus Vorteilen, Nachteilen, Sonderfertigkeiten und Zustands­modifikatoren
+    /// (Schmerz, Furcht, …). Wird vom ViewModel berechnet.
+    /// </summary>
+    [JsonIgnore]
+    public int BoniEffekte
+    {
+        get => _atFkBoniEffekte;
+        set { if (_atFkBoniEffekte != value) { _atFkBoniEffekte = value; OnPropertyChanged(nameof(BoniEffekte)); OnPropertyChanged(nameof(Gesamt)); } }
+    }
+
+    /// <summary>Gesamtwert = KTW + AT/FK-Basis + manueller Boni + Effekt-/Status-Boni.</summary>
     [JsonIgnore]
     public int Gesamt
     {
         get
         {
             int.TryParse(_ktw, out var ktw);
-            return ktw + _atFkBasis + _boni;
+            return ktw + _atFkBasis + _boni + _atFkBoniEffekte;
         }
     }
 
-    /// <summary>Parade-Wert (berechnet: ⌈KTW/2⌉ + Leiteigenschaftsbonus, nur Nahkampf).</summary>
-    public int Parade
+    /// <summary>
+    /// Reiner Parade-Basiswert: ⌈KTW/2⌉ + ⌊(LE-8)/3⌋ (nur Nahkampf).
+    /// Enthält keine Status-Modifikatoren und keine RuleEffect-Boni.
+    /// </summary>
+    public int ParadeBasis
     {
-        get => _parade;
-        set { if (_parade != value) { _parade = value; OnPropertyChanged(nameof(Parade)); } }
+        get => _paradeBasis;
+        set { if (_paradeBasis != value) { _paradeBasis = value; OnPropertyChanged(nameof(ParadeBasis)); OnPropertyChanged(nameof(Parade)); } }
     }
+
+    /// <summary>PA-Boni aus Effekten und Zustands­modifikatoren. Wird vom ViewModel berechnet.</summary>
+    [JsonIgnore]
+    public int ParadeBoniEffekte
+    {
+        get => _paradeBoniEffekte;
+        set { if (_paradeBoniEffekte != value) { _paradeBoniEffekte = value; OnPropertyChanged(nameof(ParadeBoniEffekte)); OnPropertyChanged(nameof(Parade)); } }
+    }
+
+    /// <summary>Parade-Gesamtwert = ParadeBasis + ParadeBoniEffekte.</summary>
+    [JsonIgnore]
+    public int Parade => _paradeBasis + _paradeBoniEffekte;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

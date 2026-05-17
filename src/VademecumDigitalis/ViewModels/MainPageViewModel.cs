@@ -228,14 +228,16 @@ public class MainPageViewModel : INotifyPropertyChanged
     public string EreignisSkBonusAnzeige  => EreignisSkBonus  != 0 ? $"{EreignisSkBonus:+#;-#;0} Ere."  : "";
     public string EreignisZkBonusAnzeige  => EreignisZkBonus  != 0 ? $"{EreignisZkBonus:+#;-#;0} Ere."  : "";
 
-    // Boni-Spalte: Summe aus Vorteilsboni + Ereignisboni (alle Quellen)
-    public int LebensenergieBoniGesamt   => _sheet.LebensenergieVorteilsBonus + EreignisLepBonus;
-    public int AstralergieBoniGesamt     => _sheet.AstralenergieVorteilsBonus + EreignisAspBonus;
-    public int KarmaenergieBoniGesamt    => _sheet.KarmaenergieVorteilsBonus  + EreignisKapBonus;
-    public int SeelenkraftBoniGesamt     => _sheet.SeelenkraftVorteilsBonus   + EreignisSkBonus;
-    public int ZähigkeitBoniGesamt       => _sheet.ZähigkeitVorteilsBonus     + EreignisZkBonus;
-    public int InitiativeBasisBoniGesamt => _sheet.InitiativeBasisVorteilsBonus;
-    public int GeschwindigkeitBoniGesamt => _sheet.GeschwindigkeitVorteilsBonus;
+    // Boni-Spalte: alle additiven Quellen (manueller Vorteilsbonus + Ereignisse + RuleEffects).
+    // Berechnet als Gesamtwert minus reine Basis, damit RuleEffect-Boni (z. B. „Hohe Lebensenergie")
+    // automatisch sichtbar werden.
+    public int LebensenergieBoniGesamt   => Lebensenergie   - LebensenergieBasis - _sheet.LebensenergieZugekauft;
+    public int AstralergieBoniGesamt     => Astralenergie   - _sheet.AstralenergieZugekauft;
+    public int KarmaenergieBoniGesamt    => Karmaenergie    - _sheet.KarmaenergieZugekauft;
+    public int SeelenkraftBoniGesamt     => Seelenkraft     - SeelenkraftBasis;
+    public int ZähigkeitBoniGesamt       => Zähigkeit       - ZähigkeitBasis;
+    public int InitiativeBasisBoniGesamt => InitiativeBasis - InitiativeBasisBerechnet;
+    public int GeschwindigkeitBoniGesamt => Geschwindigkeit - GeschwindigkeitBasis;
 
     public string GeschwindigkeitAuditText => BuildGeschwindigkeitAuditText();
 
@@ -437,6 +439,8 @@ public class MainPageViewModel : INotifyPropertyChanged
             }
         }
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KeineVorteileNachteile)));
+        // Effekte der geladenen Vorteile/Nachteile auf abgeleitete Werte (GS, LeP, …) anwenden.
+        NotifyRuleEffectValuesChanged();
 
         // Sonderfertigkeiten laden
         foreach (var sf in SonderfertigkeitEintraege.ToList())
@@ -754,7 +758,8 @@ public class MainPageViewModel : INotifyPropertyChanged
     {
         if (kt.IstFernkampf)
         {
-            kt.Parade = 0;
+            kt.ParadeBasis = 0;
+            kt.ParadeBoniEffekte = 0;
             return;
         }
 
@@ -766,15 +771,19 @@ public class MainPageViewModel : INotifyPropertyChanged
                 best = Math.Max(best, val);
         }
 
-        // Parade = ⌈KTW/2⌉ + ⌊(Leiteigenschaft-8)/3⌋ - Status-Modifikatoren
         if (int.TryParse(kt.Ktw, out var ktw))
         {
-            int statusModifikator = GetStatusModifikatorForPA();
-            kt.Parade = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0) + statusModifikator);
+            int paBasis = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0));
+            int statusMod = GetStatusModifikatorForPA();
+            int paResolved = (int)ResolveDerivedValue($"combat.{kt.Kampftechnik}.PA", paBasis).FinalValue;
+            int effektDelta = paResolved - paBasis;
+            kt.ParadeBasis = paBasis;
+            kt.ParadeBoniEffekte = effektDelta + statusMod;
         }
         else
         {
-            kt.Parade = 0;
+            kt.ParadeBasis = 0;
+            kt.ParadeBoniEffekte = 0;
         }
     }
 
@@ -1090,13 +1099,17 @@ public class MainPageViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>AsP gesamt = Zugekauft + Vorteilsboni + EreignisBoni</summary>
-    public int Astralenergie => _sheet.AstralenergieZugekauft + _sheet.AstralenergieVorteilsBonus + EreignisAspBonus;
+    /// <summary>AsP gesamt = Zugekauft + Vorteilsboni + EreignisBoni + RuleEffects (derived.ASP)</summary>
+    public int Astralenergie => (int)ResolveDerivedValue(
+        "derived.ASP",
+        _sheet.AstralenergieZugekauft + _sheet.AstralenergieVorteilsBonus + EreignisAspBonus).FinalValue;
 
     public string AstralenergieFormel => "kein Basiswert \u2013 nur zugekauft";
 
-    /// <summary>KaP gesamt = Zugekauft + Vorteilsboni + EreignisBoni</summary>
-    public int Karmaenergie => _sheet.KarmaenergieZugekauft + _sheet.KarmaenergieVorteilsBonus + EreignisKapBonus;
+    /// <summary>KaP gesamt = Zugekauft + Vorteilsboni + EreignisBoni + RuleEffects (derived.KAP)</summary>
+    public int Karmaenergie => (int)ResolveDerivedValue(
+        "derived.KAP",
+        _sheet.KarmaenergieZugekauft + _sheet.KarmaenergieVorteilsBonus + EreignisKapBonus).FinalValue;
 
     public string KarmaenergieFormel => "kein Basiswert \u2013 nur zugekauft";
 
@@ -1151,8 +1164,10 @@ public class MainPageViewModel : INotifyPropertyChanged
     /// <summary>INI-Basiswert = ⌈(MU+GE)/2⌉ (ohne Vorteilsboni)</summary>
     public int InitiativeBasisBerechnet => (int)Math.Ceiling((_sheet.Mut + _sheet.Gewandtheit) / 2.0);
 
-    /// <summary>INI gesamt = Berechnet + Vorteilsboni</summary>
-    public int InitiativeBasis => InitiativeBasisBerechnet + _sheet.InitiativeBasisVorteilsBonus;
+    /// <summary>INI gesamt = Berechnet + Vorteilsboni + RuleEffects (derived.INI)</summary>
+    public int InitiativeBasis => (int)ResolveDerivedValue(
+        "derived.INI",
+        InitiativeBasisBerechnet + _sheet.InitiativeBasisVorteilsBonus).FinalValue;
 
     public string InitiativeBasisFormel => $"\u2308(MU+GE)/2\u2309 = \u2308({_sheet.Mut}+{_sheet.Gewandtheit})/2\u2309";
 
@@ -1391,13 +1406,27 @@ public class MainPageViewModel : INotifyPropertyChanged
 
     private void NotifyRuleEffectValuesChanged()
     {
+        // Gesamtwerte
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Lebensenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Astralenergie)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Karmaenergie)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Seelenkraft)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Zähigkeit)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasis)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SchicksalspunkteGesamt)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Geschwindigkeit)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitFormel)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitAuditText)));
+        // Boni-Spalten (enthalten jetzt auch die RuleEffect-Deltas)
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LebensenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AstralergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(KarmaenergieBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SeelenkraftBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ZähigkeitBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(InitiativeBasisBoniGesamt)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GeschwindigkeitBoniGesamt)));
+        // Kampftechniken-AT/PA hängen jetzt auch von RuleEffects ab (combat.X.AT / .PA).
+        RecalculateKampftechniken();
     }
 
     // --- AP / SchiP ---
@@ -1577,27 +1606,37 @@ public class MainPageViewModel : INotifyPropertyChanged
 
         foreach (var kt in Kampftechniken)
         {
-            // AT/FK-Basis: Für Nahkampf = ⌈(MU-8)/3⌉, Fernkampf = ⌈(FF-8)/3⌉ (vereinfacht: Leiteigenschaft als Bonus)
-            if (kt.IstFernkampf)
-            {
-                kt.AtFkBasis = Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("FF", 8) - 8) / 3.0) + statusModAT);
-            }
-            else
-            {
-                // Nahkampf: höchste Leiteigenschaft
-                kt.AtFkBasis = Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("MU", 8) - 8) / 3.0) + statusModAT);
-            }
+            // AT/FK-Basis: ⌊(MU-8)/3⌋ bzw. ⌊(FF-8)/3⌋ (rein, ohne Status, ohne Effekte)
+            int atBasis = kt.IstFernkampf
+                ? Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("FF", 8) - 8) / 3.0))
+                : Math.Max(0, (int)Math.Floor((attrs.GetValueOrDefault("MU", 8) - 8) / 3.0));
+            kt.AtFkBasis = atBasis;
+
+            // Effekt-Boni über RuleEffectResolver bestimmen (z. B. Vorteil "Zweihandhiebwaffen +2 AT")
+            int atResolved = (int)ResolveDerivedValue($"combat.{kt.Kampftechnik}.AT", atBasis).FinalValue;
+            int atEffektDelta = atResolved - atBasis;
+            kt.BoniEffekte = atEffektDelta + statusModAT;
+
+            // Parade nur für Nahkampf
             int best = 0;
             foreach (var le in kt.Leiteigenschaft.Split('/'))
             {
                 if (attrs.TryGetValue(le.Trim(), out var val))
                     best = Math.Max(best, val);
             }
-            // Parade = ⌈KTW/2⌉ + ⌊(Leiteigenschaft-8)/3⌋ - Status-Modifikatoren
             if (!kt.IstFernkampf && int.TryParse(kt.Ktw, out var ktw))
-                kt.Parade = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0) + statusModPA);
+            {
+                int paBasis = Math.Max(0, (int)Math.Ceiling(ktw / 2.0) + (int)Math.Floor((best - 8) / 3.0));
+                int paResolved = (int)ResolveDerivedValue($"combat.{kt.Kampftechnik}.PA", paBasis).FinalValue;
+                int paEffektDelta = paResolved - paBasis;
+                kt.ParadeBasis = paBasis;
+                kt.ParadeBoniEffekte = paEffektDelta + statusModPA;
+            }
             else
-                kt.Parade = 0;
+            {
+                kt.ParadeBasis = 0;
+                kt.ParadeBoniEffekte = 0;
+            }
         }
     }
 

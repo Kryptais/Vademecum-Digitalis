@@ -235,6 +235,53 @@ public class VorteilNachteilViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Liefert einen lesbaren Detailtext für einen Eintrag (Beschreibung + Effekte).</summary>
+    public string BuildDetailsText(CharakterVorteilNachteilEintrag entry)
+    {
+        ArgumentNullException.ThrowIfNull(entry);
+        var katalog = _vnService.FindById(entry.VnId);
+        if (katalog is null)
+            return "Kein Katalogeintrag gefunden.";
+
+        var parts = new List<string>();
+        if (!string.IsNullOrWhiteSpace(katalog.Beschreibung))
+            parts.Add(katalog.Beschreibung.Trim());
+
+        if (katalog.MaxStufe > 1)
+            parts.Add($"Aktuelle Stufe: {entry.StufeAnzeige} (max. {katalog.MaxStufe})");
+
+        if (!string.IsNullOrWhiteSpace(entry.ApKostenDisplay))
+            parts.Add($"AP-Kosten: {entry.ApKostenDisplay}");
+
+        var effekte = katalog.Effects;
+        if (effekte.Count > 0)
+        {
+            parts.Add("Effekte:");
+            foreach (var eff in effekte)
+            {
+                if (eff.Kind == Models.RuleEngine.EffectKind.Narrative)
+                {
+                    parts.Add($"  • {eff.Title}{(string.IsNullOrWhiteSpace(eff.Description) ? "" : ": " + eff.Description)}");
+                    continue;
+                }
+                var op = eff.Operation switch
+                {
+                    Models.RuleEngine.ModifierOp.Add => eff.Value >= 0 ? $"+{eff.Value}" : $"{eff.Value}",
+                    Models.RuleEngine.ModifierOp.Multiply => $"×{eff.Value}",
+                    Models.RuleEngine.ModifierOp.Override => $"→{eff.Value}",
+                    _ => $"{eff.Value}"
+                };
+                var perLvl = eff.PerLevel ? " pro Stufe" : string.Empty;
+                parts.Add($"  • {eff.Target} {op}{perLvl}");
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(katalog.Anmerkungen))
+            parts.Add($"Anmerkung: {katalog.Anmerkungen}");
+
+        return string.Join("\n", parts);
+    }
+
     /// <summary>Entfernt einen Vorteil/Nachteil vom Charakter.</summary>
     public void Remove(CharakterVorteilNachteilEintrag entry)
     {

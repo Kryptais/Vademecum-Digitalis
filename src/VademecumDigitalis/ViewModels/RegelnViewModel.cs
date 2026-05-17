@@ -14,6 +14,9 @@ public sealed class RegelnKatalogEintrag
     public string Effekte { get; init; } = string.Empty;
     public bool IstNachteil { get; init; }
     public bool IsHomebrew { get; init; }
+    /// <summary>True wenn die Regel-Logik fest im Code steckt – Eintrag nicht editier-/löschbar.</summary>
+    public bool HasCodeLogic { get; init; }
+    public bool IsEditable => !HasCodeLogic;
     public bool HasBeschreibung => !string.IsNullOrWhiteSpace(Beschreibung);
     public bool HasEffekte => !string.IsNullOrWhiteSpace(Effekte);
 }

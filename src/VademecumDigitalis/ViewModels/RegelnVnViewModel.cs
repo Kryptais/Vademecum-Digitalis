@@ -28,8 +28,24 @@ public class RegelnVnViewModel : INotifyPropertyChanged
 
     // --- Properties ---
 
-    public ObservableCollection<RegelnKategorie> VorteileGruppen { get; } = [];
-    public ObservableCollection<RegelnKategorie> NachteileGruppen { get; } = [];
+    private IReadOnlyList<RegelnKategorie> _vorteileGruppen = [];
+    private IReadOnlyList<RegelnKategorie> _nachteileGruppen = [];
+
+    /// <summary>
+    /// Settable Property statt ObservableCollection — vermeidet Clear+Add auf einer
+    /// grouped CollectionView, was unter MAUI/WinUI zu stowed exceptions führt.
+    /// </summary>
+    public IReadOnlyList<RegelnKategorie> VorteileGruppen
+    {
+        get => _vorteileGruppen;
+        private set { _vorteileGruppen = value; Notify(); }
+    }
+
+    public IReadOnlyList<RegelnKategorie> NachteileGruppen
+    {
+        get => _nachteileGruppen;
+        private set { _nachteileGruppen = value; Notify(); }
+    }
 
     public bool IsLoading
     {
@@ -100,15 +116,39 @@ public class RegelnVnViewModel : INotifyPropertyChanged
         IsEditorVisible = true;
     }
 
-    /// <summary>Öffnet den Editor zum Bearbeiten eines bestehenden Homebrew-Eintrags.</summary>
-    public void StartEdit(string vnId)
+    /// <summary>
+    /// Versucht, den Editor zum Bearbeiten eines Eintrags zu öffnen.
+    /// Liefert einen Fehlertext, wenn der Eintrag fest in C# implementiert ist.
+    /// </summary>
+    public string StartEdit(string vnId)
     {
         var vn = _vnService.FindById(vnId);
-        if (vn is null || !vn.IsHomebrew) return;
+        if (vn is null) return "Eintrag nicht gefunden.";
+        if (vn.HasCodeLogic)
+            return $"„{vn.Name}\" ist fest in der App implementiert (Würfellogik / Spezialverhalten) und kann nicht editiert werden.";
 
         CurrentEdit = VorteilNachteilEditModel.FromCatalog(vn);
         EditorTitle = $"Bearbeiten: {vn.Name}";
         IsEditing = true;
+        IsEditorVisible = true;
+        return string.Empty;
+    }
+
+    /// <summary>Öffnet den Editor mit einer Kopie eines vorhandenen Eintrags (neue Id).</summary>
+    public void StartCopy(string vnId)
+    {
+        var vn = _vnService.FindById(vnId);
+        if (vn is null) return;
+
+        var model = VorteilNachteilEditModel.FromCatalog(vn);
+        model.Id = string.Empty; // Neue Id wird beim Speichern generiert
+        model.Name = $"{vn.Name} (Kopie)";
+        // Eine Kopie übernimmt nicht die Code-Logik des Originals — sie ist nur Daten.
+        model.HasCodeLogic = false;
+        model.IsHomebrew = true;
+        CurrentEdit = model;
+        EditorTitle = $"Kopie von: {vn.Name}";
+        IsEditing = false;
         IsEditorVisible = true;
     }
 
@@ -125,14 +165,19 @@ public class RegelnVnViewModel : INotifyPropertyChanged
         {
             var entry = CurrentEdit.ToCatalogEntry();
 
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.SaveAsync] Pre-Persist (IsEditing={IsEditing})");
             if (IsEditing)
-                await _vnService.UpdateHomebrewEntryAsync(entry);
+                await _vnService.UpdateUserEntryAsync(entry);
             else
-                await _vnService.AddHomebrewEntryAndPersistAsync(entry);
-
-            IsEditorVisible = false;
-            CurrentEdit = null;
+                await _vnService.AddUserEntryAndPersistAsync(entry);
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.SaveAsync] Post-Persist, ApplyFilter…");
+            // ApplyFilter MUSS aufgerufen werden, solange die Katalog-CollectionViews noch
+            // unsichtbar sind (IsListVisible=false). Sonst crasht MAUI/WinUI beim Clear+Add
+            // auf grouped CollectionView (stowed exception 0xc000027b).
             ApplyFilter();
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.SaveAsync] ApplyFilter done, hiding editor");
+            IsEditorVisible = false;
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.SaveAsync] Editor hidden");
             return string.Empty;
         }
         catch (Exception ex)
@@ -143,23 +188,26 @@ public class RegelnVnViewModel : INotifyPropertyChanged
         }
     }
 
-    /// <summary>Löscht einen Homebrew-Eintrag aus dem Katalog.</summary>
-    /// <returns>True wenn gelöscht.</returns>
-    public async Task<bool> DeleteAsync(string vnId)
+    /// <summary>Löscht einen Eintrag (offiziell oder Homebrew) aus dem Katalog.</summary>
+    /// <returns>Leerer String bei Erfolg, sonst Fehlertext (z. B. bei Code-Logik-Einträgen).</returns>
+    public async Task<string> DeleteAsync(string vnId)
     {
         var vn = _vnService.FindById(vnId);
-        if (vn is null || !vn.IsHomebrew) return false;
+        if (vn is null) return "Eintrag nicht gefunden.";
+        if (vn.HasCodeLogic)
+            return $"„{vn.Name}\" ist fest in der App implementiert und kann nicht gelöscht werden.";
 
-        await _vnService.DeleteHomebrewEntryAsync(vnId);
+        await _vnService.DeleteUserEntryAsync(vnId);
         ApplyFilter();
-        return true;
+        return string.Empty;
     }
 
     /// <summary>Schließt den Editor ohne zu speichern.</summary>
     public void CancelEdit()
     {
         IsEditorVisible = false;
-        CurrentEdit = null;
+        // CurrentEdit nicht ersetzen — vermeidet Compiled-Binding-Crashs bei
+        // BindableLayout/Picker. Nächstes StartCreate/StartEdit setzt eine neue Instanz.
     }
 
     // --- Effekt-Verwaltung ---
@@ -184,44 +232,52 @@ public class RegelnVnViewModel : INotifyPropertyChanged
 
     private void ApplyFilter()
     {
-        var query = _searchText.Trim();
-        var catalog = string.IsNullOrEmpty(query)
-            ? _vnService.Catalog
-            : _vnService.Catalog.Where(vn =>
-                vn.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                vn.Beschreibung.Contains(query, StringComparison.OrdinalIgnoreCase));
-
-        var entries = catalog.Select(vn => new RegelnKatalogEintrag
+        try
         {
-            Id = vn.Id,
-            Name = vn.Name,
-            Kategorie = vn.Kategorie.ToDisplayString(),
-            ApInfo = BuildApInfo(vn),
-            Beschreibung = vn.Beschreibung,
-            Effekte = BuildEffekteText(vn),
-            IstNachteil = vn.Kategorie.IstNachteil(),
-            IsHomebrew = vn.IsHomebrew
-        });
+            var query = _searchText.Trim();
+            var catalog = string.IsNullOrEmpty(query)
+                ? _vnService.Catalog
+                : _vnService.Catalog.Where(vn =>
+                    vn.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                    vn.Beschreibung.Contains(query, StringComparison.OrdinalIgnoreCase));
 
-        // Vorteile
-        var vorteile = entries.Where(e => !e.IstNachteil)
-            .GroupBy(e => e.Kategorie)
-            .OrderBy(g => g.Key)
-            .Select(g => new RegelnKategorie(g.Key, g.OrderBy(e => e.Name)));
+            var entries = catalog.Select(vn => new RegelnKatalogEintrag
+            {
+                Id = vn.Id,
+                Name = vn.Name,
+                Kategorie = vn.Kategorie.ToDisplayString(),
+                ApInfo = BuildApInfo(vn),
+                Beschreibung = vn.Beschreibung,
+                Effekte = BuildEffekteText(vn),
+                IstNachteil = vn.Kategorie.IstNachteil(),
+                IsHomebrew = vn.IsHomebrew,
+                HasCodeLogic = vn.HasCodeLogic
+            }).ToList();
 
-        VorteileGruppen.Clear();
-        foreach (var g in vorteile)
-            VorteileGruppen.Add(g);
+            // Materialisieren BEVOR die ObservableCollections angefasst werden — so kann
+            // eine Exception in BuildApInfo/BuildEffekteText nicht mitten im Clear/Add
+            // zuschlagen und WinUI in einen inkonsistenten Zustand bringen.
+            var vorteile = entries.Where(e => !e.IstNachteil)
+                .GroupBy(e => e.Kategorie)
+                .OrderBy(g => g.Key)
+                .Select(g => new RegelnKategorie(g.Key, g.OrderBy(e => e.Name)))
+                .ToList();
 
-        // Nachteile
-        var nachteile = entries.Where(e => e.IstNachteil)
-            .GroupBy(e => e.Kategorie)
-            .OrderBy(g => g.Key)
-            .Select(g => new RegelnKategorie(g.Key, g.OrderBy(e => e.Name)));
+            var nachteile = entries.Where(e => e.IstNachteil)
+                .GroupBy(e => e.Kategorie)
+                .OrderBy(g => g.Key)
+                .Select(g => new RegelnKategorie(g.Key, g.OrderBy(e => e.Name)))
+                .ToList();
 
-        NachteileGruppen.Clear();
-        foreach (var g in nachteile)
-            NachteileGruppen.Add(g);
+            VorteileGruppen = vorteile;
+            NachteileGruppen = nachteile;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.ApplyFilter] ERROR: {ex.GetType().Name}: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine($"[RegelnVnViewModel.ApplyFilter] StackTrace: {ex.StackTrace}");
+            throw;
+        }
     }
 
     private static string BuildApInfo(VorteilNachteil vn)

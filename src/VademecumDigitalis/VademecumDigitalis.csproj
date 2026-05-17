@@ -38,6 +38,7 @@
     <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
     <MauiImage Include="Resources\Images\*" />
     <MauiImage Remove="Resources\Images\.gitkeep" />
+    <MauiFont Include="Resources\Fonts\*" />
     <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 

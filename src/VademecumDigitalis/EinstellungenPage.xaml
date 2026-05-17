@@ -15,14 +15,14 @@
                 Margin="0,8,0,4"/>
 
             <!-- Platzhalter für zukünftige Einstellungen -->
-            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
+            <Border Padding="16" BackgroundColor="{StaticResource SurfaceLow}" StrokeShape="RoundRectangle 10">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Darstellung" FontAttributes="Bold" FontSize="15"/>
                     <Label Text="Farbschema, Schriftgröße und weitere Optionen folgen in einer späteren Version." FontSize="13" TextColor="Gray"/>
                 </VerticalStackLayout>
             </Border>
 
-            <Border Padding="16" BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}" StrokeShape="RoundRectangle 10">
+            <Border Padding="16" BackgroundColor="{StaticResource SurfaceLow}" StrokeShape="RoundRectangle 10">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Daten" FontAttributes="Bold" FontSize="15"/>
                     <Label Text="Automatisches Speichern, Sicherungskopien und Synchronisierung folgen in einer späteren Version." FontSize="13" TextColor="Gray"/>

@@ -31,13 +31,13 @@
             <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
                 <Border Grid.Column="0" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding VorteileCount}" FontSize="22" FontAttributes="Bold" TextColor="#0E7490" />
+                        <Label Text="{Binding VorteileCount}" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource Gold}" />
                         <Label Text="Vorteile" FontSize="12" TextColor="{StaticResource TextSecondary}" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Column="1" Style="{StaticResource CardBorder}">
                     <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding NachteileCount}" FontSize="22" FontAttributes="Bold" TextColor="#C0392B" />
+                        <Label Text="{Binding NachteileCount}" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource Danger}" />
                         <Label Text="Nachteile" FontSize="12" TextColor="{StaticResource TextSecondary}" />
                     </VerticalStackLayout>
                 </Border>
@@ -147,9 +147,9 @@
                 <!-- === VORTEILE === -->
                 <VerticalStackLayout Grid.Column="0" Spacing="6">
                     <Border StrokeShape="RoundRectangle 8"
-                            Stroke="#0E7490"
+                            Stroke="{StaticResource Gold}"
                             StrokeThickness="1.5"
-                            BackgroundColor="#0E7490"
+                            BackgroundColor="{StaticResource Gold}"
                             Padding="8,6">
                         <Label Text="✦ Vorteile" FontAttributes="Bold" FontSize="14" TextColor="White" />
                     </Border>
@@ -158,46 +158,55 @@
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:CharakterVorteilNachteilEintrag">
                                 <Border StrokeShape="RoundRectangle 8"
-                                        Stroke="#0E7490"
+                                        Stroke="{StaticResource Gold}"
                                         StrokeThickness="1"
-                                        BackgroundColor="#0D2D36"
+                                        BackgroundColor="{StaticResource SurfaceLow}"
                                         Padding="10,8">
-                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
                                         <!-- Name + Stufe -->
                                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
                                             <Label Text="{Binding DisplayName}"
                                                    FontSize="14" FontAttributes="Bold"
-                                                   TextColor="#7FD6EC" />
+                                                   TextColor="{StaticResource GoldBright}" />
                                             <Label Text="{Binding StufeAnzeige}"
-                                                   FontSize="12" TextColor="#0E7490"
+                                                   FontSize="12" TextColor="{StaticResource Gold}"
                                                    VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <!-- Level-Down Button -->
+                                        <!-- Details Button -->
                                         <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                Text="ℹ"
+                                                WidthRequest="36" HeightRequest="36" Padding="0"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{StaticResource GoldBright}"
+                                                FontSize="14"
+                                                Clicked="OnDetailsClicked"
+                                                CommandParameter="{Binding .}" />
+                                        <!-- Level-Down Button -->
+                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                                 Text="▼"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#0E7490"
+                                                TextColor="{StaticResource Gold}"
                                                 FontSize="14"
                                                 IsVisible="{Binding KannReduzieren}"
                                                 Clicked="OnLevelDownClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Level-Up Button -->
-                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                                 Text="▲"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#0E7490"
+                                                TextColor="{StaticResource Gold}"
                                                 FontSize="14"
                                                 IsVisible="{Binding KannAufsteigen}"
                                                 Clicked="OnLevelUpClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Entfernen Button -->
-                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2"
                                                 Text="✕"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#5A8090"
+                                                TextColor="{StaticResource TextMuted}"
                                                 FontSize="13"
                                                 Clicked="OnEntfernenClicked"
                                                 CommandParameter="{Binding .}" />
@@ -205,10 +214,10 @@
                                         <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="6">
                                             <Label Text="{Binding ApKostenDisplay}"
                                                    FontSize="11" FontAttributes="Bold"
-                                                   TextColor="#0E7490" />
+                                                   TextColor="{StaticResource Gold}" />
                                             <Label Text="{Binding KategorieAnzeige}"
                                                    FontSize="10"
-                                                   TextColor="#4A7080" />
+                                                   TextColor="{StaticResource BorderSoft}" />
                                         </HorizontalStackLayout>
                                     </Grid>
                                 </Border>
@@ -220,9 +229,9 @@
                 <!-- === NACHTEILE === -->
                 <VerticalStackLayout Grid.Column="1" Spacing="6">
                     <Border StrokeShape="RoundRectangle 8"
-                            Stroke="#C0392B"
+                            Stroke="{StaticResource Danger}"
                             StrokeThickness="1.5"
-                            BackgroundColor="#C0392B"
+                            BackgroundColor="{StaticResource Danger}"
                             Padding="8,6">
                         <Label Text="✦ Nachteile" FontAttributes="Bold" FontSize="14" TextColor="White" />
                     </Border>
@@ -231,46 +240,55 @@
                         <BindableLayout.ItemTemplate>
                             <DataTemplate x:DataType="models:CharakterVorteilNachteilEintrag">
                                 <Border StrokeShape="RoundRectangle 8"
-                                        Stroke="#C0392B"
+                                        Stroke="{StaticResource Danger}"
                                         StrokeThickness="1"
-                                        BackgroundColor="#2D0D0D"
+                                        BackgroundColor="{StaticResource SurfaceLow}"
                                         Padding="10,8">
-                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
+                                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" RowDefinitions="Auto,Auto" ColumnSpacing="6" RowSpacing="3">
                                         <!-- Name + Stufe -->
                                         <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="5">
                                             <Label Text="{Binding DisplayName}"
                                                    FontSize="14" FontAttributes="Bold"
-                                                   TextColor="#EC7F7F" />
+                                                   TextColor="{StaticResource Danger}" />
                                             <Label Text="{Binding StufeAnzeige}"
-                                                   FontSize="12" TextColor="#C0392B"
+                                                   FontSize="12" TextColor="{StaticResource Danger}"
                                                    VerticalOptions="Center" />
                                         </HorizontalStackLayout>
-                                        <!-- Level-Down Button -->
+                                        <!-- Details Button -->
                                         <Button Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                                Text="ℹ"
+                                                WidthRequest="36" HeightRequest="36" Padding="0"
+                                                BackgroundColor="Transparent"
+                                                TextColor="{StaticResource Danger}"
+                                                FontSize="14"
+                                                Clicked="OnDetailsClicked"
+                                                CommandParameter="{Binding .}" />
+                                        <!-- Level-Down Button -->
+                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                                                 Text="▼"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#C0392B"
+                                                TextColor="{StaticResource Danger}"
                                                 FontSize="14"
                                                 IsVisible="{Binding KannReduzieren}"
                                                 Clicked="OnLevelDownClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Level-Up Button -->
-                                        <Button Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
                                                 Text="▲"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#C0392B"
+                                                TextColor="{StaticResource Danger}"
                                                 FontSize="14"
                                                 IsVisible="{Binding KannAufsteigen}"
                                                 Clicked="OnLevelUpClicked"
                                                 CommandParameter="{Binding .}" />
                                         <!-- Entfernen Button -->
-                                        <Button Grid.Row="0" Grid.Column="3" Grid.RowSpan="2"
+                                        <Button Grid.Row="0" Grid.Column="4" Grid.RowSpan="2"
                                                 Text="✕"
                                                 WidthRequest="36" HeightRequest="36" Padding="0"
                                                 BackgroundColor="Transparent"
-                                                TextColor="#804040"
+                                                TextColor="{StaticResource BorderSoft}"
                                                 FontSize="13"
                                                 Clicked="OnEntfernenClicked"
                                                 CommandParameter="{Binding .}" />
@@ -278,10 +296,10 @@
                                         <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="6">
                                             <Label Text="{Binding ApKostenDisplay}"
                                                    FontSize="11" FontAttributes="Bold"
-                                                   TextColor="#C0392B" />
+                                                   TextColor="{StaticResource Danger}" />
                                             <Label Text="{Binding KategorieAnzeige}"
                                                    FontSize="10"
-                                                   TextColor="#804040" />
+                                                   TextColor="{StaticResource BorderSoft}" />
                                         </HorizontalStackLayout>
                                     </Grid>
                                 </Border>
