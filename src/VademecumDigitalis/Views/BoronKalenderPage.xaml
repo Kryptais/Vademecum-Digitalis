@@ -85,7 +85,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag0.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag0.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag0.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag0.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -96,7 +96,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag1.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag1.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag1.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag1.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -107,7 +107,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag2.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag2.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag2.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag2.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -118,7 +118,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag3.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag3.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag3.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag3.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -129,7 +129,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag4.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag4.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag4.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag4.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -140,7 +140,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag5.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag5.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag5.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag5.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -151,7 +151,7 @@
                                         </Border.GestureRecognizers>
                                         <Grid RowDefinitions="*,10" IsVisible="{Binding Tag6.ShowContent}">
                                             <Label Grid.Row="0" Text="{Binding Tag6.Tag}" FontSize="17" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" />
-                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="#FCD34D" IsVisible="{Binding Tag6.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                            <Ellipse Grid.Row="1" WidthRequest="6" HeightRequest="6" Fill="{StaticResource GoldBright}" IsVisible="{Binding Tag6.HatEintrag}" HorizontalOptions="Center" VerticalOptions="Center" />
                                         </Grid>
                                     </Border>
 
@@ -163,7 +163,7 @@
             </Border>
 
             <!-- Tagesdetails & Kalender-Einträge -->
-            <Border Stroke="#D1D5DB" StrokeShape="RoundRectangle 12" Padding="12">
+            <Border Stroke="{StaticResource TextPrimary}" StrokeShape="RoundRectangle 12" Padding="12">
                 <VerticalStackLayout Spacing="8">
                     <Label Text="Tagesdetails &amp; Einträge" Style="{StaticResource SectionHeaderLabel}" />
                     <Label Text="{Binding SelectedTagText}"
@@ -183,7 +183,7 @@
                                                TextColor="{StaticResource TextSecondary}" />
                                     </VerticalStackLayout>
                                     <Button Grid.Column="1" Text="✕"
-                                            BackgroundColor="Transparent" TextColor="#DC2626"
+                                            BackgroundColor="Transparent" TextColor="{StaticResource Danger}"
                                             FontSize="18" Padding="4"
                                             Command="{Binding BindingContext.EintragLoeschenCommand, Source={x:Reference KalenderSeite}}"
                                             CommandParameter="{Binding .}" />
@@ -204,7 +204,7 @@
                     </Grid>
                     <Button Text="✚ Eintrag hinzufügen"
                             Command="{Binding NeuerEintragHinzufuegenCommand}"
-                            BackgroundColor="#0E7490" TextColor="White" Padding="12,10" />
+                            BackgroundColor="{StaticResource Gold}" TextColor="White" Padding="12,10" />
                 </VerticalStackLayout>
             </Border>
 

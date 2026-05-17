@@ -63,4 +63,12 @@ public partial class AdvantagesPage : ContentPage
         }
     }
 
+    private async void OnDetailsClicked(object? sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.CommandParameter is CharakterVorteilNachteilEintrag entry)
+        {
+            var text = _vm.BuildDetailsText(entry);
+            await DisplayAlert(entry.DisplayName, text, "OK");
+        }
+    }
 }

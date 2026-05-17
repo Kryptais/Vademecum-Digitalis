@@ -7,8 +7,29 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        // Globale Exception-Logger: liefern echte StackTraces für sonst stille Crashes
+        // (insb. unbeobachtete Exceptions in async void Event-Handlern und XAML-Bindings).
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"[UnhandledException] {args.ExceptionObject}");
+        };
+        System.Threading.Tasks.TaskScheduler.UnobservedTaskException += (_, args) =>
+        {
+            System.Diagnostics.Debug.WriteLine($"[UnobservedTaskException] {args.Exception}");
+            args.SetObserved();
+        };
+
         var builder = MauiApp.CreateBuilder();
-        builder.UseMauiApp<App>();
+        builder.UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                // Aventurisches Manuskript – Schrift-Aliase
+                fonts.AddFont("Cinzel.ttf", "Cinzel");
+                fonts.AddFont("CormorantGaramond.ttf", "Cormorant");
+                fonts.AddFont("CormorantGaramond-Italic.ttf", "CormorantItalic");
+                fonts.AddFont("Inter.ttf", "Inter");
+                fonts.AddFont("JetBrainsMono.ttf", "Mono");
+            });
 
         // --- Services ---
         builder.Services.AddSingleton<PersistenceService>();
@@ -19,6 +40,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<SpecialAbilityService>();
         builder.Services.AddSingleton<HomebrewCatalogService>();
         builder.Services.AddSingleton<VorteilNachteilService>();
+        builder.Services.AddSingleton<Services.RuleEngine.EffectResolver>();
         builder.Services.AddSingleton<TalentModifierService>();
         builder.Services.AddSingleton<TalentCatalogService>();
         builder.Services.AddSingleton<CharacterSaveService>();

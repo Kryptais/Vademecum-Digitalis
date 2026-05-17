@@ -52,8 +52,8 @@
                     <Setter Property="IsVisible" Value="False"/>
                 </DataTrigger>
             </HorizontalStackLayout.Triggers>
-            <Label Text="{Binding Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center"/>
-            <Label Text="K"                 FontSize="18" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center"/>
+            <Label Text="{Binding Kreuzer}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
+            <Label Text="K"                 FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center"/>
         </HorizontalStackLayout>
 
     </HorizontalStackLayout>

@@ -5,10 +5,10 @@
              x:Class="VademecumDigitalis.Controls.MainAttributesView"
              x:Name="Root">
 
-    <Border Stroke="#0E7490" StrokeShape="RoundRectangle 8" BackgroundColor="#1a1a2e" Padding="10,8">
+    <Border Stroke="{StaticResource Gold}" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource Background}" Padding="10,8">
         <VerticalStackLayout Spacing="6">
             <Label Text="Hauptattribute" HorizontalOptions="Center" FontAttributes="Bold"
-                   TextColor="#0E7490" FontSize="14" />
+                   TextColor="{StaticResource Gold}" FontSize="14" />
 
             <Grid ColumnDefinitions="*,*,*,*,*,*,*,*" RowDefinitions="Auto,Auto"
                   ColumnSpacing="6" RowSpacing="4">

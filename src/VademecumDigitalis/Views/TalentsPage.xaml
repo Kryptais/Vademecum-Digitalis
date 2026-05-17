@@ -23,7 +23,7 @@
                 <DataTemplate x:DataType="models:TalentGroup">
                     <VerticalStackLayout Spacing="8">
                         <!-- Collapsible Header -->
-                        <Grid ColumnDefinitions="Auto,*" Padding="{OnIdiom Phone='8,6', Default='12,10'}" BackgroundColor="#0E7490"
+                        <Grid ColumnDefinitions="Auto,*" Padding="{OnIdiom Phone='8,6', Default='12,10'}" BackgroundColor="{StaticResource Gold}"
                               RowSpacing="0" ColumnSpacing="{OnIdiom Phone='8', Default='12'}">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer
@@ -46,7 +46,7 @@
                                   ColumnDefinitions="*,0.4*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.2*,0.3*,0.3*,1.4*"
                                   ColumnSpacing="{OnIdiom Phone=2, Default=4}"
                                   Padding="{OnIdiom Phone='8,0', Default='12,0'}"
-                                  BackgroundColor="#0E7490">
+                                  BackgroundColor="{StaticResource Gold}">
 
                                 <Label Grid.Row="0" Grid.Column="0" Text="Talent" FontAttributes="Bold"
                                        FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" TextColor="White" VerticalOptions="Center" Grid.RowSpan="2" />
@@ -64,12 +64,12 @@
                                        FontSize="{OnIdiom Phone=11, Tablet=13, Default=16}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" />
 
                                 <!-- Sub-headers -->
-                                <Label Grid.Row="1" Grid.Column="3" Text="P1" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
-                                <Label Grid.Row="1" Grid.Column="4" Text="P2" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
-                                <Label Grid.Row="1" Grid.Column="5" Text="P3" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
-                                <Label Grid.Row="1" Grid.Column="6" Text="W1" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
-                                <Label Grid.Row="1" Grid.Column="7" Text="W2" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
-                                <Label Grid.Row="1" Grid.Column="8" Text="W3" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="#B0E0E6" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="3" Text="P1" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="4" Text="P2" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="5" Text="P3" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="6" Text="W1" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="7" Text="W2" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
+                                <Label Grid.Row="1" Grid.Column="8" Text="W3" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="{StaticResource TextPrimary}" HorizontalOptions="Center" />
 
                                 <Label Grid.Row="0" Grid.Column="9" Text="BE" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
                                 <Label Grid.Row="0" Grid.Column="10" Text="FW" FontAttributes="Bold" FontSize="{OnIdiom Phone=10, Tablet=12, Default=16}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Grid.RowSpan="2" />
@@ -127,7 +127,7 @@
                                             <Label Text="{Binding BonusInfo}"
                                                    IsVisible="{Binding HatBonusInfo}"
                                                    FontSize="10"
-                                                   TextColor="#0E7490"
+                                                   TextColor="{StaticResource Gold}"
                                                    FontAttributes="Italic"
                                                    Padding="12,0,12,4" />
                                         </VerticalStackLayout>

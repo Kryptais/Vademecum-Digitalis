@@ -8,7 +8,7 @@
              x:Class="VademecumDigitalis.InventoryContainerPage"
              x:DataType="viewmodels:InventoryContainerViewModel"
              Title=""
-             BackgroundColor="#121212">
+             BackgroundColor="{StaticResource Background}">
 
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="12">
@@ -48,35 +48,35 @@
                     <Label Text="Geld (Bank)" Style="{StaticResource SubheadLabel}" VerticalOptions="Center" Grid.Row="0" />
                     
                     <StackLayout Orientation="Horizontal" Grid.Column="0" Grid.Row="1" Spacing="8">
-                        <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="#E6E6E6" />
+                        <Label Text="Münzgewicht:" VerticalOptions="Center" TextColor="{StaticResource TextPrimary}" />
                         <CheckBox IsChecked="{Binding Container.IncludeCoinWeight}" />
                     </StackLayout>
                     
                     <Label Text="Dukaten:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="Gold" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Dukaten, Mode=TwoWay , Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
-                        BackgroundColor="#2A2A2A" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2">
+                        BackgroundColor="{StaticResource SurfaceHigh}" TextColor="Gold" PlaceholderColor="#666" Grid.Column="1" Grid.Row="2">
                         <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                     </Entry>
                         
                     <Label Text="Silbertaler:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="Silver" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Silbertaler, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                            Keyboard="Numeric" WidthRequest="80"
-                           BackgroundColor="#2A2A2A" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3">
+                           BackgroundColor="{StaticResource SurfaceHigh}" TextColor="Silver" PlaceholderColor="#666" Grid.Column="1" Grid.Row="3">
                         <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                     </Entry>
                            
                     <Label Text="Heller:" Grid.Row="4" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32"  VerticalTextAlignment="Center"/>
                     <Entry Text="{Binding Container.Money.Heller, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                        Keyboard="Numeric" WidthRequest="80"
-                       BackgroundColor="#2A2A2A" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4">
+                       BackgroundColor="{StaticResource SurfaceHigh}" TextColor="#CD7F32" PlaceholderColor="#666" Grid.Column="1" Grid.Row="4">
                         <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                     </Entry>
                        
-                    <Label Text="Kreuzer:" Grid.Row="5" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" VerticalTextAlignment="Center" />
+                    <Label Text="Kreuzer:" Grid.Row="5" Grid.Column="0" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalTextAlignment="Center" />
                     <Entry Text="{Binding Container.Money.Kreuzer, Mode=TwoWay, Converter={StaticResource IntStringConverter}}"
                         Keyboard="Numeric" WidthRequest="80"
-                        BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5">
+                        BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextMuted}" PlaceholderColor="#666"  Grid.Column="1" Grid.Row="5">
                         <Entry.Behaviors><behaviors:NumericEntryBehavior /></Entry.Behaviors>
                     </Entry>
 
@@ -84,7 +84,7 @@
                     <Button Text="Geld transferieren" Command="{Binding TransferMoneyCommand}" 
                             Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,10,0,0"/>
                     <Button Text="Geld in Tresor transferieren" Command="{Binding TransferToTreasuryCommand}" 
-                            BackgroundColor="#2A2A2A" TextColor="Gold" BorderColor="Gold" BorderWidth="1"
+                            BackgroundColor="{StaticResource SurfaceHigh}" TextColor="Gold" BorderColor="Gold" BorderWidth="1"
                             Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,5,0,0"/>
                 </Grid>
             </Border>
@@ -93,16 +93,16 @@
             
             <HorizontalStackLayout Spacing="8">
                 <Button Text="Item hinzufügen" Command="{Binding AddItemCommand}" ZIndex="1" Margin="0,0,12,0"/>
-                <Label Text="Gesamtgewicht:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
-                <Label Text="{Binding Container.TotalWeight,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="Gesamtgewicht:" FontSize="18" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
+                <Label Text="{Binding Container.TotalWeight,UpdateSourceEventName=TextChanged, StringFormat='{0:N2} stein'}" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
                 <Label Text=" | " FontSize="18" TextColor="#999" VerticalOptions="Center"/>
-                <Label Text="Wert:" FontSize="18" TextColor="#E6E6E6" VerticalOptions="Center"/>
+                <Label Text="Wert:" FontSize="18" TextColor="{StaticResource TextPrimary}" VerticalOptions="Center"/>
                 <Label Text="{Binding Container.FormattedTotalValue}" FontSize="18" FontAttributes="Bold" TextColor="Gold" VerticalOptions="Center" IsVisible="False"/> <!-- Hide -->
 
                 <local:CoinDisplayView Currency="{Binding Container.TotalValueAsCurrency}" VerticalOptions="Center"/>
             </HorizontalStackLayout>
             
-            <SearchBar Placeholder="Items suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
+            <SearchBar Placeholder="Items suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="{StaticResource SurfaceHigh}" TextColor="White" PlaceholderColor="#999" Margin="0,0,0,5"/>
 
             <CollectionView x:Name="ItemsCollectionView" ItemsSource="{Binding FilteredItems}">
                 <CollectionView.Header>
@@ -137,7 +137,7 @@
                 </CollectionView.Header>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:InventoryItem">
-                        <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="0" Margin="0,2">
+                        <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="{StaticResource SurfaceLow}" Padding="0" Margin="0,2">
                             <Grid Padding="8" ColumnSpacing="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*" />

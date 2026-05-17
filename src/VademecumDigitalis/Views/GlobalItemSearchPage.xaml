@@ -6,12 +6,12 @@
              x:Class="VademecumDigitalis.GlobalItemSearchPage"
              x:DataType="viewmodels:GlobalItemSearchViewModel"
              Title="Gegenstandsuche"
-             BackgroundColor="#121212">
+             BackgroundColor="{StaticResource Background}">
 
     <VerticalStackLayout Padding="16" Spacing="12">
         <Button Text="Zurück" Command="{Binding NavigateBackCommand}" HorizontalOptions="Start" />
         <Label Text="Gegenstand suchen" Style="{StaticResource HeadlineLabel}" />
-        <SearchBar Placeholder="Suchbegriff..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" />
+        <SearchBar Placeholder="Suchbegriff..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="{StaticResource SurfaceHigh}" TextColor="White" PlaceholderColor="#999" />
         
         <CollectionView ItemsSource="{Binding SearchResults}">
             <CollectionView.EmptyView>
@@ -21,7 +21,7 @@
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:GlobalSearchResult">
-                    <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="#1E1E1E" Padding="12" Margin="0,4">
+                    <Border Stroke="#333" StrokeThickness="1" StrokeShape="RoundRectangle 4" BackgroundColor="{StaticResource SurfaceLow}" Padding="12" Margin="0,4">
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:GlobalItemSearchViewModel}}, Path=ShowItemCommand}" CommandParameter="{Binding .}" />
                         </Border.GestureRecognizers>

@@ -70,16 +70,21 @@ public class VorteilNachteilService
         await LoadCatalogAsync();
     }
 
-    /// <summary>Fügt einen neuen Homebrew-Eintrag hinzu und persistiert ihn.</summary>
-    public async Task AddHomebrewEntryAndPersistAsync(VorteilNachteil entry)
+    /// <summary>Fügt einen neuen User-Eintrag (Offiziell oder Homebrew) hinzu und persistiert ihn.</summary>
+    public async Task AddUserEntryAndPersistAsync(VorteilNachteil entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        _catalog.Add(entry);
+        // Falls die Id bereits im Katalog existiert, ersetzen statt duplizieren
+        var index = _catalog.FindIndex(c => c.Id == entry.Id);
+        if (index >= 0)
+            _catalog[index] = entry;
+        else
+            _catalog.Add(entry);
         await _homebrewService.AddAsync(entry);
     }
 
-    /// <summary>Aktualisiert einen Homebrew-Eintrag im Katalog und persistiert.</summary>
-    public async Task UpdateHomebrewEntryAsync(VorteilNachteil entry)
+    /// <summary>Aktualisiert einen User-Eintrag im Katalog und persistiert.</summary>
+    public async Task UpdateUserEntryAsync(VorteilNachteil entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
         var index = _catalog.FindIndex(c => c.Id == entry.Id);
@@ -90,8 +95,8 @@ public class VorteilNachteilService
         await _homebrewService.UpdateAsync(entry);
     }
 
-    /// <summary>Löscht einen Homebrew-Eintrag aus dem Katalog und von der Persistenz.</summary>
-    public async Task DeleteHomebrewEntryAsync(string id)
+    /// <summary>Löscht einen User-Eintrag aus dem Katalog und von der Persistenz.</summary>
+    public async Task DeleteUserEntryAsync(string id)
     {
         _catalog.RemoveAll(c => c.Id == id);
         await _homebrewService.DeleteAsync(id);

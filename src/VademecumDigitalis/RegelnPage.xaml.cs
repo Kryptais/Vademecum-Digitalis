@@ -49,30 +49,74 @@ public partial class RegelnPage : ContentPage
         _vm.VnTab.StartCreate();
     }
 
-    private void OnEditClicked(object? sender, EventArgs e)
+    private async void OnEditClicked(object? sender, EventArgs e)
     {
-        if (sender is Button btn && btn.CommandParameter is string id)
-            _vm.VnTab.StartEdit(id);
+        try
+        {
+            if (sender is Button btn && btn.CommandParameter is string id)
+            {
+                var error = _vm.VnTab.StartEdit(id);
+                if (!string.IsNullOrEmpty(error))
+                    await DisplayAlert("Bearbeiten nicht möglich", error, "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnEditClicked] CRASH: {ex}");
+        }
+    }
+
+    private void OnCopyClicked(object? sender, EventArgs e)
+    {
+        try
+        {
+            if (sender is Button btn && btn.CommandParameter is string id)
+                _vm.VnTab.StartCopy(id);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnCopyClicked] CRASH: {ex}");
+        }
     }
 
     private async void OnDeleteClicked(object? sender, EventArgs e)
     {
-        if (sender is not Button btn || btn.CommandParameter is not string id) return;
+        try
+        {
+            if (sender is not Button btn || btn.CommandParameter is not string id) return;
 
-        bool confirmed = await DisplayAlert(
-            "Eintrag löschen",
-            "Diesen Homebrew-Eintrag wirklich löschen?",
-            "Löschen", "Abbrechen");
+            bool confirmed = await DisplayAlert(
+                "Eintrag löschen",
+                "Diesen Eintrag wirklich löschen?",
+                "Löschen", "Abbrechen");
 
-        if (confirmed)
-            await _vm.VnTab.DeleteAsync(id);
+            if (confirmed)
+            {
+                var error = await _vm.VnTab.DeleteAsync(id);
+                if (!string.IsNullOrEmpty(error))
+                    await DisplayAlert("Löschen nicht möglich", error, "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnDeleteClicked] CRASH: {ex}");
+            await DisplayAlert("Unerwarteter Fehler", ex.Message, "OK");
+        }
     }
 
     private async void OnSaveClicked(object? sender, EventArgs e)
     {
-        var error = await _vm.VnTab.SaveAsync();
-        if (!string.IsNullOrEmpty(error))
-            await DisplayAlert("Validierung", error, "OK");
+        try
+        {
+            var error = await _vm.VnTab.SaveAsync();
+            if (!string.IsNullOrEmpty(error))
+                await DisplayAlert("Validierung", error, "OK");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnSaveClicked] CRASH: {ex}");
+            await DisplayAlert("Unerwarteter Fehler beim Speichern", ex.ToString(), "OK");
+        }
     }
 
     private void OnCancelClicked(object? sender, EventArgs e)
@@ -84,12 +128,26 @@ public partial class RegelnPage : ContentPage
 
     private void OnAddEffectClicked(object? sender, EventArgs e)
     {
-        _vm.VnTab.AddEffect();
+        try
+        {
+            _vm.VnTab.AddEffect();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnAddEffectClicked] CRASH: {ex}");
+        }
     }
 
     private void OnRemoveEffectClicked(object? sender, EventArgs e)
     {
-        if (sender is Button btn && btn.CommandParameter is RuleEffectEditModel effect)
-            _vm.VnTab.RemoveEffect(effect);
+        try
+        {
+            if (sender is Button btn && btn.CommandParameter is RuleEffectEditModel effect)
+                _vm.VnTab.RemoveEffect(effect);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"[OnRemoveEffectClicked] CRASH: {ex}");
+        }
     }
 }

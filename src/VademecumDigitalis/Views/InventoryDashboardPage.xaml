@@ -36,8 +36,8 @@
                         <Label Text="Heller:" Grid.Row="2" Grid.Column="0" FontAttributes="Bold" TextColor="#CD7F32" />
                         <Label Text="{Binding TotalBank.Heller}" Grid.Row="2" Grid.Column="1" TextColor="#CD7F32" />
                         <!-- Kreuzer: Eisern (stahlgrau) -->
-                        <Label Text="Kreuzer:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="#6E6E6E" />
-                        <Label Text="{Binding TotalBank.Kreuzer}" Grid.Row="3" Grid.Column="1" TextColor="#6E6E6E" />
+                        <Label Text="Kreuzer:" Grid.Row="3" Grid.Column="0" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="{Binding TotalBank.Kreuzer}" Grid.Row="3" Grid.Column="1" TextColor="{StaticResource TextMuted}" />
                     </Grid>
                 </Border>
 
@@ -50,7 +50,7 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <SearchBar Grid.Column="0" Placeholder="Container suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="#2A2A2A" TextColor="White" PlaceholderColor="#999" Margin="0,0,5,5"/>
+                    <SearchBar Grid.Column="0" Placeholder="Container suchen..." Text="{Binding SearchText, Mode=TwoWay}" BackgroundColor="{StaticResource SurfaceHigh}" TextColor="White" PlaceholderColor="#999" Margin="0,0,5,5"/>
                     <Button Grid.Column="1" Text="Item suchen" Command="{Binding NavigateToSearchCommand}" Margin="0,0,5,5" BackgroundColor="#333" FontAttributes="None" FontSize="14" Padding="10,0"/>
                     <!-- SAVE Button -->
                     <Button x:Name="SaveButton" Grid.Column="2" Text="Speichern" Command="{Binding SaveDataCommand}" Margin="0,0,5,5"  BackgroundColor="#1E88E5" FontAttributes="None" FontSize="14" Padding="10,0"/>
@@ -64,7 +64,7 @@
                             <Label Text="Gesamtgewicht:" VerticalOptions="Center" FontAttributes="Bold" Grid.Column="0" FontSize="16"  />
                             <Entry Grid.Column="2" VerticalOptions="Center" IsReadOnly="True" FontSize="16" FontAttributes="Bold" 
                                    Text="{Binding TotalWeight, StringFormat='{0:N2} Stein', Mode=OneWay}" WidthRequest="150"
-                                   BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666" HeightRequest="30" Margin="9" />
+                                   BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextMuted}" PlaceholderColor="#666" HeightRequest="30" Margin="9" />
                         </Grid>
                     </Border>
                     <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
@@ -72,7 +72,7 @@
                             <Label Text="Getragenes Gewicht:" FontAttributes="Bold" VerticalOptions="Center" Grid.Column="0" FontSize="16"  />
                             <Entry Grid.Column="1" FontSize="16" FontAttributes="Bold"  IsReadOnly="True" 
                                    Text="{Binding CarriedWeight, StringFormat='{0:N2} Stein', Mode=OneWay}" WidthRequest="150"
-                                   BackgroundColor="#2A2A2A" TextColor="#6E6E6E" PlaceholderColor="#666" HeightRequest="30" Margin="9"  />
+                                   BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextMuted}" PlaceholderColor="#666" HeightRequest="30" Margin="9"  />
                         </Grid>
                     </Border>
                     <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" BackgroundColor="Black" Padding="0" Margin="5" StrokeShape="RoundRectangle 15" >
@@ -114,8 +114,8 @@
                                             <Setter Property="IsVisible" Value="False"/>
                                         </DataTrigger>
                                     </HorizontalStackLayout.Triggers>
-                                    <Label Text="{Binding FormattedTotalValue.Kreuzer}" FontSize="16" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
-                                    <Label Text="K" FontSize="16" FontAttributes="Bold" TextColor="#6E6E6E" VerticalOptions="Center" />
+                                    <Label Text="{Binding FormattedTotalValue.Kreuzer}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+                                    <Label Text="K" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
                                 </HorizontalStackLayout>
                             </HorizontalStackLayout>
                         </Grid>
@@ -124,7 +124,7 @@
 
                 <CollectionView ItemsSource="{Binding FilteredContainers}" SelectionMode="Single">
                     <CollectionView.Header>
-                        <Border StrokeThickness="0" BackgroundColor="#2A2A2A" Padding="0" Margin="4,0,4,4" StrokeShape="RoundRectangle 8">
+                        <Border StrokeThickness="0" BackgroundColor="{StaticResource SurfaceHigh}" Padding="0" Margin="4,0,4,4" StrokeShape="RoundRectangle 8">
                             <Grid Padding="12" ColumnSpacing="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*" />
@@ -145,7 +145,7 @@
                     </CollectionView.Header>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="models:InventoryContainer">
-                            <Border Padding="12" Margin="4" StrokeShape="RoundRectangle 8" BackgroundColor="#1E1E1E" Stroke="#333" StrokeThickness="1">
+                            <Border Padding="12" Margin="4" StrokeShape="RoundRectangle 8" BackgroundColor="{StaticResource SurfaceLow}" Stroke="#333" StrokeThickness="1">
                                <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type viewmodels:InventoryViewModel}}, Path=NavigateToContainerCommand}" CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
@@ -160,7 +160,7 @@
                                     </Grid.ColumnDefinitions>
                                     <Label Text="{Binding Name}" HorizontalOptions="Center" FontAttributes="Bold" Grid.Column="0" TextColor="White" FontSize="16" VerticalTextAlignment="Center"/>
                                     <HorizontalStackLayout Grid.Column="1" Spacing="8" HorizontalOptions="Center">
-                                        <CheckBox IsChecked="{Binding IsCarried, Mode=TwoWay}" Color="#E6E6E6" HorizontalOptions="Center"  />
+                                        <CheckBox IsChecked="{Binding IsCarried, Mode=TwoWay}" Color="{StaticResource TextPrimary}" HorizontalOptions="Center"  />
                                     </HorizontalStackLayout>
     
                                     <Label Grid.Column="2" Text="{Binding TotalWeight, StringFormat='{0:N2} Stein'}" FontSize="16" VerticalOptions="Center" TextColor="#CCCCCC" HorizontalTextAlignment="Center" FontAttributes="Bold"/>
@@ -179,8 +179,8 @@
                                             <Label Text="H" TextColor="#CD7F32" FontAttributes="Bold" Style="{StaticResource TableHeaderLabel}" />
                                         </HorizontalStackLayout>
                                         <HorizontalStackLayout Spacing="4">
-                                            <Label Text="{Binding Money.Kreuzer}" TextColor="#6E6E6E" Style="{StaticResource TableHeaderLabel}" />
-                                            <Label Text="K" TextColor="#6E6E6E" FontAttributes="Bold" Style="{StaticResource TableHeaderLabel}" />
+                                            <Label Text="{Binding Money.Kreuzer}" TextColor="{StaticResource TextMuted}" Style="{StaticResource TableHeaderLabel}" />
+                                            <Label Text="K" TextColor="{StaticResource TextMuted}" FontAttributes="Bold" Style="{StaticResource TableHeaderLabel}" />
                                         </HorizontalStackLayout>
                                     </HorizontalStackLayout>
                                     
@@ -218,8 +218,8 @@
                                                     <Setter Property="IsVisible" Value="False"/>
                                                 </DataTrigger>
                                             </HorizontalStackLayout.Triggers>
-                                            <Label Text="{Binding TotalValueAsCurrency.Kreuzer}" TextColor="#6E6E6E" Style="{StaticResource TableHeaderLabel}" />
-                                            <Label Text="K" TextColor="#6E6E6E" FontAttributes="Bold" Style="{StaticResource TableHeaderLabel}" />
+                                            <Label Text="{Binding TotalValueAsCurrency.Kreuzer}" TextColor="{StaticResource TextMuted}" Style="{StaticResource TableHeaderLabel}" />
+                                            <Label Text="K" TextColor="{StaticResource TextMuted}" FontAttributes="Bold" Style="{StaticResource TableHeaderLabel}" />
                                         </HorizontalStackLayout>
                                     </HorizontalStackLayout>
                                     

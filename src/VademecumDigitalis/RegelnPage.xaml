@@ -6,30 +6,30 @@
     xmlns:vm="clr-namespace:VademecumDigitalis.ViewModels"
     x:DataType="vm:RegelnViewModel"
     Title="Regeln"
-    BackgroundColor="{AppThemeBinding Light=#F5F0E8, Dark=#1A1A2E}">
+    BackgroundColor="{StaticResource Background}">
 
     <Grid RowDefinitions="Auto,*">
 
         <!-- ===== Tab-Leiste ===== -->
         <ScrollView Grid.Row="0" Orientation="Horizontal" HorizontalScrollBarVisibility="Never"
-                    BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#0D0D1A}">
+                    BackgroundColor="{StaticResource Background}">
             <HorizontalStackLayout Spacing="0" Padding="8,6">
                 <Button Text="Vorteile / Nachteile" Clicked="OnTabVnClicked"
                         x:Name="TabVnBtn"
                         FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
-                        BackgroundColor="#0E7490" TextColor="White" />
+                        BackgroundColor="{StaticResource Gold}" TextColor="White" />
                 <Button Text="Sonderfertigkeiten" Clicked="OnTabSfClicked"
                         x:Name="TabSfBtn"
                         FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
-                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+                        BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextSecondary}" />
                 <Button Text="Magie" Clicked="OnTabMagieClicked"
                         x:Name="TabMagieBtn"
                         FontSize="13" Padding="14,8" CornerRadius="6" Margin="0,0,4,0"
-                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+                        BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextSecondary}" />
                 <Button Text="Götterwirken" Clicked="OnTabGoetterwirkenClicked"
                         x:Name="TabGoetterwirkenBtn"
                         FontSize="13" Padding="14,8" CornerRadius="6"
-                        BackgroundColor="#2A2A3E" TextColor="#B0B0B0" />
+                        BackgroundColor="{StaticResource SurfaceHigh}" TextColor="{StaticResource TextSecondary}" />
             </HorizontalStackLayout>
         </ScrollView>
 
@@ -54,7 +54,7 @@
                         <Button Grid.Column="1"
                                 Text="＋ Neu"
                                 FontSize="13" Padding="12,8"
-                                BackgroundColor="#0E7490" TextColor="White" CornerRadius="8"
+                                BackgroundColor="{StaticResource Gold}" TextColor="White" CornerRadius="8"
                                 Clicked="OnCreateClicked"
                                 IsVisible="{Binding VnTab.IsListVisible}" />
                     </Grid>
@@ -62,22 +62,22 @@
                     <!-- ===== Editor-Panel ===== -->
                     <Border IsVisible="{Binding VnTab.IsEditorVisible}"
                             Padding="14" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="10">
 
                             <Label Text="{Binding VnTab.EditorTitle}" FontSize="18" FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#C8A96E}" />
+                                   TextColor="{StaticResource Gold}" />
 
                             <!-- Name -->
                             <Label Text="Name" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                             <Entry Text="{Binding VnTab.CurrentEdit.Name}"
                                    Placeholder="Name des Vorteils/Nachteils" />
 
                             <!-- Beschreibung -->
                             <Label Text="Beschreibung" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                             <Editor Text="{Binding VnTab.CurrentEdit.Beschreibung}"
                                     Placeholder="Regelbeschreibung..."
                                     AutoSize="TextChanges" MinimumHeightRequest="60" />
@@ -86,14 +86,14 @@
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <VerticalStackLayout Grid.Column="0" Spacing="4">
                                     <Label Text="Kategorie" FontSize="12" FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                           TextColor="{StaticResource TextSecondary}" />
                                     <Picker ItemsSource="{x:Static vm:VorteilNachteilEditModel.KategorieOptionen}"
                                             SelectedItem="{Binding VnTab.CurrentEdit.Kategorie}" />
                                 </VerticalStackLayout>
                                 <VerticalStackLayout Grid.Column="1" Spacing="4" WidthRequest="80">
                                     <Label Text="Max-Stufe" FontSize="12" FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
-                                    <Entry Text="{Binding VnTab.CurrentEdit.MaxStufe}"
+                                           TextColor="{StaticResource TextSecondary}" />
+                                    <Entry Text="{Binding VnTab.CurrentEdit.MaxStufeText}"
                                            Keyboard="Numeric" HorizontalTextAlignment="Center" />
                                 </VerticalStackLayout>
                             </Grid>
@@ -102,13 +102,13 @@
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                                 <VerticalStackLayout Grid.Column="0" Spacing="4">
                                     <Label Text="AP-Kosten (kommagetrennt)" FontSize="12" FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                           TextColor="{StaticResource TextSecondary}" />
                                     <Entry Text="{Binding VnTab.CurrentEdit.ApKostenText}"
                                            Placeholder="z.B. 20, 20, 20" />
                                 </VerticalStackLayout>
                                 <VerticalStackLayout Grid.Column="1" Spacing="4">
                                     <Label Text="Talent-Typ" FontSize="12" FontAttributes="Bold"
-                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                           TextColor="{StaticResource TextSecondary}" />
                                     <Picker ItemsSource="{x:Static vm:VorteilNachteilEditModel.TalentTypOptionen}"
                                             SelectedItem="{Binding VnTab.CurrentEdit.TalentTyp}" />
                                 </VerticalStackLayout>
@@ -116,17 +116,25 @@
 
                             <!-- Anmerkungen -->
                             <Label Text="Anmerkungen" FontSize="12" FontAttributes="Bold"
-                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                             <Entry Text="{Binding VnTab.CurrentEdit.Anmerkungen}"
                                    Placeholder="Redaktionelle Hinweise..." />
+
+                            <!-- Offiziell vs. Homebrew -->
+                            <HorizontalStackLayout Spacing="10" Margin="0,4,0,0">
+                                <Switch IsToggled="{Binding VnTab.CurrentEdit.IsHomebrew}" />
+                                <Label Text="Als Homebrew markieren (sonst: offizieller Eintrag)"
+                                       FontSize="12" VerticalOptions="Center"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </HorizontalStackLayout>
 
                             <!-- === Effekte === -->
                             <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
                                 <Label Grid.Column="0" Text="Effekte" FontSize="15" FontAttributes="Bold"
-                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#C8A96E}"
+                                       TextColor="{StaticResource Gold}"
                                        VerticalOptions="Center" />
                                 <Button Grid.Column="1" Text="＋ Effekt" FontSize="12" Padding="10,6"
-                                        BackgroundColor="#4A6B5C" TextColor="White" CornerRadius="6"
+                                        BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="6"
                                         Clicked="OnAddEffectClicked" />
                             </Grid>
 
@@ -135,8 +143,8 @@
                                 <BindableLayout.ItemTemplate>
                                     <DataTemplate x:DataType="vm:RuleEffectEditModel">
                                         <Border Padding="10" StrokeShape="RoundRectangle 8"
-                                                BackgroundColor="{AppThemeBinding Light=#F0EBE0, Dark=#1E1E2E}"
-                                                Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                                                BackgroundColor="#1E1E2E"
+                                                Stroke="{StaticResource Border}">
                                             <VerticalStackLayout Spacing="8">
                                                 <!-- Typ + Entfernen -->
                                                 <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
@@ -149,7 +157,7 @@
                                                            Placeholder="Titel / Kurzbeschreibung" />
                                                     <Button Grid.Column="2" Text="✕"
                                                             FontSize="12" Padding="8,4"
-                                                            BackgroundColor="#8B4444" TextColor="White"
+                                                            BackgroundColor="{StaticResource Danger}" TextColor="White"
                                                             CornerRadius="4"
                                                             Clicked="OnRemoveEffectClicked"
                                                             CommandParameter="{Binding .}" />
@@ -166,7 +174,7 @@
                                                 <VerticalStackLayout Spacing="6" IsVisible="{Binding IsModifier}">
                                                     <!-- Zielwert-Auswahl (Kategorie + Unteroption) -->
                                                     <Label Text="Zielwert:" FontSize="12"
-                                                           TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                                           TextColor="{StaticResource TextSecondary}" />
                                                     <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
                                                         <Picker Grid.Column="0"
                                                                 Title="Kategorie wählen"
@@ -196,7 +204,7 @@
                                                     <Grid ColumnDefinitions="Auto,Auto,*,*" ColumnSpacing="8">
                                                         <Label Grid.Column="0" Text="Pro Stufe:" FontSize="12"
                                                                VerticalOptions="Center"
-                                                               TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}" />
+                                                               TextColor="{StaticResource TextSecondary}" />
                                                         <Switch Grid.Column="1" IsToggled="{Binding PerLevel}" />
                                                         <Picker Grid.Column="2"
                                                                 ItemsSource="{x:Static vm:RuleEffectEditModel.PhaseOptionen}"
@@ -215,10 +223,10 @@
                             <!-- Speichern / Abbrechen -->
                             <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,8,0,0">
                                 <Button Grid.Column="0" Text="Speichern" FontSize="14"
-                                        BackgroundColor="#4A6B5C" TextColor="White" CornerRadius="8"
+                                        BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="8"
                                         Clicked="OnSaveClicked" />
                                 <Button Grid.Column="1" Text="Abbrechen" FontSize="14"
-                                        BackgroundColor="#6B5B45" TextColor="White" CornerRadius="8"
+                                        BackgroundColor="{StaticResource GoldDeep}" TextColor="White" CornerRadius="8"
                                         Clicked="OnCancelClicked" />
                             </Grid>
                         </VerticalStackLayout>
@@ -228,57 +236,67 @@
                     <VerticalStackLayout IsVisible="{Binding VnTab.IsListVisible}" Spacing="8">
 
                         <Label Text="Vorteile" FontSize="18" FontAttributes="Bold"
-                               TextColor="#0E7490" Margin="0,4,0,0" />
+                               TextColor="{StaticResource Gold}" Margin="0,4,0,0" />
 
                         <CollectionView ItemsSource="{Binding VnTab.VorteileGruppen}"
                                         IsGrouped="True">
                             <CollectionView.GroupHeaderTemplate>
                                 <DataTemplate x:DataType="vm:RegelnKategorie">
                                     <Border Padding="12,8"
-                                            BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
+                                            BackgroundColor="{StaticResource Background}"
                                             Margin="0,4,0,0">
                                         <Label Text="{Binding Titel}" FontAttributes="Bold" FontSize="14"
-                                               TextColor="#C8A96E" />
+                                               TextColor="{StaticResource Gold}" />
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.GroupHeaderTemplate>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
                                     <Border Margin="4,2" Padding="12,10" StrokeShape="RoundRectangle 8"
-                                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                                            Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
+                                            BackgroundColor="{StaticResource SurfaceLow}"
+                                            Stroke="{StaticResource Border}">
                                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                             <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
                                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15"
-                                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                                       TextColor="{StaticResource TextPrimary}" />
                                                 <Border IsVisible="{Binding IsHomebrew}" Padding="4,2"
-                                                        BackgroundColor="#7A5C38" StrokeShape="RoundRectangle 4"
+                                                        BackgroundColor="{StaticResource GoldDeep}" StrokeShape="RoundRectangle 4"
                                                         StrokeThickness="0">
                                                     <Label Text="HB" FontSize="10" TextColor="White" />
+                                                </Border>
+                                                <Border IsVisible="{Binding HasCodeLogic}" Padding="4,2"
+                                                        BackgroundColor="{StaticResource SurfaceHigh}" StrokeShape="RoundRectangle 4"
+                                                        StrokeThickness="0"
+                                                        ToolTipProperties.Text="Fest in der App implementiert – nicht editierbar.">
+                                                    <Label Text="🔒 Code" FontSize="10" TextColor="{StaticResource Gold}" />
                                                 </Border>
                                             </HorizontalStackLayout>
                                             <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
                                                 <Label Text="{Binding ApInfo}" FontSize="13" FontAttributes="Bold"
-                                                       TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                       TextColor="{StaticResource Success}"
                                                        VerticalOptions="Center" />
                                                 <Button Text="✎" FontSize="12" Padding="6,4"
-                                                        BackgroundColor="#3A5580" TextColor="White" CornerRadius="4"
-                                                        IsVisible="{Binding IsHomebrew}"
+                                                        BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsEditable}"
                                                         CommandParameter="{Binding Id}"
                                                         Clicked="OnEditClicked" />
+                                                <Button Text="⎘" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="4"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnCopyClicked" />
                                                 <Button Text="✕" FontSize="12" Padding="6,4"
-                                                        BackgroundColor="#8B4444" TextColor="White" CornerRadius="4"
-                                                        IsVisible="{Binding IsHomebrew}"
+                                                        BackgroundColor="{StaticResource Danger}" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsEditable}"
                                                         CommandParameter="{Binding Id}"
                                                         Clicked="OnDeleteClicked" />
                                             </HorizontalStackLayout>
                                             <Label Grid.Row="1" Grid.ColumnSpan="2"
                                                    Text="{Binding Beschreibung}" FontSize="13"
-                                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
+                                                   TextColor="{StaticResource TextSecondary}"
                                                    Margin="0,4,0,0" IsVisible="{Binding HasBeschreibung}" />
                                             <Label Grid.Row="2" Grid.ColumnSpan="2"
                                                    Text="{Binding Effekte}" FontSize="12"
-                                                   TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                   TextColor="{StaticResource Success}"
                                                    FontFamily="Monospace" Margin="0,4,0,0"
                                                    IsVisible="{Binding HasEffekte}" />
                                         </Grid>
@@ -289,57 +307,67 @@
 
                         <!-- Nachteile -->
                         <Label Text="Nachteile" FontSize="18" FontAttributes="Bold"
-                               TextColor="#C85050" Margin="0,8,0,0" />
+                               TextColor="{StaticResource Danger}" Margin="0,8,0,0" />
 
                         <CollectionView ItemsSource="{Binding VnTab.NachteileGruppen}"
                                         IsGrouped="True">
                             <CollectionView.GroupHeaderTemplate>
                                 <DataTemplate x:DataType="vm:RegelnKategorie">
                                     <Border Padding="12,8"
-                                            BackgroundColor="{AppThemeBinding Light=#2C1A0E, Dark=#1A1A2E}"
+                                            BackgroundColor="{StaticResource Background}"
                                             Margin="0,4,0,0">
                                         <Label Text="{Binding Titel}" FontAttributes="Bold" FontSize="14"
-                                               TextColor="#C8A96E" />
+                                               TextColor="{StaticResource Gold}" />
                                     </Border>
                                 </DataTemplate>
                             </CollectionView.GroupHeaderTemplate>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="vm:RegelnKatalogEintrag">
                                     <Border Margin="4,2" Padding="12,10" StrokeShape="RoundRectangle 8"
-                                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                                            Stroke="{AppThemeBinding Light=#E0D0B8, Dark=#3A3A5C}">
+                                            BackgroundColor="{StaticResource SurfaceLow}"
+                                            Stroke="{StaticResource Border}">
                                         <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,Auto">
                                             <HorizontalStackLayout Grid.Row="0" Grid.Column="0" Spacing="6">
                                                 <Label Text="{Binding Name}" FontAttributes="Bold" FontSize="15"
-                                                       TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                                       TextColor="{StaticResource TextPrimary}" />
                                                 <Border IsVisible="{Binding IsHomebrew}" Padding="4,2"
-                                                        BackgroundColor="#7A5C38" StrokeShape="RoundRectangle 4"
+                                                        BackgroundColor="{StaticResource GoldDeep}" StrokeShape="RoundRectangle 4"
                                                         StrokeThickness="0">
                                                     <Label Text="HB" FontSize="10" TextColor="White" />
+                                                </Border>
+                                                <Border IsVisible="{Binding HasCodeLogic}" Padding="4,2"
+                                                        BackgroundColor="{StaticResource SurfaceHigh}" StrokeShape="RoundRectangle 4"
+                                                        StrokeThickness="0"
+                                                        ToolTipProperties.Text="Fest in der App implementiert – nicht editierbar.">
+                                                    <Label Text="🔒 Code" FontSize="10" TextColor="{StaticResource Gold}" />
                                                 </Border>
                                             </HorizontalStackLayout>
                                             <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Spacing="4">
                                                 <Label Text="{Binding ApInfo}" FontSize="13" FontAttributes="Bold"
-                                                       TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                       TextColor="{StaticResource Success}"
                                                        VerticalOptions="Center" />
                                                 <Button Text="✎" FontSize="12" Padding="6,4"
-                                                        BackgroundColor="#3A5580" TextColor="White" CornerRadius="4"
-                                                        IsVisible="{Binding IsHomebrew}"
+                                                        BackgroundColor="{StaticResource Info}" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsEditable}"
                                                         CommandParameter="{Binding Id}"
                                                         Clicked="OnEditClicked" />
+                                                <Button Text="⎘" FontSize="12" Padding="6,4"
+                                                        BackgroundColor="{StaticResource Success}" TextColor="White" CornerRadius="4"
+                                                        CommandParameter="{Binding Id}"
+                                                        Clicked="OnCopyClicked" />
                                                 <Button Text="✕" FontSize="12" Padding="6,4"
-                                                        BackgroundColor="#8B4444" TextColor="White" CornerRadius="4"
-                                                        IsVisible="{Binding IsHomebrew}"
+                                                        BackgroundColor="{StaticResource Danger}" TextColor="White" CornerRadius="4"
+                                                        IsVisible="{Binding IsEditable}"
                                                         CommandParameter="{Binding Id}"
                                                         Clicked="OnDeleteClicked" />
                                             </HorizontalStackLayout>
                                             <Label Grid.Row="1" Grid.ColumnSpan="2"
                                                    Text="{Binding Beschreibung}" FontSize="13"
-                                                   TextColor="{AppThemeBinding Light=#5C4A32, Dark=#9090A8}"
+                                                   TextColor="{StaticResource TextSecondary}"
                                                    Margin="0,4,0,0" IsVisible="{Binding HasBeschreibung}" />
                                             <Label Grid.Row="2" Grid.ColumnSpan="2"
                                                    Text="{Binding Effekte}" FontSize="12"
-                                                   TextColor="{AppThemeBinding Light=#4A6B5C, Dark=#6BA88E}"
+                                                   TextColor="{StaticResource Success}"
                                                    FontFamily="Monospace" Margin="0,4,0,0"
                                                    IsVisible="{Binding HasEffekte}" />
                                         </Grid>
@@ -356,50 +384,50 @@
             <ScrollView IsVisible="{Binding IsSfVisible}">
                 <VerticalStackLayout Padding="16" Spacing="16">
                     <Label Text="Sonderfertigkeiten" FontSize="22" FontAttributes="Bold"
-                           TextColor="#C8A96E" />
+                           TextColor="{StaticResource Gold}" />
 
                     <Border Padding="16" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Profane Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                   TextColor="{StaticResource TextPrimary}" />
                             <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
                         </VerticalStackLayout>
                     </Border>
                     <Border Padding="16" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Kampf-Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                   TextColor="{StaticResource TextPrimary}" />
                             <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
                         </VerticalStackLayout>
                     </Border>
                     <Border Padding="16" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Magische Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                   TextColor="{StaticResource TextPrimary}" />
                             <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
                         </VerticalStackLayout>
                     </Border>
                     <Border Padding="16" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Karmale Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                   TextColor="{StaticResource TextPrimary}" />
                             <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
                         </VerticalStackLayout>
                     </Border>
                     <Border Padding="16" StrokeShape="RoundRectangle 10"
-                            BackgroundColor="{AppThemeBinding Light=#FFFDF5, Dark=#252535}"
-                            Stroke="{AppThemeBinding Light=#D4B896, Dark=#3A3A5C}">
+                            BackgroundColor="{StaticResource SurfaceLow}"
+                            Stroke="{StaticResource Border}">
                         <VerticalStackLayout Spacing="6">
                             <Label Text="Tierische Sonderfertigkeiten" FontAttributes="Bold" FontSize="15"
-                                   TextColor="{AppThemeBinding Light=#2C1A0E, Dark=#E8D5B7}" />
+                                   TextColor="{StaticResource TextPrimary}" />
                             <Label Text="Kommt in einer zukünftigen Version." FontSize="13" TextColor="Gray" />
                         </VerticalStackLayout>
                     </Border>
@@ -411,7 +439,7 @@
                                  VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Padding="32">
                 <Label Text="✨" FontSize="48" HorizontalOptions="Center" />
                 <Label Text="Magie" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center"
-                       TextColor="#C8A96E" />
+                       TextColor="{StaticResource Gold}" />
                 <Label Text="Zaubersprüche, Rituale und magische Traditionen werden in einer zukünftigen Version hinzugefügt."
                        FontSize="14" TextColor="Gray" HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
@@ -421,7 +449,7 @@
                                  VerticalOptions="Center" HorizontalOptions="Center" Spacing="12" Padding="32">
                 <Label Text="☀" FontSize="48" HorizontalOptions="Center" />
                 <Label Text="Götterwirken" FontSize="22" FontAttributes="Bold" HorizontalOptions="Center"
-                       TextColor="#C8A96E" />
+                       TextColor="{StaticResource Gold}" />
                 <Label Text="Liturgien, Zeremonien und göttliche Traditionen werden in einer zukünftigen Version hinzugefügt."
                        FontSize="14" TextColor="Gray" HorizontalTextAlignment="Center" />
             </VerticalStackLayout>
